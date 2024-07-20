@@ -1,0 +1,208 @@
+Explain String
+RESOURCE GROUP: default_wg
+
+PLAN FRAGMENT 0(F11)
+  Fragment Cost: 36.0
+  Output Exprs:103: sum
+  Input Partition: UNPARTITIONED
+  RESULT SINK
+
+  22:AGGREGATE (merge finalize)
+  |  aggregate: sum[([103: sum, BIGINT, true]); args: INT; result: BIGINT; args nullable: true; result nullable: true]
+  |  cardinality: 1
+  |  
+  21:EXCHANGE
+     distribution type: GATHER
+     cardinality: 1
+
+PLAN FRAGMENT 1(F08)
+  Fragment Cost: 2.538180257714287E11
+
+  Input Partition: HASH_PARTITIONED: 7: ss_addr_sk
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 21
+
+  20:AGGREGATE (update serialize)
+  |  aggregate: sum[([11: ss_quantity, INT, true]); args: INT; result: BIGINT; args nullable: true; result nullable: true]
+  |  cardinality: 1
+  |  
+  19:Project
+  |  output columns:
+  |  11 <-> [11: ss_quantity, INT, true]
+  |  cardinality: 701490284
+  |  
+  18:HASH JOIN
+  |  join op: INNER JOIN (BROADCAST)
+  |  equal join conjunct: [1: ss_sold_date_sk, BIGINT, true] = [75: d_date_sk, BIGINT, true]
+  |  build runtime filters:
+  |  - filter_id = 3, build_expr = (75: d_date_sk), remote = true
+  |  output columns: 11
+  |  can local shuffle: true
+  |  cardinality: 701490284
+  |  
+  |----17:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 36525
+  |    
+  14:Project
+  |  output columns:
+  |  1 <-> [1: ss_sold_date_sk, BIGINT, true]
+  |  11 <-> [11: ss_quantity, INT, true]
+  |  cardinality: 701490284
+  |  
+  13:HASH JOIN
+  |  join op: INNER JOIN (PARTITIONED)
+  |  equal join conjunct: [7: ss_addr_sk, BIGINT, true] = [62: ca_address_sk, BIGINT, true]
+  |  other join predicates: ((((70: ca_state IN ('MI', 'GA', 'NH')) AND (23: ss_net_profit >= 0)) AND (23: ss_net_profit <= 2000)) OR (((70: ca_state IN ('TX', 'KY', 'SD')) AND (23: ss_net_profit >= 150)) AND (23: ss_net_profit <= 3000))) OR (((70: ca_state IN ('NY', 'OH', 'FL')) AND (23: ss_net_profit >= 50)) AND (23: ss_net_profit <= 25000))
+  |  build runtime filters:
+  |  - filter_id = 2, build_expr = (62: ca_address_sk), remote = true
+  |  output columns: 1, 11
+  |  can local shuffle: false
+  |  cardinality: 701490284
+  |  
+  |----12:EXCHANGE
+  |       distribution type: SHUFFLE
+  |       partition exprs: [62: ca_address_sk, BIGINT, true]
+  |       cardinality: 32500000
+  |    
+  9:EXCHANGE
+     distribution type: SHUFFLE
+     partition exprs: [7: ss_addr_sk, BIGINT, true]
+     cardinality: 3150000224
+     probe runtime filters:
+     - filter_id = 3, probe_expr = (1: ss_sold_date_sk)
+
+PLAN FRAGMENT 2(F09)
+  Fragment Cost: 1753176.0
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 17
+
+  16:Project
+  |  output columns:
+  |  75 <-> [75: d_date_sk, BIGINT, true]
+  |  cardinality: 36525
+  |  
+  15:HdfsScanNode
+     TABLE: date_dim
+     NON-PARTITION PREDICATES: 81: d_year = 1998
+     MIN/MAX PREDICATES: 81: d_year <= 1998, 81: d_year >= 1998
+     partitions=1/1
+     avgRowSize=2.0
+     cardinality: 36525
+
+PLAN FRAGMENT 3(F06)
+  Fragment Cost: 5.2E9
+
+  Input Partition: RANDOM
+  OutPut Partition: HASH_PARTITIONED: 62: ca_address_sk
+  OutPut Exchange Id: 12
+
+  11:Project
+  |  output columns:
+  |  62 <-> [62: ca_address_sk, BIGINT, true]
+  |  70 <-> [70: ca_state, VARCHAR, true]
+  |  cardinality: 32500000
+  |  
+  10:HdfsScanNode
+     TABLE: customer_address
+     NON-PARTITION PREDICATES: 70: ca_state IN ('MI', 'GA', 'NH', 'TX', 'KY', 'SD', 'NY', 'OH', 'FL'), 72: ca_country = 'United States'
+     MIN/MAX PREDICATES: 70: ca_state >= 'FL', 70: ca_state <= 'TX', 72: ca_country <= 'United States', 72: ca_country >= 'United States'
+     partitions=1/1
+     avgRowSize=3.0
+     cardinality: 32500000
+
+PLAN FRAGMENT 4(F00)
+  Fragment Cost: 7.560580672603912E12
+
+  Input Partition: RANDOM
+  OutPut Partition: HASH_PARTITIONED: 7: ss_addr_sk
+  OutPut Exchange Id: 09
+
+  8:Project
+  |  output columns:
+  |  1 <-> [1: ss_sold_date_sk, BIGINT, true]
+  |  7 <-> [7: ss_addr_sk, BIGINT, true]
+  |  11 <-> [11: ss_quantity, INT, true]
+  |  23 <-> [23: ss_net_profit, DECIMAL64(7,2), true]
+  |  cardinality: 3150000224
+  |  
+  7:HASH JOIN
+  |  join op: INNER JOIN (BROADCAST)
+  |  equal join conjunct: [5: ss_cdemo_sk, BIGINT, true] = [53: cd_demo_sk, BIGINT, true]
+  |  other join predicates: ((((55: cd_marital_status = 'M') AND (56: cd_education_status = 'Unknown')) AND ((14: ss_sales_price >= 100.00) AND (14: ss_sales_price <= 150.00))) OR (((55: cd_marital_status = 'W') AND (56: cd_education_status = 'College')) AND ((14: ss_sales_price >= 50.00) AND (14: ss_sales_price <= 100.00)))) OR (((55: cd_marital_status = 'D') AND (56: cd_education_status = 'Primary')) AND ((14: ss_sales_price >= 150.00) AND (14: ss_sales_price <= 200.00)))
+  |  build runtime filters:
+  |  - filter_id = 1, build_expr = (53: cd_demo_sk), remote = false
+  |  output columns: 1, 7, 11, 23
+  |  can local shuffle: false
+  |  cardinality: 3150000224
+  |  
+  |----6:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 1920800
+  |    
+  4:Project
+  |  output columns:
+  |  1 <-> [1: ss_sold_date_sk, BIGINT, true]
+  |  5 <-> [5: ss_cdemo_sk, BIGINT, true]
+  |  7 <-> [7: ss_addr_sk, BIGINT, true]
+  |  11 <-> [11: ss_quantity, INT, true]
+  |  14 <-> [14: ss_sales_price, DECIMAL64(7,2), true]
+  |  23 <-> [23: ss_net_profit, DECIMAL64(7,2), true]
+  |  cardinality: 7200000512
+  |  
+  3:HASH JOIN
+  |  join op: INNER JOIN (BROADCAST)
+  |  equal join conjunct: [8: ss_store_sk, BIGINT, true] = [24: s_store_sk, BIGINT, true]
+  |  build runtime filters:
+  |  - filter_id = 0, build_expr = (24: s_store_sk), remote = false
+  |  output columns: 1, 5, 7, 11, 14, 23
+  |  can local shuffle: false
+  |  cardinality: 7200000512
+  |  
+  |----2:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 1350
+  |    
+  0:HdfsScanNode
+     TABLE: store_sales
+     NON-PARTITION PREDICATES: 14: ss_sales_price >= 50.00, 14: ss_sales_price <= 200.00, 23: ss_net_profit >= 0, 23: ss_net_profit <= 25000
+     MIN/MAX PREDICATES: 14: ss_sales_price >= 50.00, 14: ss_sales_price <= 200.00, 23: ss_net_profit >= 0, 23: ss_net_profit <= 25000
+     partitions=1/1
+     avgRowSize=7.0
+     cardinality: 28800002049
+     probe runtime filters:
+     - filter_id = 0, probe_expr = (8: ss_store_sk)
+     - filter_id = 1, probe_expr = (5: ss_cdemo_sk)
+     - filter_id = 2, probe_expr = (7: ss_addr_sk)
+     - filter_id = 3, probe_expr = (1: ss_sold_date_sk)
+
+PLAN FRAGMENT 5(F03)
+  Fragment Cost: 3.07328E8
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 06
+
+  5:HdfsScanNode
+     TABLE: customer_demographics
+     NON-PARTITION PREDICATES: 55: cd_marital_status IN ('M', 'W', 'D'), 56: cd_education_status IN ('Unknown', 'College', 'Primary')
+     MIN/MAX PREDICATES: 55: cd_marital_status >= 'D', 55: cd_marital_status <= 'W', 56: cd_education_status >= 'College', 56: cd_education_status <= 'Unknown'
+     partitions=1/1
+     avgRowSize=3.0
+     cardinality: 1920800
+
+PLAN FRAGMENT 6(F01)
+  Fragment Cost: 43200.0
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 02
+
+  1:HdfsScanNode
+     TABLE: store
+     NON-PARTITION PREDICATES: 24: s_store_sk IS NOT NULL
+     partitions=1/1
+     avgRowSize=1.0
+     cardinality: 1350

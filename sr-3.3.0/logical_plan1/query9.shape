@@ -1,0 +1,285 @@
+Explain String
+- Output => [79:case, 155:case, 231:case, 307:case, 383:case]
+    - NESTLOOP/CROSS JOIN => [307:case, 231:case, 155:case, 79:case, 383:case]
+            Estimates: {row: 35, cpu: 206080000000.00, memory: 3200.00, network: 0.00, cost: 4878080391018.81}
+            307:case := if(281:count > 96251173, 306:avg, 256:avg)
+            231:case := if(205:count > 12733327, 230:avg, 180:avg)
+            155:case := if(129:count > 160856845, 154:avg, 104:avg)
+            79:case := if(53:count > 98972190, 78:avg, 28:avg)
+            383:case := if(357:count > 80049606, 382:avg, 331:avg)
+        - NESTLOOP/CROSS JOIN => [129:count, 357:count, 230:avg, 104:avg, 205:count, 78:avg, 306:avg, 180:avg, 53:count, 281:count, 154:avg, 28:avg, 382:avg, 256:avg]
+                Estimates: {row: 35, cpu: 188160000000.00, memory: 3200.00, network: 0.00, cost: 4425120359008.26}
+                382:avg := 381:avg
+            - NESTLOOP/CROSS JOIN => [129:count, 357:count, 230:avg, 104:avg, 205:count, 78:avg, 306:avg, 180:avg, 53:count, 281:count, 154:avg, 28:avg, 256:avg]
+                    Estimates: {row: 35, cpu: 89600000000.00, memory: 1600.00, network: 0.00, cost: 3981120326997.71}
+                    357:count := 356:count
+                - NESTLOOP/CROSS JOIN => [129:count, 306:avg, 180:avg, 53:count, 230:avg, 104:avg, 281:count, 154:avg, 28:avg, 205:count, 78:avg, 256:avg]
+                        Estimates: {row: 35, cpu: 161280000000.00, memory: 3200.00, network: 0.00, cost: 3790520313067.05}
+                        256:avg := 255:avg
+                    - NESTLOOP/CROSS JOIN => [129:count, 306:avg, 180:avg, 53:count, 230:avg, 104:avg, 281:count, 154:avg, 28:avg, 205:count, 78:avg]
+                            Estimates: {row: 35, cpu: 143360000000.00, memory: 3200.00, network: 0.00, cost: 3359960281056.50}
+                            306:avg := 305:avg
+                        - NESTLOOP/CROSS JOIN => [129:count, 180:avg, 53:count, 230:avg, 104:avg, 281:count, 154:avg, 28:avg, 205:count, 78:avg]
+                                Estimates: {row: 35, cpu: 67200000000.00, memory: 1600.00, network: 0.00, cost: 2938360249045.95}
+                                281:count := 280:count
+                            - NESTLOOP/CROSS JOIN => [129:count, 180:avg, 53:count, 230:avg, 104:avg, 154:avg, 28:avg, 205:count, 78:avg]
+                                    Estimates: {row: 35, cpu: 116480000000.00, memory: 3200.00, network: 0.00, cost: 2758960235115.29}
+                                    180:avg := 179:avg
+                                - NESTLOOP/CROSS JOIN => [129:count, 53:count, 230:avg, 104:avg, 154:avg, 28:avg, 205:count, 78:avg]
+                                        Estimates: {row: 35, cpu: 98560000000.00, memory: 3200.00, network: 0.00, cost: 2350800203104.74}
+                                        230:avg := 229:avg
+                                    - NESTLOOP/CROSS JOIN => [129:count, 53:count, 104:avg, 154:avg, 28:avg, 205:count, 78:avg]
+                                            Estimates: {row: 35, cpu: 44800000000.00, memory: 1600.00, network: 0.00, cost: 1951600171094.19}
+                                            205:count := 204:count
+                                        - NESTLOOP/CROSS JOIN => [129:count, 53:count, 104:avg, 154:avg, 28:avg, 78:avg]
+                                                Estimates: {row: 35, cpu: 71680000000.00, memory: 3200.00, network: 0.00, cost: 1783400157163.53}
+                                                104:avg := 103:avg
+                                            - NESTLOOP/CROSS JOIN => [129:count, 53:count, 154:avg, 28:avg, 78:avg]
+                                                    Estimates: {row: 35, cpu: 53760000000.00, memory: 3200.00, network: 0.00, cost: 1397640125152.97}
+                                                    154:avg := 153:avg
+                                                - NESTLOOP/CROSS JOIN => [129:count, 53:count, 28:avg, 78:avg]
+                                                        Estimates: {row: 35, cpu: 22400000000.00, memory: 1600.00, network: 0.00, cost: 1020840093142.42}
+                                                        129:count := 128:count
+                                                    - NESTLOOP/CROSS JOIN => [53:count, 28:avg, 78:avg]
+                                                            Estimates: {row: 35, cpu: 26880000000.00, memory: 3200.00, network: 0.00, cost: 863840079211.76}
+                                                            28:avg := 27:avg
+                                                        - NESTLOOP/CROSS JOIN => [53:count, 78:avg]
+                                                                Estimates: {row: 35, cpu: 8960000000.00, memory: 3200.00, network: 0.00, cost: 500480047201.21}
+                                                                78:avg := 77:avg
+                                                            - NESTLOOP/CROSS JOIN => [53:count]
+                                                                    Estimates: {row: 35, cpu: 560000000.00, memory: 1600.00, network: 0.00, cost: 146080015190.66}
+                                                                    53:count := 52:count
+                                                                - HIVE-SCAN [reason] => [395:auto_fill_col]
+                                                                        Estimates: {row: 35, cpu: 315.00, memory: 315.00, network: 315.00, cost: 1260.00}
+                                                                        395:auto_fill_col := 1
+                                                                        predicate: 1:r_reason_sk = 1
+                                                                - EXCHANGE(BROADCAST)
+                                                                        Estimates: {row: 1, cpu: 80.00, memory: 80.00, network: 80.00, cost: 145800010730.66}
+                                                                    - ASSERT LE 1
+                                                                            Estimates: {row: 1, cpu: 0.00, memory: 0.00, network: 0.00, cost: 145800010410.66}
+                                                                        - AGGREGATE(GLOBAL) []
+                                                                                Estimates: {row: 1, cpu: 8.00, memory: 8.00, network: 0.00, cost: 145800010410.66}
+                                                                                52:count := count(52:count)
+                                                                            - EXCHANGE(GATHER)
+                                                                                    Estimates: {row: 1, cpu: 8.00, memory: 0.00, network: 8.00, cost: 145800010390.66}
+                                                                                - AGGREGATE(LOCAL) []
+                                                                                        Estimates: {row: 1, cpu: 3600000256.13, memory: 0.80, network: 0.00, cost: 145800010374.66}
+                                                                                        52:count := count()
+                                                                                    - HIVE-SCAN [store_sales] => [394:auto_fill_col]
+                                                                                            Estimates: {row: 7200000512, cpu: 36000002561.25, memory: 36000002561.25, network: 36000002561.25, cost: 144000010245.00}
+                                                                                            394:auto_fill_col := 1
+                                                                                            predicate: 39:ss_quantity >= 1 AND 39:ss_quantity <= 20
+                                                            - EXCHANGE(BROADCAST)
+                                                                    Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002561055E11}
+                                                                - ASSERT LE 1
+                                                                        Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002497055E11}
+                                                                    - AGGREGATE(GLOBAL) []
+                                                                            Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002497055E11}
+                                                                            77:avg := avg(77:avg)
+                                                                        - EXCHANGE(GATHER)
+                                                                                Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002493055E11}
+                                                                            - AGGREGATE(LOCAL) []
+                                                                                    Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002489855E11}
+                                                                                    77:avg := avg(68:ss_ext_discount_amt)
+                                                                                - HIVE-SCAN [store_sales] => [68:ss_ext_discount_amt]
+                                                                                        Estimates: {row: 7200000512, cpu: ?, memory: ?, network: ?, cost: 3.45600024588E11}
+                                                                                        predicate: 64:ss_quantity >= 1 AND 64:ss_quantity <= 20
+                                                        - EXCHANGE(BROADCAST)
+                                                                Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002561055E11}
+                                                            - ASSERT LE 1
+                                                                    Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002497055E11}
+                                                                - AGGREGATE(GLOBAL) []
+                                                                        Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002497055E11}
+                                                                        27:avg := avg(27:avg)
+                                                                    - EXCHANGE(GATHER)
+                                                                            Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002493055E11}
+                                                                        - AGGREGATE(LOCAL) []
+                                                                                Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002489855E11}
+                                                                                27:avg := avg(26:ss_net_profit)
+                                                                            - HIVE-SCAN [store_sales] => [26:ss_net_profit]
+                                                                                    Estimates: {row: 7200000512, cpu: ?, memory: ?, network: ?, cost: 3.45600024588E11}
+                                                                                    predicate: 14:ss_quantity >= 1 AND 14:ss_quantity <= 20
+                                                    - EXCHANGE(BROADCAST)
+                                                            Estimates: {row: 1, cpu: 80.00, memory: 80.00, network: 80.00, cost: 145800010730.66}
+                                                        - ASSERT LE 1
+                                                                Estimates: {row: 1, cpu: 0.00, memory: 0.00, network: 0.00, cost: 145800010410.66}
+                                                            - AGGREGATE(GLOBAL) []
+                                                                    Estimates: {row: 1, cpu: 8.00, memory: 8.00, network: 0.00, cost: 145800010410.66}
+                                                                    128:count := count(128:count)
+                                                                - EXCHANGE(GATHER)
+                                                                        Estimates: {row: 1, cpu: 8.00, memory: 0.00, network: 8.00, cost: 145800010390.66}
+                                                                    - AGGREGATE(LOCAL) []
+                                                                            Estimates: {row: 1, cpu: 3600000256.13, memory: 0.80, network: 0.00, cost: 145800010374.66}
+                                                                            128:count := count()
+                                                                        - HIVE-SCAN [store_sales] => [393:auto_fill_col]
+                                                                                Estimates: {row: 7200000512, cpu: 36000002561.25, memory: 36000002561.25, network: 36000002561.25, cost: 144000010245.00}
+                                                                                393:auto_fill_col := 1
+                                                                                predicate: 115:ss_quantity >= 21 AND 115:ss_quantity <= 40
+                                                - EXCHANGE(BROADCAST)
+                                                        Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002561055E11}
+                                                    - ASSERT LE 1
+                                                            Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002497055E11}
+                                                        - AGGREGATE(GLOBAL) []
+                                                                Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002497055E11}
+                                                                153:avg := avg(153:avg)
+                                                            - EXCHANGE(GATHER)
+                                                                    Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002493055E11}
+                                                                - AGGREGATE(LOCAL) []
+                                                                        Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002489855E11}
+                                                                        153:avg := avg(144:ss_ext_discount_amt)
+                                                                    - HIVE-SCAN [store_sales] => [144:ss_ext_discount_amt]
+                                                                            Estimates: {row: 7200000512, cpu: ?, memory: ?, network: ?, cost: 3.45600024588E11}
+                                                                            predicate: 140:ss_quantity >= 21 AND 140:ss_quantity <= 40
+                                            - EXCHANGE(BROADCAST)
+                                                    Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002561055E11}
+                                                - ASSERT LE 1
+                                                        Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002497055E11}
+                                                    - AGGREGATE(GLOBAL) []
+                                                            Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002497055E11}
+                                                            103:avg := avg(103:avg)
+                                                        - EXCHANGE(GATHER)
+                                                                Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002493055E11}
+                                                            - AGGREGATE(LOCAL) []
+                                                                    Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002489855E11}
+                                                                    103:avg := avg(102:ss_net_profit)
+                                                                - HIVE-SCAN [store_sales] => [102:ss_net_profit]
+                                                                        Estimates: {row: 7200000512, cpu: ?, memory: ?, network: ?, cost: 3.45600024588E11}
+                                                                        predicate: 90:ss_quantity >= 21 AND 90:ss_quantity <= 40
+                                        - EXCHANGE(BROADCAST)
+                                                Estimates: {row: 1, cpu: 80.00, memory: 80.00, network: 80.00, cost: 145800010730.66}
+                                            - ASSERT LE 1
+                                                    Estimates: {row: 1, cpu: 0.00, memory: 0.00, network: 0.00, cost: 145800010410.66}
+                                                - AGGREGATE(GLOBAL) []
+                                                        Estimates: {row: 1, cpu: 8.00, memory: 8.00, network: 0.00, cost: 145800010410.66}
+                                                        204:count := count(204:count)
+                                                    - EXCHANGE(GATHER)
+                                                            Estimates: {row: 1, cpu: 8.00, memory: 0.00, network: 8.00, cost: 145800010390.66}
+                                                        - AGGREGATE(LOCAL) []
+                                                                Estimates: {row: 1, cpu: 3600000256.13, memory: 0.80, network: 0.00, cost: 145800010374.66}
+                                                                204:count := count()
+                                                            - HIVE-SCAN [store_sales] => [392:auto_fill_col]
+                                                                    Estimates: {row: 7200000512, cpu: 36000002561.25, memory: 36000002561.25, network: 36000002561.25, cost: 144000010245.00}
+                                                                    392:auto_fill_col := 1
+                                                                    predicate: 191:ss_quantity >= 41 AND 191:ss_quantity <= 60
+                                    - EXCHANGE(BROADCAST)
+                                            Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002561055E11}
+                                        - ASSERT LE 1
+                                                Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002497055E11}
+                                            - AGGREGATE(GLOBAL) []
+                                                    Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002497055E11}
+                                                    229:avg := avg(229:avg)
+                                                - EXCHANGE(GATHER)
+                                                        Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002493055E11}
+                                                    - AGGREGATE(LOCAL) []
+                                                            Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002489855E11}
+                                                            229:avg := avg(220:ss_ext_discount_amt)
+                                                        - HIVE-SCAN [store_sales] => [220:ss_ext_discount_amt]
+                                                                Estimates: {row: 7200000512, cpu: ?, memory: ?, network: ?, cost: 3.45600024588E11}
+                                                                predicate: 216:ss_quantity >= 41 AND 216:ss_quantity <= 60
+                                - EXCHANGE(BROADCAST)
+                                        Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002561055E11}
+                                    - ASSERT LE 1
+                                            Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002497055E11}
+                                        - AGGREGATE(GLOBAL) []
+                                                Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002497055E11}
+                                                179:avg := avg(179:avg)
+                                            - EXCHANGE(GATHER)
+                                                    Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002493055E11}
+                                                - AGGREGATE(LOCAL) []
+                                                        Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002489855E11}
+                                                        179:avg := avg(178:ss_net_profit)
+                                                    - HIVE-SCAN [store_sales] => [178:ss_net_profit]
+                                                            Estimates: {row: 7200000512, cpu: ?, memory: ?, network: ?, cost: 3.45600024588E11}
+                                                            predicate: 166:ss_quantity >= 41 AND 166:ss_quantity <= 60
+                            - EXCHANGE(BROADCAST)
+                                    Estimates: {row: 1, cpu: 80.00, memory: 80.00, network: 80.00, cost: 145800010730.66}
+                                - ASSERT LE 1
+                                        Estimates: {row: 1, cpu: 0.00, memory: 0.00, network: 0.00, cost: 145800010410.66}
+                                    - AGGREGATE(GLOBAL) []
+                                            Estimates: {row: 1, cpu: 8.00, memory: 8.00, network: 0.00, cost: 145800010410.66}
+                                            280:count := count(280:count)
+                                        - EXCHANGE(GATHER)
+                                                Estimates: {row: 1, cpu: 8.00, memory: 0.00, network: 8.00, cost: 145800010390.66}
+                                            - AGGREGATE(LOCAL) []
+                                                    Estimates: {row: 1, cpu: 3600000256.13, memory: 0.80, network: 0.00, cost: 145800010374.66}
+                                                    280:count := count()
+                                                - HIVE-SCAN [store_sales] => [391:auto_fill_col]
+                                                        Estimates: {row: 7200000512, cpu: 36000002561.25, memory: 36000002561.25, network: 36000002561.25, cost: 144000010245.00}
+                                                        391:auto_fill_col := 1
+                                                        predicate: 267:ss_quantity >= 61 AND 267:ss_quantity <= 80
+                        - EXCHANGE(BROADCAST)
+                                Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002561055E11}
+                            - ASSERT LE 1
+                                    Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002497055E11}
+                                - AGGREGATE(GLOBAL) []
+                                        Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002497055E11}
+                                        305:avg := avg(305:avg)
+                                    - EXCHANGE(GATHER)
+                                            Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002493055E11}
+                                        - AGGREGATE(LOCAL) []
+                                                Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002489855E11}
+                                                305:avg := avg(296:ss_ext_discount_amt)
+                                            - HIVE-SCAN [store_sales] => [296:ss_ext_discount_amt]
+                                                    Estimates: {row: 7200000512, cpu: ?, memory: ?, network: ?, cost: 3.45600024588E11}
+                                                    predicate: 292:ss_quantity >= 61 AND 292:ss_quantity <= 80
+                    - EXCHANGE(BROADCAST)
+                            Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002561055E11}
+                        - ASSERT LE 1
+                                Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002497055E11}
+                            - AGGREGATE(GLOBAL) []
+                                    Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002497055E11}
+                                    255:avg := avg(255:avg)
+                                - EXCHANGE(GATHER)
+                                        Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002493055E11}
+                                    - AGGREGATE(LOCAL) []
+                                            Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002489855E11}
+                                            255:avg := avg(254:ss_net_profit)
+                                        - HIVE-SCAN [store_sales] => [254:ss_net_profit]
+                                                Estimates: {row: 7200000512, cpu: ?, memory: ?, network: ?, cost: 3.45600024588E11}
+                                                predicate: 242:ss_quantity >= 61 AND 242:ss_quantity <= 80
+                - EXCHANGE(BROADCAST)
+                        Estimates: {row: 1, cpu: 80.00, memory: 80.00, network: 80.00, cost: 145800010730.66}
+                    - ASSERT LE 1
+                            Estimates: {row: 1, cpu: 0.00, memory: 0.00, network: 0.00, cost: 145800010410.66}
+                        - AGGREGATE(GLOBAL) []
+                                Estimates: {row: 1, cpu: 8.00, memory: 8.00, network: 0.00, cost: 145800010410.66}
+                                356:count := count(356:count)
+                            - EXCHANGE(GATHER)
+                                    Estimates: {row: 1, cpu: 8.00, memory: 0.00, network: 8.00, cost: 145800010390.66}
+                                - AGGREGATE(LOCAL) []
+                                        Estimates: {row: 1, cpu: 3600000256.13, memory: 0.80, network: 0.00, cost: 145800010374.66}
+                                        356:count := count()
+                                    - HIVE-SCAN [store_sales] => [390:auto_fill_col]
+                                            Estimates: {row: 7200000512, cpu: 36000002561.25, memory: 36000002561.25, network: 36000002561.25, cost: 144000010245.00}
+                                            390:auto_fill_col := 1
+                                            predicate: 343:ss_quantity >= 81 AND 343:ss_quantity <= 100
+            - EXCHANGE(BROADCAST)
+                    Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002561055E11}
+                - ASSERT LE 1
+                        Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002497055E11}
+                    - AGGREGATE(GLOBAL) []
+                            Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002497055E11}
+                            381:avg := avg(381:avg)
+                        - EXCHANGE(GATHER)
+                                Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002493055E11}
+                            - AGGREGATE(LOCAL) []
+                                    Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002489855E11}
+                                    381:avg := avg(372:ss_ext_discount_amt)
+                                - HIVE-SCAN [store_sales] => [372:ss_ext_discount_amt]
+                                        Estimates: {row: 7200000512, cpu: ?, memory: ?, network: ?, cost: 3.45600024588E11}
+                                        predicate: 368:ss_quantity >= 81 AND 368:ss_quantity <= 100
+        - EXCHANGE(BROADCAST)
+                Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002561055E11}
+            - ASSERT LE 1
+                    Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002497055E11}
+                - AGGREGATE(GLOBAL) []
+                        Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002497055E11}
+                        331:avg := avg(331:avg)
+                    - EXCHANGE(GATHER)
+                            Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002493055E11}
+                        - AGGREGATE(LOCAL) []
+                                Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.4992002489855E11}
+                                331:avg := avg(330:ss_net_profit)
+                            - HIVE-SCAN [store_sales] => [330:ss_net_profit]
+                                    Estimates: {row: 7200000512, cpu: ?, memory: ?, network: ?, cost: 3.45600024588E11}
+                                    predicate: 318:ss_quantity >= 81 AND 318:ss_quantity <= 100

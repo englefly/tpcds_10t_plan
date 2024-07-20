@@ -1,0 +1,66 @@
+Explain String
+- Output => [129:c_customer_id]
+    - CTEAnchor[1]
+            Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 7.31573441275365E11}
+        - CTEProduce[1]
+            - AGGREGATE(GLOBAL) [4:sr_customer_sk, 8:sr_store_sk]
+                    Estimates: {row: 642976145, cpu: ?, memory: ?, network: ?, cost: 4.636854216435509E11}
+                    49:sum := sum(49:sum)
+                - EXCHANGE(SHUFFLE) [4, 8]
+                        Estimates: {row: 1224716467, cpu: ?, memory: ?, network: ?, cost: 4.029394848581177E11}
+                    - AGGREGATE(LOCAL) [4:sr_customer_sk, 8:sr_store_sk]
+                            Estimates: {row: 1224716467, cpu: ?, memory: ?, network: ?, cost: 3.9510129946644885E11}
+                            49:sum := sum(15:sr_fee)
+                        - HASH/INNER JOIN [1:sr_returned_date_sk = 21:d_date_sk] => [4:sr_customer_sk, 8:sr_store_sk, 15:sr_fee]
+                                Estimates: {row: 2332793271, cpu: ?, memory: ?, network: ?, cost: 3.8259752753212006E11}
+                            - HIVE-SCAN [store_returns] => [1:sr_returned_date_sk, 4:sr_customer_sk, 8:sr_store_sk, 15:sr_fee]
+                                    Estimates: {row: 2332793271, cpu: ?, memory: ?, network: ?, cost: 2.9859753873024005E11}
+                                    predicate: 8:sr_store_sk IS NOT NULL AND 1:sr_returned_date_sk IS NOT NULL
+                            - EXCHANGE(BROADCAST)
+                                    Estimates: {row: 36524, cpu: ?, memory: ?, network: ?, cost: 1.3441016E7}
+                                - HIVE-SCAN [date_dim] => [21:d_date_sk]
+                                        Estimates: {row: 36524, cpu: ?, memory: ?, network: ?, cost: 1753176.0}
+                                        predicate: 27:d_year = 2000
+        - TOP-100(FINAL)[129: c_customer_id ASC NULLS FIRST]
+                Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 1.6912688369678714E11}
+            - TOP-100(PARTIAL)[129: c_customer_id ASC NULLS FIRST]
+                    Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 1.6912687409678714E11}
+                - HASH/INNER JOIN [57:sr_store_sk = 99:s_store_sk] => [129:c_customer_id]
+                        Estimates: {row: 357208969, cpu: ?, memory: ?, network: ?, cost: 1.4626549363775314E11}
+                    - HASH/INNER JOIN [53:sr_customer_sk = 128:c_customer_sk] => [129:c_customer_id, 57:sr_store_sk]
+                            Estimates: {row: 357208969, cpu: ?, memory: ?, network: ?, cost: 1.3626277248692577E11}
+                        - EXCHANGE(SHUFFLE) [53]
+                                Estimates: {row: 357208969, cpu: ?, memory: ?, network: ?, cost: 1.1499967133609839E11}
+                            - HASH/INNER JOIN [57:sr_store_sk = 153:sr_store_sk AND cast(98:sum as double) > cast(195:avg * 1.2 as double)] => [53:sr_customer_sk, 57:sr_store_sk]
+                                    Estimates: {row: 357208969, cpu: ?, memory: ?, network: ?, cost: 1.0356898430658139E11}
+                                - EXCHANGE(SHUFFLE) [57]
+                                        Estimates: {row: 714417939, cpu: ?, memory: ?, network: ?, cost: 4.572274811806801E10}
+                                    - CTEConsume[1]
+                                            98:sum := 49:sum
+                                            53:sr_customer_sk := 4:sr_customer_sk
+                                            57:sr_store_sk := 8:sr_store_sk
+                                            Estimates: {row: 714417939, cpu: ?, memory: ?, network: ?, cost: 0.0}
+                                            predicate: 57:sr_store_sk IS NOT NULL
+                                - AGGREGATE(GLOBAL) [153:sr_store_sk]
+                                        Estimates: {row: 178604484, cpu: ?, memory: ?, network: ?, cost: 1.7431797720013428E10}
+                                        195:avg := avg(195:avg)
+                                    - EXCHANGE(SHUFFLE) [153]
+                                            Estimates: {row: 357208969, cpu: ?, memory: ?, network: ?, cost: 4.572274811806801E9}
+                                        - AGGREGATE(LOCAL) [153:sr_store_sk]
+                                                Estimates: {row: 357208969, cpu: ?, memory: ?, network: ?, cost: 2.8576717573792505E9}
+                                                195:avg := avg(194:sum)
+                                            - CTEConsume[1]
+                                                    194:sum := 49:sum
+                                                    153:sr_store_sk := 8:sr_store_sk
+                                                    Estimates: {row: 714417939, cpu: ?, memory: ?, network: ?, cost: 0.0}
+                                                    predicate: 153:sr_store_sk IS NOT NULL
+                        - EXCHANGE(SHUFFLE) [128]
+                                Estimates: {row: 58500000, cpu: ?, memory: ?, network: ?, cost: 8.424E9}
+                            - HIVE-SCAN [customer] => [129:c_customer_id, 128:c_customer_sk]
+                                    Estimates: {row: 58500000, cpu: ?, memory: ?, network: ?, cost: 5.616E9}
+                                    predicate: 128:c_customer_sk IS NOT NULL
+                    - EXCHANGE(BROADCAST)
+                            Estimates: {row: 1500, cpu: ?, memory: ?, network: ?, cost: 624000.0}
+                        - HIVE-SCAN [store] => [99:s_store_sk]
+                                Estimates: {row: 1500, cpu: ?, memory: ?, network: ?, cost: 144000.0}
+                                predicate: 123:s_state = 'NM'

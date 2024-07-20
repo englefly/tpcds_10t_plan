@@ -1,0 +1,517 @@
+Explain String
+RESOURCE GROUP: default_wg
+
+PLAN FRAGMENT 0(F26)
+  Fragment Cost: 24000.0
+  Output Exprs:57: i_item_desc | 41: w_warehouse_name | 93: d_week_seq | 221: sum | 222: sum | 223: count
+  Input Partition: UNPARTITIONED
+  RESULT SINK
+
+  50:MERGING-EXCHANGE
+     distribution type: GATHER
+     limit: 100
+     cardinality: 100
+
+PLAN FRAGMENT 1(F25)
+  Fragment Cost: 1.3836253349615625E11
+
+  Input Partition: HASH_PARTITIONED: 57: i_item_desc, 41: w_warehouse_name, 93: d_week_seq
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 50
+
+  49:TOP-N
+  |  order by: [223, BIGINT, false] DESC, [57, VARCHAR, true] ASC, [41, VARCHAR, true] ASC, [93, INT, true] ASC
+  |  offset: 0
+  |  hasNullableGenerateChild: true
+  |  limit: 100
+  |  cardinality: 100
+  |  
+  48:AGGREGATE (merge finalize)
+  |  aggregate: sum[([221: sum, BIGINT, true]); args: TINYINT; result: BIGINT; args nullable: true; result nullable: true], sum[([222: sum, BIGINT, true]); args: TINYINT; result: BIGINT; args nullable: true; result nullable: true], count[([223: count, BIGINT, false]); args: ; result: BIGINT; args nullable: true; result nullable: false]
+  |  group by: [57: i_item_desc, VARCHAR, true], [41: w_warehouse_name, VARCHAR, true], [93: d_week_seq, INT, true]
+  |  hasNullableGenerateChild: true
+  |  cardinality: 437592312
+  |  
+  47:EXCHANGE
+     distribution type: SHUFFLE
+     partition exprs: [57: i_item_desc, VARCHAR, true], [41: w_warehouse_name, VARCHAR, true], [93: d_week_seq, INT, true]
+     cardinality: 793818253
+
+PLAN FRAGMENT 2(F24)
+  Fragment Cost: 3.340449528828877E11
+
+  Input Partition: HASH_PARTITIONED: 16: cs_item_sk, 18: cs_order_number
+  OutPut Partition: HASH_PARTITIONED: 57: i_item_desc, 41: w_warehouse_name, 93: d_week_seq
+  OutPut Exchange Id: 47
+
+  46:AGGREGATE (update serialize)
+  |  STREAMING
+  |  aggregate: sum[([219: case, TINYINT, true]); args: TINYINT; result: BIGINT; args nullable: true; result nullable: true], sum[([220: case, TINYINT, true]); args: TINYINT; result: BIGINT; args nullable: true; result nullable: true], count[(*); args: ; result: BIGINT; args nullable: false; result nullable: false]
+  |  group by: [57: i_item_desc, VARCHAR, true], [41: w_warehouse_name, VARCHAR, true], [93: d_week_seq, INT, true]
+  |  hasNullableGenerateChild: true
+  |  cardinality: 793818253
+  |  
+  45:Project
+  |  output columns:
+  |  41 <-> [41: w_warehouse_name, VARCHAR, true]
+  |  57 <-> [57: i_item_desc, VARCHAR, true]
+  |  93 <-> [93: d_week_seq, INT, true]
+  |  219 <-> if[(173: p_promo_sk IS NULL, 1, 0); args: BOOLEAN,TINYINT,TINYINT; result: TINYINT; args nullable: false; result nullable: true]
+  |  220 <-> if[(173: p_promo_sk IS NOT NULL, 1, 0); args: BOOLEAN,TINYINT,TINYINT; result: TINYINT; args nullable: false; result nullable: true]
+  |  hasNullableGenerateChild: true
+  |  cardinality: 1440033112
+  |  
+  44:HASH JOIN
+  |  join op: LEFT OUTER JOIN (PARTITIONED)
+  |  equal join conjunct: [16: cs_item_sk, BIGINT, true] = [194: cr_item_sk, BIGINT, true]
+  |  equal join conjunct: [18: cs_order_number, BIGINT, true] = [208: cr_order_number, BIGINT, true]
+  |  output columns: 41, 57, 93, 173
+  |  can local shuffle: true
+  |  cardinality: 1440033112
+  |  
+  |----43:EXCHANGE
+  |       distribution type: SHUFFLE
+  |       partition exprs: [194: cr_item_sk, BIGINT, true], [208: cr_order_number, BIGINT, true]
+  |       cardinality: 1440033112
+  |    
+  41:EXCHANGE
+     distribution type: SHUFFLE
+     partition exprs: [16: cs_item_sk, BIGINT, true], [18: cs_order_number, BIGINT, true]
+     cardinality: 809998015
+
+PLAN FRAGMENT 3(F22)
+  Fragment Cost: 9.2162119168E10
+
+  Input Partition: RANDOM
+  OutPut Partition: HASH_PARTITIONED: 194: cr_item_sk, 208: cr_order_number
+  OutPut Exchange Id: 43
+
+  42:HdfsScanNode
+     TABLE: catalog_returns
+     partitions=1/1
+     avgRowSize=2.0
+     cardinality: 1440033112
+
+PLAN FRAGMENT 4(F04)
+  Fragment Cost: 4.505699009889246E12
+
+  Input Partition: HASH_PARTITIONED: 16: cs_item_sk
+  OutPut Partition: HASH_PARTITIONED: 16: cs_item_sk, 18: cs_order_number
+  OutPut Exchange Id: 41
+
+  40:Project
+  |  output columns:
+  |  16 <-> [16: cs_item_sk, BIGINT, true]
+  |  18 <-> [18: cs_order_number, BIGINT, true]
+  |  41 <-> [41: w_warehouse_name, VARCHAR, true]
+  |  57 <-> [57: i_item_desc, VARCHAR, true]
+  |  93 <-> [93: d_week_seq, INT, true]
+  |  173 <-> [173: p_promo_sk, BIGINT, true]
+  |  hasNullableGenerateChild: true
+  |  cardinality: 809998015
+  |  
+  39:HASH JOIN
+  |  join op: LEFT OUTER JOIN (BROADCAST)
+  |  equal join conjunct: [17: cs_promo_sk, BIGINT, true] = [173: p_promo_sk, BIGINT, true]
+  |  output columns: 16, 18, 41, 57, 93, 173
+  |  can local shuffle: false
+  |  cardinality: 809998015
+  |  
+  |----38:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 2000
+  |    
+  36:Project
+  |  output columns:
+  |  16 <-> [16: cs_item_sk, BIGINT, true]
+  |  17 <-> [17: cs_promo_sk, BIGINT, true]
+  |  18 <-> [18: cs_order_number, BIGINT, true]
+  |  41 <-> [41: w_warehouse_name, VARCHAR, true]
+  |  57 <-> [57: i_item_desc, VARCHAR, true]
+  |  93 <-> [93: d_week_seq, INT, true]
+  |  cardinality: 809998015
+  |  
+  35:HASH JOIN
+  |  join op: INNER JOIN (BROADCAST)
+  |  equal join conjunct: [3: cs_ship_date_sk, BIGINT, true] = [145: d_date_sk, BIGINT, true]
+  |  other join predicates: cast([147: d_date, DATE, true] as DOUBLE) > cast([91: d_date, DATE, true] as DOUBLE) + 5.0
+  |  build runtime filters:
+  |  - filter_id = 7, build_expr = (145: d_date_sk), remote = true
+  |  output columns: 16, 17, 18, 41, 57, 93
+  |  can local shuffle: false
+  |  cardinality: 809998015
+  |  
+  |----34:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 65744
+  |    
+  32:Project
+  |  output columns:
+  |  3 <-> [3: cs_ship_date_sk, BIGINT, true]
+  |  16 <-> [16: cs_item_sk, BIGINT, true]
+  |  17 <-> [17: cs_promo_sk, BIGINT, true]
+  |  18 <-> [18: cs_order_number, BIGINT, true]
+  |  41 <-> [41: w_warehouse_name, VARCHAR, true]
+  |  57 <-> [57: i_item_desc, VARCHAR, true]
+  |  91 <-> [91: d_date, DATE, true]
+  |  93 <-> [93: d_week_seq, INT, true]
+  |  cardinality: 1619996030
+  |  
+  31:HASH JOIN
+  |  join op: INNER JOIN (BROADCAST)
+  |  equal join conjunct: [35: inv_date_sk, BIGINT, true] = [117: d_date_sk, BIGINT, true]
+  |  equal join conjunct: [93: d_week_seq, INT, true] = [121: d_week_seq, INT, true]
+  |  build runtime filters:
+  |  - filter_id = 5, build_expr = (117: d_date_sk), remote = true
+  |  - filter_id = 6, build_expr = (121: d_week_seq), remote = true
+  |  output columns: 3, 16, 17, 18, 41, 57, 91, 93
+  |  can local shuffle: false
+  |  cardinality: 1619996030
+  |  
+  |----30:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 59170
+  |    
+  28:Project
+  |  output columns:
+  |  3 <-> [3: cs_ship_date_sk, BIGINT, true]
+  |  16 <-> [16: cs_item_sk, BIGINT, true]
+  |  17 <-> [17: cs_promo_sk, BIGINT, true]
+  |  18 <-> [18: cs_order_number, BIGINT, true]
+  |  35 <-> [35: inv_date_sk, BIGINT, true]
+  |  41 <-> [41: w_warehouse_name, VARCHAR, true]
+  |  57 <-> [57: i_item_desc, VARCHAR, true]
+  |  91 <-> [91: d_date, DATE, true]
+  |  93 <-> [93: d_week_seq, INT, true]
+  |  cardinality: 1619996030
+  |  
+  27:HASH JOIN
+  |  join op: INNER JOIN (BROADCAST)
+  |  equal join conjunct: [1: cs_sold_date_sk, BIGINT, true] = [89: d_date_sk, BIGINT, true]
+  |  build runtime filters:
+  |  - filter_id = 4, build_expr = (89: d_date_sk), remote = true
+  |  output columns: 3, 16, 17, 18, 35, 41, 57, 91, 93
+  |  can local shuffle: false
+  |  cardinality: 1619996030
+  |  
+  |----26:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 36525
+  |       probe runtime filters:
+  |       - filter_id = 6, probe_expr = (93: d_week_seq)
+  |    
+  23:Project
+  |  output columns:
+  |  1 <-> [1: cs_sold_date_sk, BIGINT, true]
+  |  3 <-> [3: cs_ship_date_sk, BIGINT, true]
+  |  16 <-> [16: cs_item_sk, BIGINT, true]
+  |  17 <-> [17: cs_promo_sk, BIGINT, true]
+  |  18 <-> [18: cs_order_number, BIGINT, true]
+  |  35 <-> [35: inv_date_sk, BIGINT, true]
+  |  41 <-> [41: w_warehouse_name, VARCHAR, true]
+  |  57 <-> [57: i_item_desc, VARCHAR, true]
+  |  cardinality: 1619996030
+  |  
+  22:HASH JOIN
+  |  join op: INNER JOIN (BROADCAST)
+  |  equal join conjunct: [6: cs_bill_hdemo_sk, BIGINT, true] = [84: hd_demo_sk, BIGINT, true]
+  |  build runtime filters:
+  |  - filter_id = 3, build_expr = (84: hd_demo_sk), remote = true
+  |  output columns: 1, 3, 16, 17, 18, 35, 41, 57
+  |  can local shuffle: false
+  |  cardinality: 1619996030
+  |  
+  |----21:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 7200
+  |    
+  18:Project
+  |  output columns:
+  |  1 <-> [1: cs_sold_date_sk, BIGINT, true]
+  |  3 <-> [3: cs_ship_date_sk, BIGINT, true]
+  |  6 <-> [6: cs_bill_hdemo_sk, BIGINT, true]
+  |  16 <-> [16: cs_item_sk, BIGINT, true]
+  |  17 <-> [17: cs_promo_sk, BIGINT, true]
+  |  18 <-> [18: cs_order_number, BIGINT, true]
+  |  35 <-> [35: inv_date_sk, BIGINT, true]
+  |  41 <-> [41: w_warehouse_name, VARCHAR, true]
+  |  57 <-> [57: i_item_desc, VARCHAR, true]
+  |  cardinality: 1619996030
+  |  
+  17:HASH JOIN
+  |  join op: INNER JOIN (BROADCAST)
+  |  equal join conjunct: [5: cs_bill_cdemo_sk, BIGINT, true] = [75: cd_demo_sk, BIGINT, true]
+  |  build runtime filters:
+  |  - filter_id = 2, build_expr = (75: cd_demo_sk), remote = true
+  |  output columns: 1, 3, 6, 16, 17, 18, 35, 41, 57
+  |  can local shuffle: false
+  |  cardinality: 1619996030
+  |  
+  |----16:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 1920800
+  |    
+  13:Project
+  |  output columns:
+  |  1 <-> [1: cs_sold_date_sk, BIGINT, true]
+  |  3 <-> [3: cs_ship_date_sk, BIGINT, true]
+  |  5 <-> [5: cs_bill_cdemo_sk, BIGINT, true]
+  |  6 <-> [6: cs_bill_hdemo_sk, BIGINT, true]
+  |  16 <-> [16: cs_item_sk, BIGINT, true]
+  |  17 <-> [17: cs_promo_sk, BIGINT, true]
+  |  18 <-> [18: cs_order_number, BIGINT, true]
+  |  35 <-> [35: inv_date_sk, BIGINT, true]
+  |  41 <-> [41: w_warehouse_name, VARCHAR, true]
+  |  57 <-> [57: i_item_desc, VARCHAR, true]
+  |  cardinality: 1619996030
+  |  
+  12:HASH JOIN
+  |  join op: INNER JOIN (BROADCAST)
+  |  equal join conjunct: [16: cs_item_sk, BIGINT, true] = [53: i_item_sk, BIGINT, true]
+  |  build runtime filters:
+  |  - filter_id = 1, build_expr = (53: i_item_sk), remote = true
+  |  output columns: 1, 3, 5, 6, 16, 17, 18, 35, 41, 57
+  |  can local shuffle: false
+  |  cardinality: 1619996030
+  |  
+  |----11:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 361800
+  |    
+  9:Project
+  |  output columns:
+  |  1 <-> [1: cs_sold_date_sk, BIGINT, true]
+  |  3 <-> [3: cs_ship_date_sk, BIGINT, true]
+  |  5 <-> [5: cs_bill_cdemo_sk, BIGINT, true]
+  |  6 <-> [6: cs_bill_hdemo_sk, BIGINT, true]
+  |  16 <-> [16: cs_item_sk, BIGINT, true]
+  |  17 <-> [17: cs_promo_sk, BIGINT, true]
+  |  18 <-> [18: cs_order_number, BIGINT, true]
+  |  35 <-> [35: inv_date_sk, BIGINT, true]
+  |  41 <-> [41: w_warehouse_name, VARCHAR, true]
+  |  cardinality: 1619996030
+  |  
+  8:HASH JOIN
+  |  join op: INNER JOIN (BROADCAST)
+  |  equal join conjunct: [37: inv_warehouse_sk, BIGINT, true] = [39: w_warehouse_sk, BIGINT, true]
+  |  build runtime filters:
+  |  - filter_id = 0, build_expr = (39: w_warehouse_sk), remote = true
+  |  output columns: 1, 3, 5, 6, 16, 17, 18, 35, 41
+  |  can local shuffle: false
+  |  cardinality: 1619996030
+  |  
+  |----7:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 23
+  |    
+  5:Project
+  |  output columns:
+  |  1 <-> [1: cs_sold_date_sk, BIGINT, true]
+  |  3 <-> [3: cs_ship_date_sk, BIGINT, true]
+  |  5 <-> [5: cs_bill_cdemo_sk, BIGINT, true]
+  |  6 <-> [6: cs_bill_hdemo_sk, BIGINT, true]
+  |  16 <-> [16: cs_item_sk, BIGINT, true]
+  |  17 <-> [17: cs_promo_sk, BIGINT, true]
+  |  18 <-> [18: cs_order_number, BIGINT, true]
+  |  35 <-> [35: inv_date_sk, BIGINT, true]
+  |  37 <-> [37: inv_warehouse_sk, BIGINT, true]
+  |  cardinality: 6479984120
+  |  
+  4:HASH JOIN
+  |  join op: INNER JOIN (PARTITIONED)
+  |  equal join conjunct: [16: cs_item_sk, BIGINT, true] = [36: inv_item_sk, BIGINT, true]
+  |  other join predicates: [38: inv_quantity_on_hand, INT, true] < [19: cs_quantity, INT, true]
+  |  output columns: 1, 3, 5, 6, 16, 17, 18, 35, 37
+  |  can local shuffle: false
+  |  cardinality: 6479984120
+  |  
+  |----3:EXCHANGE
+  |       distribution type: SHUFFLE
+  |       partition exprs: [36: inv_item_sk, BIGINT, true]
+  |       cardinality: 1180372500
+  |       probe runtime filters:
+  |       - filter_id = 0, probe_expr = (37: inv_warehouse_sk)
+  |       - filter_id = 1, probe_expr = (36: inv_item_sk)
+  |       - filter_id = 5, probe_expr = (35: inv_date_sk)
+  |    
+  1:EXCHANGE
+     distribution type: SHUFFLE
+     partition exprs: [16: cs_item_sk, BIGINT, true]
+     cardinality: 12959968239
+     probe runtime filters:
+     - filter_id = 1, probe_expr = (16: cs_item_sk)
+     - filter_id = 2, probe_expr = (5: cs_bill_cdemo_sk)
+     - filter_id = 3, probe_expr = (6: cs_bill_hdemo_sk)
+     - filter_id = 4, probe_expr = (1: cs_sold_date_sk)
+     - filter_id = 7, probe_expr = (3: cs_ship_date_sk)
+
+PLAN FRAGMENT 5(F19)
+  Fragment Cost: 64000.0
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 38
+
+  37:HdfsScanNode
+     TABLE: promotion
+     partitions=1/1
+     avgRowSize=1.0
+     cardinality: 2000
+
+PLAN FRAGMENT 6(F17)
+  Fragment Cost: 3155716.8000000003
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 34
+
+  33:HdfsScanNode
+     TABLE: date_dim
+     NON-PARTITION PREDICATES: 145: d_date_sk IS NOT NULL
+     partitions=1/1
+     avgRowSize=2.0
+     cardinality: 65744
+
+PLAN FRAGMENT 7(F15)
+  Fragment Cost: 2840145.1200000006
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 30
+
+  29:HdfsScanNode
+     TABLE: date_dim
+     NON-PARTITION PREDICATES: 117: d_date_sk IS NOT NULL, 121: d_week_seq IS NOT NULL
+     partitions=1/1
+     avgRowSize=2.0
+     cardinality: 59170
+
+PLAN FRAGMENT 8(F13)
+  Fragment Cost: 2921960.0
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 26
+
+  25:Project
+  |  output columns:
+  |  89 <-> [89: d_date_sk, BIGINT, true]
+  |  91 <-> [91: d_date, DATE, true]
+  |  93 <-> [93: d_week_seq, INT, true]
+  |  cardinality: 36525
+  |  
+  24:HdfsScanNode
+     TABLE: date_dim
+     NON-PARTITION PREDICATES: 95: d_year = 2000
+     MIN/MAX PREDICATES: 95: d_year <= 2000, 95: d_year >= 2000
+     partitions=1/1
+     avgRowSize=4.0
+     cardinality: 36525
+     probe runtime filters:
+     - filter_id = 6, probe_expr = (93: d_week_seq)
+
+PLAN FRAGMENT 9(F11)
+  Fragment Cost: 691200.0
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 21
+
+  20:Project
+  |  output columns:
+  |  84 <-> [84: hd_demo_sk, BIGINT, true]
+  |  cardinality: 7200
+  |  
+  19:HdfsScanNode
+     TABLE: household_demographics
+     NON-PARTITION PREDICATES: 86: hd_buy_potential = '1001-5000'
+     MIN/MAX PREDICATES: 86: hd_buy_potential <= '1001-5000', 86: hd_buy_potential >= '1001-5000'
+     partitions=1/1
+     avgRowSize=2.0
+     cardinality: 7200
+
+PLAN FRAGMENT 10(F09)
+  Fragment Cost: 1.843968E8
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 16
+
+  15:Project
+  |  output columns:
+  |  75 <-> [75: cd_demo_sk, BIGINT, true]
+  |  cardinality: 1920800
+  |  
+  14:HdfsScanNode
+     TABLE: customer_demographics
+     NON-PARTITION PREDICATES: 77: cd_marital_status = 'D'
+     MIN/MAX PREDICATES: 77: cd_marital_status <= 'D', 77: cd_marital_status >= 'D'
+     partitions=1/1
+     avgRowSize=2.0
+     cardinality: 1920800
+
+PLAN FRAGMENT 11(F07)
+  Fragment Cost: 3.47328E7
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 11
+
+  10:HdfsScanNode
+     TABLE: item
+     NON-PARTITION PREDICATES: 53: i_item_sk IS NOT NULL
+     partitions=1/1
+     avgRowSize=2.0
+     cardinality: 361800
+
+PLAN FRAGMENT 12(F05)
+  Fragment Cost: 2160.0
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 07
+
+  6:HdfsScanNode
+     TABLE: warehouse
+     NON-PARTITION PREDICATES: 39: w_warehouse_sk IS NOT NULL
+     partitions=1/1
+     avgRowSize=2.0
+     cardinality: 23
+
+PLAN FRAGMENT 13(F02)
+  Fragment Cost: 1.3220172E11
+
+  Input Partition: RANDOM
+  OutPut Partition: HASH_PARTITIONED: 36: inv_item_sk
+  OutPut Exchange Id: 03
+
+  2:HdfsScanNode
+     TABLE: inventory
+     NON-PARTITION PREDICATES: 36: inv_item_sk IS NOT NULL
+     partitions=1/1
+     avgRowSize=4.0
+     cardinality: 1180372500
+     probe runtime filters:
+     - filter_id = 0, probe_expr = (37: inv_warehouse_sk)
+     - filter_id = 1, probe_expr = (36: inv_item_sk)
+     - filter_id = 5, probe_expr = (35: inv_date_sk)
+
+PLAN FRAGMENT 14(F00)
+  Fragment Cost: 3.11039237736E12
+
+  Input Partition: RANDOM
+  OutPut Partition: HASH_PARTITIONED: 16: cs_item_sk
+  OutPut Exchange Id: 01
+
+  0:HdfsScanNode
+     TABLE: catalog_sales
+     NON-PARTITION PREDICATES: 16: cs_item_sk IS NOT NULL
+     partitions=1/1
+     avgRowSize=8.0
+     cardinality: 12959968239
+     probe runtime filters:
+     - filter_id = 1, probe_expr = (16: cs_item_sk)
+     - filter_id = 2, probe_expr = (5: cs_bill_cdemo_sk)
+     - filter_id = 3, probe_expr = (6: cs_bill_hdemo_sk)
+     - filter_id = 4, probe_expr = (1: cs_sold_date_sk)
+     - filter_id = 7, probe_expr = (3: cs_ship_date_sk)

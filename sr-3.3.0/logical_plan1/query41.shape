@@ -1,0 +1,31 @@
+Explain String
+- Output => [22:i_product_name]
+    - TOP-100(FINAL)[22: i_product_name ASC NULLS FIRST]
+            Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 2.15184456E7}
+        - TOP-100(PARTIAL)[22: i_product_name ASC NULLS FIRST]
+                Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 2.15120456E7}
+            - AGGREGATE(GLOBAL) [22:i_product_name]
+                    Estimates: {row: 25125, cpu: ?, memory: ?, network: ?, cost: 2.07048456E7}
+                - EXCHANGE(SHUFFLE) [22]
+                        Estimates: {row: 50250, cpu: ?, memory: ?, network: ?, cost: 1.94988456E7}
+                    - AGGREGATE(LOCAL) [22:i_product_name]
+                            Estimates: {row: 50250, cpu: ?, memory: ?, network: ?, cost: 1.93380456E7}
+                        - HASH/INNER JOIN [15:i_manufact = 37:i_manufact] => [22:i_product_name]
+                                Estimates: {row: 100500, cpu: ?, memory: ?, network: ?, cost: 1.88958456E7}
+                            - HIVE-SCAN [item] => [22:i_product_name, 15:i_manufact]
+                                    Estimates: {row: 100500, cpu: ?, memory: ?, network: ?, cost: 1.4472E7}
+                                    predicate: 14:i_manufact_id >= 970 AND 14:i_manufact_id <= 1010
+                            - EXCHANGE(BROADCAST)
+                                    Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 1353.6}
+                                - AGGREGATE(GLOBAL) [37:i_manufact]
+                                        Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 393.6}
+                                        45:count := count(45:count)
+                                        predicate: ifnull(45:count, 0) > 0
+                                    - EXCHANGE(SHUFFLE) [37]
+                                            Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 333.6}
+                                        - AGGREGATE(LOCAL) [37:i_manufact]
+                                                Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 328.8}
+                                                45:count := count()
+                                            - HIVE-SCAN [item] => [37:i_manufact]
+                                                    Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 320.0}
+                                                    predicate: (35:i_category = 'Women' AND ((40:i_color = 'frosted' OR 40:i_color = 'rose') AND (41:i_units = 'Lb' OR 41:i_units = 'Gross') AND (38:i_size = 'medium' OR 38:i_size = 'large') OR (40:i_color = 'chocolate' OR 40:i_color = 'black') AND (41:i_units = 'Box' OR 41:i_units = 'Dram') AND (38:i_size = 'economy' OR 38:i_size = 'petite')) OR 35:i_category = 'Men' AND (40:i_color = 'slate' OR 40:i_color = 'magenta') AND (41:i_units = 'Carton' OR 41:i_units = 'Bundle') AND (38:i_size = 'N/A' OR 38:i_size = 'small') OR 35:i_category = 'Men' AND (40:i_color = 'cornflower' OR 40:i_color = 'firebrick') AND (41:i_units = 'Pound' OR 41:i_units = 'Oz') AND (38:i_size = 'medium' OR 38:i_size = 'large') OR 35:i_category = 'Women' AND ((40:i_color = 'almond' OR 40:i_color = 'steel') AND (41:i_units = 'Tsp' OR 41:i_units = 'Case') AND (38:i_size = 'medium' OR 38:i_size = 'large') OR (40:i_color = 'purple' OR 40:i_color = 'aquamarine') AND (41:i_units = 'Bunch' OR 41:i_units = 'Gram') AND (38:i_size = 'economy' OR 38:i_size = 'petite')) OR 35:i_category = 'Men' AND (40:i_color = 'lavender' OR 40:i_color = 'papaya') AND (41:i_units = 'Pallet' OR 41:i_units = 'Cup') AND (38:i_size = 'N/A' OR 38:i_size = 'small') OR 35:i_category = 'Men' AND (40:i_color = 'maroon' OR 40:i_color = 'cyan') AND (41:i_units = 'Each' OR 41:i_units = 'N/A') AND (38:i_size = 'medium' OR 38:i_size = 'large')) AND 41:i_units IN ('Lb', 'Gross', 'Box', 'Dram', 'Carton', 'Bundle', 'Pound', 'Oz', 'Tsp', 'Case', 'Bunch', 'Gram', 'Pallet', 'Cup', 'Each', 'N/A') AND 35:i_category IN ('Women', 'Men') AND 38:i_size IN ('medium', 'large', 'economy', 'petite', 'N/A', 'small') AND 40:i_color IN ('frosted', 'rose', 'chocolate', 'black', 'slate', 'magenta', 'cornflower', 'firebrick', 'almond', 'steel', 'purple', 'aquamarine', 'lavender', 'papaya', 'maroon', 'cyan')

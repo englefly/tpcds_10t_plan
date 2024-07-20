@@ -1,0 +1,43 @@
+Explain String
+- Output => [103:sum]
+    - AGGREGATE(GLOBAL) []
+            Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 7.819600451587341E12}
+            103:sum := sum(103:sum)
+        - EXCHANGE(GATHER)
+                Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 7.819600451567341E12}
+            - AGGREGATE(LOCAL) []
+                    Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 7.819600451551341E12}
+                    103:sum := sum(11:ss_quantity)
+                - HASH/INNER JOIN [1:ss_sold_date_sk = 75:d_date_sk] => [11:ss_quantity]
+                        Estimates: {row: 701490284, cpu: ?, memory: ?, network: ?, cost: 7.818898961265458E12}
+                    - HASH/INNER JOIN [7:ss_addr_sk = 62:ca_address_sk AND (70:ca_state IN ('MI', 'GA', 'NH') AND 23:ss_net_profit >= 0 AND 23:ss_net_profit <= 2000 OR 70:ca_state IN ('TX', 'KY', 'SD') AND 23:ss_net_profit >= 150 AND 23:ss_net_profit <= 3000 OR 70:ca_state IN ('NY', 'OH', 'FL') AND 23:ss_net_profit >= 50 AND 23:ss_net_profit <= 25000)] => [1:ss_sold_date_sk, 11:ss_quantity]
+                            Estimates: {row: 701490284, cpu: ?, memory: ?, network: ?, cost: 7.807655685682929E12}
+                        - EXCHANGE(SHUFFLE) [7]
+                                Estimates: {row: 3150000224, cpu: ?, memory: ?, network: ?, cost: 7.736980685154037E12}
+                            - HASH/INNER JOIN [5:ss_cdemo_sk = 53:cd_demo_sk AND (55:cd_marital_status = 'M' AND 56:cd_education_status = 'Unknown' AND 14:ss_sales_price >= 100.00 AND 14:ss_sales_price <= 150.00 OR 55:cd_marital_status = 'W' AND 56:cd_education_status = 'College' AND 14:ss_sales_price >= 50.00 AND 14:ss_sales_price <= 100.00 OR 55:cd_marital_status = 'D' AND 56:cd_education_status = 'Primary' AND 14:ss_sales_price >= 150.00 AND 14:ss_sales_price <= 200.00)] => [1:ss_sold_date_sk, 7:ss_addr_sk, 23:ss_net_profit, 11:ss_quantity]
+                                    Estimates: {row: 3150000224, cpu: ?, memory: ?, network: ?, cost: 7.560580672603912E12}
+                                - HASH/INNER JOIN [8:ss_store_sk = 24:s_store_sk] => [1:ss_sold_date_sk, 5:ss_cdemo_sk, 7:ss_addr_sk, 23:ss_net_profit, 11:ss_quantity, 14:ss_sales_price]
+                                        Estimates: {row: 7200000512, cpu: ?, memory: ?, network: ?, cost: 6.9552011914335E12}
+                                    - HIVE-SCAN [store_sales] => [1:ss_sold_date_sk, 5:ss_cdemo_sk, 7:ss_addr_sk, 23:ss_net_profit, 8:ss_store_sk, 11:ss_quantity, 14:ss_sales_price]
+                                            Estimates: {row: 28800002049, cpu: ?, memory: ?, network: ?, cost: 5.990400426192E12}
+                                            predicate: 14:ss_sales_price >= 50.00 AND 14:ss_sales_price <= 200.00 AND 23:ss_net_profit >= 0 AND 23:ss_net_profit <= 25000
+                                    - EXCHANGE(BROADCAST)
+                                            Estimates: {row: 1350, cpu: ?, memory: ?, network: ?, cost: 475200.0}
+                                        - HIVE-SCAN [store] => [24:s_store_sk]
+                                                Estimates: {row: 1350, cpu: ?, memory: ?, network: ?, cost: 43200.0}
+                                                predicate: 24:s_store_sk IS NOT NULL
+                                - EXCHANGE(BROADCAST)
+                                        Estimates: {row: 1920800, cpu: ?, memory: ?, network: ?, cost: 3.380608E9}
+                                    - HIVE-SCAN [customer_demographics] => [53:cd_demo_sk, 55:cd_marital_status, 56:cd_education_status]
+                                            Estimates: {row: 1920800, cpu: ?, memory: ?, network: ?, cost: 3.07328E8}
+                                            predicate: 55:cd_marital_status IN ('M', 'W', 'D') AND 56:cd_education_status IN ('Unknown', 'College', 'Primary')
+                        - EXCHANGE(SHUFFLE) [62]
+                                Estimates: {row: 32500000, cpu: ?, memory: ?, network: ?, cost: 6.76E9}
+                            - HIVE-SCAN [customer_address] => [70:ca_state, 62:ca_address_sk]
+                                    Estimates: {row: 32500000, cpu: ?, memory: ?, network: ?, cost: 5.2E9}
+                                    predicate: 70:ca_state IN ('MI', 'GA', 'NH', 'TX', 'KY', 'SD', 'NY', 'OH', 'FL') AND 72:ca_country = 'United States'
+                    - EXCHANGE(BROADCAST)
+                            Estimates: {row: 36524, cpu: ?, memory: ?, network: ?, cost: 1.3441016E7}
+                        - HIVE-SCAN [date_dim] => [75:d_date_sk]
+                                Estimates: {row: 36524, cpu: ?, memory: ?, network: ?, cost: 1753176.0}
+                                predicate: 81:d_year = 1998

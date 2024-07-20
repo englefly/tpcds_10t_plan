@@ -1,0 +1,95 @@
+Explain String
+- Output => [230:c_last_name, 229:c_first_name, 175:s_store_name, 253:sum]
+    - CTEAnchor[1]
+            Estimates: {row: 426503043, cpu: ?, memory: ?, network: ?, cost: 1.629611038556513E13}
+        - CTEProduce[1]
+            - AGGREGATE(GLOBAL) [104:c_last_name, 103:c_first_name, 49:s_store_name, 121:ca_state, 68:s_state, 90:i_color, 78:i_current_price, 93:i_manager_id, 91:i_units, 88:i_size] => [49:s_store_name, 103:c_first_name, 104:c_last_name, 90:i_color, 126:sum]
+                    Estimates: {row: 701770218, cpu: ?, memory: ?, network: ?, cost: 1.4638084761483916E13}
+                    126:sum := sum(126:sum)
+                - EXCHANGE(SHUFFLE) [104, 103, 49, 121, 68, 90, 78, 93, 91, 88]
+                        Estimates: {row: 904734679, cpu: ?, memory: ?, network: ?, cost: 1.4348563148286256E13}
+                    - AGGREGATE(LOCAL) [104:c_last_name, 103:c_first_name, 49:s_store_name, 121:ca_state, 68:s_state, 90:i_color, 78:i_current_price, 93:i_manager_id, 91:i_units, 88:i_size]
+                            Estimates: {row: 904734679, cpu: ?, memory: ?, network: ?, cost: 1.4320335426272541E13}
+                            126:sum := sum(14:ss_sales_price)
+                        - HASH/INNER JOIN [99:c_current_addr_sk = 113:ca_address_sk AND 69:s_zip = 122:ca_zip AND 109:c_birth_country != upper(123:ca_country)] => [49:s_store_name, 68:s_state, 103:c_first_name, 104:c_last_name, 88:i_size, 121:ca_state, 90:i_color, 91:i_units, 93:i_manager_id, 78:i_current_price, 14:ss_sales_price]
+                                Estimates: {row: 1166400082, cpu: ?, memory: ?, network: ?, cost: 1.4280676983445578E13}
+                            - EXCHANGE(SHUFFLE) [99, 69]
+                                    Estimates: {row: 5832000414, cpu: ?, memory: ?, network: ?, cost: 1.3652993427129762E13}
+                                - HASH/INNER JOIN [4:ss_customer_sk = 95:c_customer_sk] => [99:c_current_addr_sk, 68:s_state, 69:s_zip, 103:c_first_name, 104:c_last_name, 109:c_birth_country, 14:ss_sales_price, 78:i_current_price, 49:s_store_name, 88:i_size, 90:i_color, 91:i_units, 93:i_manager_id]
+                                        Estimates: {row: 5832000414, cpu: ?, memory: ?, network: ?, cost: 1.1646785284396422E13}
+                                    - EXCHANGE(SHUFFLE) [4]
+                                            Estimates: {row: 5832000414, cpu: ?, memory: ?, network: ?, cost: 1.0706963219668512E13}
+                                        - HASH/INNER JOIN [3:ss_item_sk = 73:i_item_sk] => [49:s_store_name, 4:ss_customer_sk, 68:s_state, 69:s_zip, 88:i_size, 90:i_color, 91:i_units, 93:i_manager_id, 14:ss_sales_price, 78:i_current_price]
+                                                Estimates: {row: 5832000414, cpu: ?, memory: ?, network: ?, cost: 9.26062711676773E12}
+                                            - HASH/INNER JOIN [8:ss_store_sk = 44:s_store_sk] => [49:s_store_name, 3:ss_item_sk, 4:ss_customer_sk, 68:s_state, 69:s_zip, 14:ss_sales_price]
+                                                    Estimates: {row: 5832000414, cpu: ?, memory: ?, network: ?, cost: 8.580818446677301E12}
+                                                - HASH/INNER JOIN [10:ss_ticket_number = 33:sr_ticket_number AND 3:ss_item_sk = 26:sr_item_sk] => [3:ss_item_sk, 4:ss_customer_sk, 8:ss_store_sk, 14:ss_sales_price]
+                                                        Estimates: {row: 23328001659, cpu: ?, memory: ?, network: ?, cost: 7.950959680865671E12}
+                                                    - EXCHANGE(SHUFFLE) [10, 3]
+                                                            Estimates: {row: 23328001659, cpu: ?, memory: ?, network: ?, cost: 5.598720398325601E12}
+                                                        - HIVE-SCAN [store_sales] => [3:ss_item_sk, 4:ss_customer_sk, 8:ss_store_sk, 10:ss_ticket_number, 14:ss_sales_price]
+                                                                Estimates: {row: 23328001659, cpu: ?, memory: ?, network: ?, cost: 3.7324802655504004E12}
+                                                                predicate: 10:ss_ticket_number IS NOT NULL AND 3:ss_item_sk IS NOT NULL
+                                                    - EXCHANGE(SHUFFLE) [33, 26]
+                                                            Estimates: {row: 2332793271, cpu: ?, memory: ?, network: ?, cost: 2.2394815404768005E11}
+                                                        - HIVE-SCAN [store_returns] => [33:sr_ticket_number, 26:sr_item_sk]
+                                                                Estimates: {row: 2332793271, cpu: ?, memory: ?, network: ?, cost: 1.4929876936512003E11}
+                                                                predicate: 33:sr_ticket_number IS NOT NULL AND 26:sr_item_sk IS NOT NULL
+                                                - EXCHANGE(BROADCAST)
+                                                        Estimates: {row: 750, cpu: ?, memory: ?, network: ?, cost: 1860000.0}
+                                                    - HIVE-SCAN [store] => [49:s_store_name, 68:s_state, 69:s_zip, 44:s_store_sk]
+                                                            Estimates: {row: 750, cpu: ?, memory: ?, network: ?, cost: 180000.0}
+                                                            predicate: 54:s_market_id = 10
+                                            - EXCHANGE(BROADCAST)
+                                                    Estimates: {row: 361800, cpu: ?, memory: ?, network: ?, cost: 1.0825056E9}
+                                                - HIVE-SCAN [item] => [88:i_size, 73:i_item_sk, 90:i_color, 91:i_units, 93:i_manager_id, 78:i_current_price]
+                                                        Estimates: {row: 361800, cpu: ?, memory: ?, network: ?, cost: 9.84096E7}
+                                                        predicate: 73:i_item_sk IS NOT NULL
+                                    - EXCHANGE(SHUFFLE) [95]
+                                            Estimates: {row: 58500000, cpu: ?, memory: ?, network: ?, cost: 2.2464E10}
+                                        - HIVE-SCAN [customer] => [99:c_current_addr_sk, 103:c_first_name, 104:c_last_name, 109:c_birth_country, 95:c_customer_sk]
+                                                Estimates: {row: 58500000, cpu: ?, memory: ?, network: ?, cost: 1.4976E10}
+                                                predicate: 95:c_customer_sk IS NOT NULL
+                            - EXCHANGE(SHUFFLE) [113, 122]
+                                    Estimates: {row: 26325000, cpu: ?, memory: ?, network: ?, cost: 8.8452E9}
+                                - HIVE-SCAN [customer_address] => [113:ca_address_sk, 121:ca_state, 122:ca_zip, 123:ca_country]
+                                        Estimates: {row: 26325000, cpu: ?, memory: ?, network: ?, cost: 5.8968E9}
+                                        predicate: 113:ca_address_sk IS NOT NULL AND 122:ca_zip IS NOT NULL
+        - SORT(FINAL)[230: c_last_name ASC NULLS FIRST, 229: c_first_name ASC NULLS FIRST, 175: s_store_name ASC NULLS FIRST]
+                Estimates: {row: 426503043, cpu: ?, memory: ?, network: ?, cost: 1.388545860187834E12}
+            - SORT(PARTIAL)[230: c_last_name ASC NULLS FIRST, 229: c_first_name ASC NULLS FIRST, 175: s_store_name ASC NULLS FIRST]
+                    Estimates: {row: 426503043, cpu: ?, memory: ?, network: ?, cost: 1.252064886329114E12}
+                - NESTLOOP/INNER JOIN [cast(253:sum as double) > cast(381:expr as double)] => [229:c_first_name, 230:c_last_name, 253:sum, 175:s_store_name]
+                        Estimates: {row: 426503043, cpu: ?, memory: ?, network: ?, cost: 1.115583912470394E12}
+                    - AGGREGATE(GLOBAL) [230:c_last_name, 229:c_first_name, 175:s_store_name]
+                            Estimates: {row: 853006086, cpu: ?, memory: ?, network: ?, cost: 2.202104418110487E11}
+                            253:sum := sum(253:sum)
+                        - EXCHANGE(SHUFFLE) [230, 229, 175]
+                                Estimates: {row: 1547403331, cpu: ?, memory: ?, network: ?, cost: 6.150875610866405E10}
+                            - AGGREGATE(LOCAL) [230:c_last_name, 229:c_first_name, 175:s_store_name]
+                                    Estimates: {row: 1547403331, cpu: ?, memory: ?, network: ?, cost: 4.1701993462500595E10}
+                                    253:sum := sum(252:sum)
+                                - CTEConsume[1]
+                                        229:c_first_name := 103:c_first_name
+                                        230:c_last_name := 104:c_last_name
+                                        216:i_color := 90:i_color
+                                        252:sum := 126:sum
+                                        175:s_store_name := 49:s_store_name
+                                        Estimates: {row: 2807080873, cpu: ?, memory: ?, network: ?, cost: 0.0}
+                                        predicate: 216:i_color = 'snow'
+                    - EXCHANGE(BROADCAST)
+                            Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 2.1895231563537148E10}
+                        - ASSERT LE 1
+                                Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 2.1895230923537148E10}
+                            - AGGREGATE(GLOBAL) [] => [381:expr]
+                                    Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 2.1895230923537148E10}
+                                    380:avg := avg(380:avg)
+                                    381:expr := 0.05 * 380:avg
+                                - EXCHANGE(GATHER)
+                                        Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 2.1895230851537148E10}
+                                    - AGGREGATE(LOCAL) []
+                                            Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 2.1895230819537148E10}
+                                            380:avg := avg(379:sum)
+                                        - CTEConsume[1]
+                                                379:sum := 126:sum
+                                                Estimates: {row: 2807080873, cpu: ?, memory: ?, network: ?, cost: 0.0}

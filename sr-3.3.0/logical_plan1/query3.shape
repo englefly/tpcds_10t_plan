@@ -1,0 +1,31 @@
+Explain String
+- Output => [7:d_year, 59:i_brand_id, 60:i_brand, 74:sum]
+    - TOP-100(FINAL)[7: d_year ASC NULLS FIRST, 74: sum DESC NULLS LAST, 59: i_brand_id ASC NULLS FIRST]
+            Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 5.984422806093607E12}
+        - TOP-100(PARTIAL)[7: d_year ASC NULLS FIRST, 74: sum DESC NULLS LAST, 59: i_brand_id ASC NULLS FIRST]
+                Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 5.984422790093607E12}
+            - AGGREGATE(GLOBAL) [7:d_year, 60:i_brand, 59:i_brand_id]
+                    Estimates: {row: 7876481060, cpu: ?, memory: ?, network: ?, cost: 5.354304297263306E12}
+                    74:sum := sum(74:sum)
+                - EXCHANGE(SHUFFLE) [7, 60, 59]
+                        Estimates: {row: 14288401016, cpu: ?, memory: ?, network: ?, cost: 4.438417792101802E12}
+                    - AGGREGATE(LOCAL) [7:d_year, 60:i_brand, 59:i_brand_id]
+                            Estimates: {row: 14288401016, cpu: ?, memory: ?, network: ?, cost: 4.324110583969321E12}
+                            74:sum := sum(42:ss_sales_price)
+                        - HASH/INNER JOIN [31:ss_item_sk = 52:i_item_sk] => [7:d_year, 42:ss_sales_price, 59:i_brand_id, 60:i_brand]
+                                Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 4.147595371411E12}
+                            - HASH/INNER JOIN [29:ss_sold_date_sk = 1:d_date_sk] => [7:d_year, 42:ss_sales_price, 31:ss_item_sk]
+                                    Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 3.2659490867116E12}
+                                - HIVE-SCAN [store_sales] => [42:ss_sales_price, 29:ss_sold_date_sk, 31:ss_item_sk]
+                                        Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 2.4883201770336E12}
+                                        predicate: 29:ss_sold_date_sk IS NOT NULL
+                                - EXCHANGE(BROADCAST)
+                                        Estimates: {row: 36524, cpu: ?, memory: ?, network: ?, cost: 1.9869328E7}
+                                    - HIVE-SCAN [date_dim] => [1:d_date_sk, 7:d_year]
+                                            Estimates: {row: 36524, cpu: ?, memory: ?, network: ?, cost: 2337568.0}
+                                            predicate: 9:d_moy = 11
+                            - EXCHANGE(BROADCAST)
+                                    Estimates: {row: 201000, cpu: ?, memory: ?, network: ?, cost: 2.50848E8}
+                                - HIVE-SCAN [item] => [52:i_item_sk, 59:i_brand_id, 60:i_brand]
+                                        Estimates: {row: 201000, cpu: ?, memory: ?, network: ?, cost: 2.5728E7}
+                                        predicate: 65:i_manufact_id = 816

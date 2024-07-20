@@ -1,0 +1,73 @@
+Explain String
+- Output => [118:case, 119:case, 64:sum(63: sum), 117:sum(116: sum), 120:max(64: sum(63: sum)), 121:max(117: sum(116: sum))]
+    - TOP-100(FINAL)[118: case ASC NULLS FIRST, 119: case ASC NULLS FIRST]
+            Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 7.267368707366387E12}
+        - TOP-100(PARTIAL)[118: case ASC NULLS FIRST, 119: case ASC NULLS FIRST]
+                Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 7.267368665766387E12}
+            - PREDICATE [120: max(64: sum(63: sum)) > 121: max(117: sum(116: sum))]
+                - ANALYTIC [ partition by (118:case), order by (119: case ASC NULLS FIRST)]
+                        Estimates: {row: 1786040902, cpu: ?, memory: ?, network: ?, cost: 7.0316112402945E12}
+                        120:max(64: sum(63: sum)) := max(64:sum(63: sum)) ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+                        121:max(117: sum(116: sum)) := max(117:sum(116: sum)) ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+                    - SORT(GLOBAL)[118: case ASC NULLS FIRST, 119: case ASC NULLS FIRST]
+                            Estimates: {row: 1786040902, cpu: ?, memory: ?, network: ?, cost: 6.913732540758557E12}
+                        - EXCHANGE(SHUFFLE) [118]
+                                Estimates: {row: 1786040902, cpu: ?, memory: ?, network: ?, cost: 6.913732540758557E12}
+                            - HASH/FULL OUTER JOIN [67:ss_item_sk = 4:ws_item_sk AND 90:d_date = 37:d_date] => [117:sum(116: sum), 118:case, 119:case, 64:sum(63: sum)]
+                                    Estimates: {row: 1786040902, cpu: ?, memory: ?, network: ?, cost: 6.756560941377299E12}
+                                    118:case := if(4:ws_item_sk IS NOT NULL, 4:ws_item_sk, 67:ss_item_sk)
+                                    119:case := if(37:d_date IS NOT NULL, 37:d_date, 90:d_date)
+                                - EXCHANGE(SHUFFLE) [67, 90]
+                                        Estimates: {row: 7144200508, cpu: ?, memory: ?, network: ?, cost: 5.012910383824135E12}
+                                    - ANALYTIC [ partition by (67:ss_item_sk), order by (90: d_date ASC NULLS FIRST)]
+                                            Estimates: {row: 7144200508, cpu: ?, memory: ?, network: ?, cost: 4.612835155360451E12}
+                                            117:sum(116: sum) := sum(116:sum) ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+                                        - SORT(GLOBAL)[67: ss_item_sk ASC NULLS FIRST, 90: d_date ASC NULLS FIRST]
+                                                Estimates: {row: 7144200508, cpu: ?, memory: ?, network: ?, cost: 4.45566274417829E12}
+                                            - EXCHANGE(SHUFFLE) [67]
+                                                    Estimates: {row: 7144200508, cpu: ?, memory: ?, network: ?, cost: 4.45566274417829E12}
+                                                - AGGREGATE(GLOBAL) [67:ss_item_sk, 90:d_date]
+                                                        Estimates: {row: 7144200508, cpu: ?, memory: ?, network: ?, cost: 4.0555875157146064E12}
+                                                        116:sum := sum(116:sum)
+                                                    - EXCHANGE(SHUFFLE) [67, 90]
+                                                            Estimates: {row: 13608000968, cpu: ?, memory: ?, network: ?, cost: 3.465000273696788E12}
+                                                        - AGGREGATE(LOCAL) [67:ss_item_sk, 90:d_date]
+                                                                Estimates: {row: 13608000968, cpu: ?, memory: ?, network: ?, cost: 3.3887954682751343E12}
+                                                                116:sum := sum(78:ss_sales_price)
+                                                            - HASH/INNER JOIN [65:ss_sold_date_sk = 88:d_date_sk] => [67:ss_item_sk, 90:d_date, 78:ss_sales_price]
+                                                                    Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 3.2659346595341E12}
+                                                                - HIVE-SCAN [store_sales] => [65:ss_sold_date_sk, 67:ss_item_sk, 78:ss_sales_price]
+                                                                        Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 2.4883201770336E12}
+                                                                        predicate: 67:ss_item_sk IS NOT NULL
+                                                                - EXCHANGE(BROADCAST)
+                                                                        Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 9934664.0}
+                                                                    - HIVE-SCAN [date_dim] => [88:d_date_sk, 90:d_date]
+                                                                            Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 1168784.0}
+                                                                            predicate: 91:d_month_seq >= 1214 AND 91:d_month_seq <= 1225
+                                - EXCHANGE(SHUFFLE) [4, 37]
+                                        Estimates: {row: 1786040902, cpu: ?, memory: ?, network: ?, cost: 1.2532319433942004E12}
+                                    - ANALYTIC [ partition by (4:ws_item_sk), order by (37: d_date ASC NULLS FIRST)]
+                                            Estimates: {row: 1786040902, cpu: ?, memory: ?, network: ?, cost: 1.1532136528788545E12}
+                                            64:sum(63: sum) := sum(63:sum) ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+                                        - SORT(GLOBAL)[4: ws_item_sk ASC NULLS FIRST, 37: d_date ASC NULLS FIRST]
+                                                Estimates: {row: 1786040902, cpu: ?, memory: ?, network: ?, cost: 1.11392075303354E12}
+                                            - EXCHANGE(SHUFFLE) [4]
+                                                    Estimates: {row: 1786040902, cpu: ?, memory: ?, network: ?, cost: 1.11392075303354E12}
+                                                - AGGREGATE(GLOBAL) [4:ws_item_sk, 37:d_date]
+                                                        Estimates: {row: 1786040902, cpu: ?, memory: ?, network: ?, cost: 1.0139024625181941E12}
+                                                        63:sum := sum(63:sum)
+                                                    - EXCHANGE(SHUFFLE) [4, 37]
+                                                            Estimates: {row: 3401982670, cpu: ?, memory: ?, network: ?, cost: 8.66256414614588E11}
+                                                        - AGGREGATE(LOCAL) [4:ws_item_sk, 37:d_date]
+                                                                Estimates: {row: 3401982670, cpu: ?, memory: ?, network: ?, cost: 8.47205311659284E11}
+                                                                63:sum := sum(22:ws_sales_price)
+                                                            - HASH/INNER JOIN [1:ws_sold_date_sk = 35:d_date_sk] => [4:ws_item_sk, 37:d_date, 22:ws_sales_price]
+                                                                    Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 8.164902681191001E11}
+                                                                - HIVE-SCAN [web_sales] => [1:ws_sold_date_sk, 4:ws_item_sk, 22:ws_sales_price]
+                                                                        Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 6.220768311936001E11}
+                                                                        predicate: 4:ws_item_sk IS NOT NULL
+                                                                - EXCHANGE(BROADCAST)
+                                                                        Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 9934664.0}
+                                                                    - HIVE-SCAN [date_dim] => [35:d_date_sk, 37:d_date]
+                                                                            Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 1168784.0}
+                                                                            predicate: 38:d_month_seq >= 1214 AND 38:d_month_seq <= 1225

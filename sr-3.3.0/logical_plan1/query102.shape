@@ -1,0 +1,67 @@
+Explain String
+- Output => [98:w_warehouse_sk, 76:i_item_sk, 120:d_moy, 141:avg, 142:case, 169:w_warehouse_sk, 147:i_item_sk, 191:d_moy, 212:avg, 213:case]
+    - CTEAnchor[1]
+            Estimates: {row: 49431626, cpu: ?, memory: ?, network: ?, cost: 2.7052168246641974E11}
+        - CTEProduce[1]
+            - AGGREGATE(GLOBAL) [29:w_warehouse_name, 27:w_warehouse_sk, 5:i_item_sk, 49:d_moy] => [49:d_moy, 5:i_item_sk, 70:avg, 71:case, 27:w_warehouse_sk]
+                    Estimates: {row: 37073719, cpu: ?, memory: ?, network: ?, cost: 2.2583672816930457E11}
+                    69:stddev_samp := stddev_samp(69:stddev_samp)
+                    70:avg := avg(70:avg)
+                    71:case := if(70:avg = 0.0, null, 69:stddev_samp / 70:avg)
+                    predicate: (49:d_moy = 3 OR 49:d_moy = 2 AND if(70:avg = 0.0, null, 69:stddev_samp / 70:avg) > 1.5) AND if(70:avg = 0.0, 0.0, 69:stddev_samp / 70:avg) > 1.0
+                - EXCHANGE(SHUFFLE) [29, 27, 5, 49]
+                        Estimates: {row: 170803589, cpu: ?, memory: ?, network: ?, cost: 2.1694698853764124E11}
+                    - AGGREGATE(LOCAL) [29:w_warehouse_name, 27:w_warehouse_sk, 5:i_item_sk, 49:d_moy]
+                            Estimates: {row: 170803589, cpu: ?, memory: ?, network: ?, cost: 2.15170631207735E11}
+                            69:stddev_samp := stddev_samp(4:inv_quantity_on_hand)
+                            70:avg := avg(4:inv_quantity_on_hand)
+                        - HASH/INNER JOIN [1:inv_date_sk = 41:d_date_sk] => [49:d_moy, 4:inv_quantity_on_hand, 5:i_item_sk, 27:w_warehouse_sk, 29:w_warehouse_name]
+                                Estimates: {row: 295093125, cpu: ?, memory: ?, network: ?, cost: 2.1268605037782874E11}
+                            - HASH/INNER JOIN [3:inv_warehouse_sk = 27:w_warehouse_sk] => [1:inv_date_sk, 4:inv_quantity_on_hand, 5:i_item_sk, 27:w_warehouse_sk, 29:w_warehouse_name]
+                                    Estimates: {row: 295093125, cpu: ?, memory: ?, network: ?, cost: 1.9908291227282874E11}
+                                - HASH/INNER JOIN [2:inv_item_sk = 5:i_item_sk] => [1:inv_date_sk, 3:inv_warehouse_sk, 4:inv_quantity_on_hand, 5:i_item_sk]
+                                        Estimates: {row: 1180372500, cpu: ?, memory: ?, network: ?, cost: 1.7488524119282874E11}
+                                    - HIVE-SCAN [inventory] => [1:inv_date_sk, 2:inv_item_sk, 3:inv_warehouse_sk, 4:inv_quantity_on_hand]
+                                            Estimates: {row: 1180372500, cpu: ?, memory: ?, network: ?, cost: 1.3220172E11}
+                                            predicate: 2:inv_item_sk IS NOT NULL
+                                    - EXCHANGE(BROADCAST)
+                                            Estimates: {row: 361800, cpu: ?, memory: ?, network: ?, cost: 1.273536E8}
+                                        - HIVE-SCAN [item] => [5:i_item_sk]
+                                                Estimates: {row: 361800, cpu: ?, memory: ?, network: ?, cost: 1.15776E7}
+                                                predicate: 5:i_item_sk IS NOT NULL
+                                - EXCHANGE(BROADCAST)
+                                        Estimates: {row: 22, cpu: ?, memory: ?, network: ?, cost: 23760.0}
+                                    - HIVE-SCAN [warehouse] => [27:w_warehouse_sk, 29:w_warehouse_name]
+                                            Estimates: {row: 22, cpu: ?, memory: ?, network: ?, cost: 2160.0}
+                                            predicate: 27:w_warehouse_sk IS NOT NULL
+                            - EXCHANGE(BROADCAST)
+                                    Estimates: {row: 36524, cpu: ?, memory: ?, network: ?, cost: 1.9869328E7}
+                                - HIVE-SCAN [date_dim] => [49:d_moy, 41:d_date_sk]
+                                        Estimates: {row: 36524, cpu: ?, memory: ?, network: ?, cost: 2337568.0}
+                                        predicate: 49:d_moy IN (3, 2) AND 47:d_year = 2000
+        - SORT(FINAL)[98: w_warehouse_sk ASC NULLS FIRST, 76: i_item_sk ASC NULLS FIRST, 120: d_moy ASC NULLS FIRST, 141: avg ASC NULLS FIRST, 142: case ASC NULLS FIRST, 191: d_moy ASC NULLS FIRST, 212: avg ASC NULLS FIRST, 213: case ASC NULLS FIRST]
+                Estimates: {row: 49431626, cpu: ?, memory: ?, network: ?, cost: 3.827861561518245E10}
+            - SORT(PARTIAL)[98: w_warehouse_sk ASC NULLS FIRST, 76: i_item_sk ASC NULLS FIRST, 120: d_moy ASC NULLS FIRST, 141: avg ASC NULLS FIRST, 142: case ASC NULLS FIRST, 191: d_moy ASC NULLS FIRST, 212: avg ASC NULLS FIRST, 213: case ASC NULLS FIRST]
+                    Estimates: {row: 49431626, cpu: ?, memory: ?, network: ?, cost: 2.404230724110975E10}
+                - HASH/INNER JOIN [147:i_item_sk = 76:i_item_sk AND 169:w_warehouse_sk = 98:w_warehouse_sk]
+                        Estimates: {row: 49431626, cpu: ?, memory: ?, network: ?, cost: 9.805998867037052E9}
+                    - EXCHANGE(SHUFFLE) [147, 169]
+                            Estimates: {row: 49431626, cpu: ?, memory: ?, network: ?, cost: 3.5590770935181737E9}
+                        - CTEConsume[1]
+                                147:i_item_sk := 5:i_item_sk
+                                212:avg := 70:avg
+                                213:case := 71:case
+                                169:w_warehouse_sk := 27:w_warehouse_sk
+                                191:d_moy := 49:d_moy
+                                Estimates: {row: 49431626, cpu: ?, memory: ?, network: ?, cost: 0.0}
+                                predicate: 191:d_moy = 3
+                    - EXCHANGE(SHUFFLE) [76, 98]
+                            Estimates: {row: 24715813, cpu: ?, memory: ?, network: ?, cost: 1.7795385467590868E9}
+                        - CTEConsume[1]
+                                98:w_warehouse_sk := 27:w_warehouse_sk
+                                120:d_moy := 49:d_moy
+                                76:i_item_sk := 5:i_item_sk
+                                141:avg := 70:avg
+                                142:case := 71:case
+                                Estimates: {row: 24715813, cpu: ?, memory: ?, network: ?, cost: 0.0}
+                                predicate: 120:d_moy = 2 AND 142:case > 1.5

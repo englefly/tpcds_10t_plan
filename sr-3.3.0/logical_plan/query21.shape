@@ -1,0 +1,43 @@
+Explain String
+- Output => [7:w_warehouse_name, 20:i_item_id, 71:sum, 72:sum]
+    - TOP-100(FINAL)[7: w_warehouse_name ASC NULLS FIRST, 20: i_item_id ASC NULLS FIRST]
+            Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 1.9467181823025E11}
+        - TOP-100(PARTIAL)[7: w_warehouse_name ASC NULLS FIRST, 20: i_item_id ASC NULLS FIRST]
+                Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 1.9467179903025E11}
+            - AGGREGATE(GLOBAL) [7:w_warehouse_name, 20:i_item_id]
+                    Estimates: {row: 20333760, cpu: ?, memory: ?, network: ?, cost: 1.92719748408375E11}
+                    71:sum := sum(71:sum)
+                    72:sum := sum(72:sum)
+                    predicate: if(71:sum > 0, cast(72:sum as double) / cast(71:sum as double), null) >= cast(2.0 / 3.0 as double) AND if(71:sum > 0, cast(72:sum as double) / cast(71:sum as double), null) <= 1.5
+                - EXCHANGE(SHUFFLE) [7, 20]
+                        Estimates: {row: 154923890, cpu: ?, memory: ?, network: ?, cost: 1.870495340115E11}
+                    - AGGREGATE(LOCAL) [7:w_warehouse_name, 20:i_item_id]
+                            Estimates: {row: 154923890, cpu: ?, memory: ?, network: ?, cost: 1.855622646615E11}
+                            71:sum := sum(69:case)
+                            72:sum := sum(70:case)
+                        - HASH/INNER JOIN [2:inv_item_sk = 19:i_item_sk] => [20:i_item_id, 69:case, 70:case, 7:w_warehouse_name]
+                                Estimates: {row: 295093125, cpu: ?, memory: ?, network: ?, cost: 1.831306973115E11}
+                                69:case := if(43:d_date < 1999-03-20, 4:inv_quantity_on_hand, 0)
+                                70:case := if(43:d_date >= 1999-03-20, 4:inv_quantity_on_hand, 0)
+                            - HASH/INNER JOIN [1:inv_date_sk = 41:d_date_sk] => [2:inv_item_sk, 4:inv_quantity_on_hand, 7:w_warehouse_name, 43:d_date]
+                                    Estimates: {row: 295093125, cpu: ?, memory: ?, network: ?, cost: 1.688074373115E11}
+                                - HASH/INNER JOIN [3:inv_warehouse_sk = 5:w_warehouse_sk] => [1:inv_date_sk, 2:inv_item_sk, 4:inv_quantity_on_hand, 7:w_warehouse_name]
+                                        Estimates: {row: 295093125, cpu: ?, memory: ?, network: ?, cost: 1.5639939108E11}
+                                    - HIVE-SCAN [inventory] => [1:inv_date_sk, 2:inv_item_sk, 3:inv_warehouse_sk, 4:inv_quantity_on_hand]
+                                            Estimates: {row: 1180372500, cpu: ?, memory: ?, network: ?, cost: 1.3220172E11}
+                                            predicate: 3:inv_warehouse_sk IS NOT NULL
+                                    - EXCHANGE(BROADCAST)
+                                            Estimates: {row: 22, cpu: ?, memory: ?, network: ?, cost: 23760.0}
+                                        - HIVE-SCAN [warehouse] => [5:w_warehouse_sk, 7:w_warehouse_name]
+                                                Estimates: {row: 22, cpu: ?, memory: ?, network: ?, cost: 2160.0}
+                                                predicate: 5:w_warehouse_sk IS NOT NULL
+                                - EXCHANGE(BROADCAST)
+                                        Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 9642468.0}
+                                    - HIVE-SCAN [date_dim] => [41:d_date_sk, 43:d_date]
+                                            Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 876588.0}
+                                            predicate: 43:d_date >= 1999-02-18 AND 43:d_date <= 1999-04-19
+                            - EXCHANGE(BROADCAST)
+                                    Estimates: {row: 100500, cpu: ?, memory: ?, network: ?, cost: 1.09344E8}
+                                - HIVE-SCAN [item] => [19:i_item_sk, 20:i_item_id]
+                                        Estimates: {row: 100500, cpu: ?, memory: ?, network: ?, cost: 1.2864E7}
+                                        predicate: 24:i_current_price >= 0.99 AND 24:i_current_price <= 1.49

@@ -1,0 +1,111 @@
+Explain String
+- Output => [4:ss_customer_sk, 256:round, 72:sum, 73:sum, 74:sum, 257:expr, 258:expr, 259:expr]
+    - TOP-100(FINAL)[4: ss_customer_sk ASC NULLS FIRST, 72: sum DESC NULLS LAST, 73: sum DESC NULLS LAST, 74: sum DESC NULLS LAST, 257: expr ASC NULLS FIRST, 258: expr ASC NULLS FIRST, 259: expr ASC NULLS FIRST, 256: round ASC NULLS FIRST]
+            Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 1.9610826365393184E13}
+        - TOP-100(PARTIAL)[4: ss_customer_sk ASC NULLS FIRST, 72: sum DESC NULLS LAST, 73: sum DESC NULLS LAST, 74: sum DESC NULLS LAST, 257: expr ASC NULLS FIRST, 258: expr ASC NULLS FIRST, 259: expr ASC NULLS FIRST, 256: round ASC NULLS FIRST]
+                Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 1.9610826304593184E13}
+            - HASH/LEFT OUTER JOIN [50:d_year = 231:d_year AND 3:ss_item_sk = 179:cs_item_sk AND 4:ss_customer_sk = 167:cs_bill_customer_sk] => [4:ss_customer_sk, 72:sum, 73:sum, 74:sum, 256:round, 257:expr, 258:expr, 259:expr]
+                    Estimates: {row: 590736079, cpu: ?, memory: ?, network: ?, cost: 1.9365080053909367E13}
+                    256:round := round(cast(72:sum as double) / cast(262:add as double), 2)
+                    257:expr := 262:add
+                    258:expr := coalesce(162:sum, 0) + coalesce(254:sum, 0)
+                    259:expr := coalesce(163:sum, 0) + coalesce(255:sum, 0)
+                    260:coalesce := coalesce(161:sum, 0), 
+                    261:coalesce := coalesce(253:sum, 0), 
+                    262:add := 260:coalesce + 261:coalesce, 
+                    predicate: coalesce(161:sum, 0) > 0 OR coalesce(253:sum, 0) > 0
+                - HASH/LEFT OUTER JOIN [50:d_year = 139:d_year AND 3:ss_item_sk = 78:ws_item_sk AND 4:ss_customer_sk = 79:ws_bill_customer_sk] => [161:sum, 50:d_year, 162:sum, 3:ss_item_sk, 163:sum, 4:ss_customer_sk, 72:sum, 73:sum, 74:sum]
+                        Estimates: {row: 787648106, cpu: ?, memory: ?, network: ?, cost: 1.3712267806901512E13}
+                    - AGGREGATE(GLOBAL) [50:d_year, 3:ss_item_sk, 4:ss_customer_sk]
+                            Estimates: {row: 787648106, cpu: ?, memory: ?, network: ?, cost: 1.0875085850321463E13}
+                            72:sum := sum(72:sum)
+                            73:sum := sum(73:sum)
+                            74:sum := sum(74:sum)
+                        - EXCHANGE(SHUFFLE) [50, 3, 4]
+                                Estimates: {row: 1428840101, cpu: ?, memory: ?, network: ?, cost: 1.0737702874547236E13}
+                            - AGGREGATE(LOCAL) [50:d_year, 3:ss_item_sk, 4:ss_customer_sk]
+                                    Estimates: {row: 1428840101, cpu: ?, memory: ?, network: ?, cost: 1.0720556793327363E13}
+                                    72:sum := sum(11:ss_quantity)
+                                    73:sum := sum(12:ss_wholesale_cost)
+                                    74:sum := sum(14:ss_sales_price)
+                                - HASH/INNER JOIN [1:ss_sold_date_sk = 44:d_date_sk] => [50:d_year, 3:ss_item_sk, 4:ss_customer_sk, 11:ss_quantity, 12:ss_wholesale_cost, 14:ss_sales_price]
+                                        Estimates: {row: 2592000184, cpu: ?, memory: ?, network: ?, cost: 1.0696153111591143E13}
+                                    - HASH/LEFT OUTER JOIN [10:ss_ticket_number = 33:sr_ticket_number AND 3:ss_item_sk = 26:sr_item_sk] => [1:ss_sold_date_sk, 3:ss_item_sk, 4:ss_customer_sk, 11:ss_quantity, 12:ss_wholesale_cost, 14:ss_sales_price]
+                                            Estimates: {row: 2592000184, cpu: ?, memory: ?, network: ?, cost: 1.0566527659403941E13}
+                                            predicate: 33:sr_ticket_number IS NULL
+                                        - EXCHANGE(SHUFFLE) [10, 3]
+                                                Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 8.087040575359201E12}
+                                            - HIVE-SCAN [store_sales] => [1:ss_sold_date_sk, 3:ss_item_sk, 4:ss_customer_sk, 10:ss_ticket_number, 11:ss_quantity, 12:ss_wholesale_cost, 14:ss_sales_price]
+                                                    Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 5.391360383572801E12}
+                                                    predicate: 1:ss_sold_date_sk IS NOT NULL
+                                        - EXCHANGE(SHUFFLE) [33, 26]
+                                                Estimates: {row: 2879991693, cpu: ?, memory: ?, network: ?, cost: 2.76479202528E11}
+                                            - HIVE-SCAN [store_returns] => [33:sr_ticket_number, 26:sr_item_sk]
+                                                    Estimates: {row: 2879991693, cpu: ?, memory: ?, network: ?, cost: 1.84319468352E11}
+                                    - EXCHANGE(BROADCAST)
+                                            Estimates: {row: 32872, cpu: ?, memory: ?, network: ?, cost: 1.7356442400000002E7}
+                                        - HIVE-SCAN [date_dim] => [50:d_year, 44:d_date_sk]
+                                                Estimates: {row: 32872, cpu: ?, memory: ?, network: ?, cost: 1577858.4000000001}
+                                                predicate: 50:d_year = 2001 AND 44:d_date_sk IS NOT NULL
+                    - AGGREGATE(GLOBAL) [139:d_year, 78:ws_item_sk, 79:ws_bill_customer_sk]
+                            Estimates: {row: 196911009, cpu: ?, memory: ?, network: ?, cost: 2.7187798749626167E12}
+                            161:sum := sum(161:sum)
+                            162:sum := sum(162:sum)
+                            163:sum := sum(163:sum)
+                        - EXCHANGE(SHUFFLE) [139, 78, 79]
+                                Estimates: {row: 357208180, cpu: ?, memory: ?, network: ?, cost: 2.684434308416008E12}
+                            - AGGREGATE(LOCAL) [139:d_year, 78:ws_item_sk, 79:ws_bill_customer_sk]
+                                    Estimates: {row: 357208180, cpu: ?, memory: ?, network: ?, cost: 2.6801478102510645E12}
+                                    161:sum := sum(93:ws_quantity)
+                                    162:sum := sum(94:ws_wholesale_cost)
+                                    163:sum := sum(96:ws_sales_price)
+                                - HASH/INNER JOIN [75:ws_sold_date_sk = 133:d_date_sk] => [139:d_year, 93:ws_quantity, 78:ws_item_sk, 94:ws_wholesale_cost, 79:ws_bill_customer_sk, 96:ws_sales_price]
+                                        Estimates: {row: 647996699, cpu: ?, memory: ?, network: ?, cost: 2.674046921328473E12}
+                                    - HASH/LEFT OUTER JOIN [92:ws_order_number = 122:wr_order_number AND 78:ws_item_sk = 111:wr_item_sk] => [75:ws_sold_date_sk, 93:ws_quantity, 78:ws_item_sk, 94:ws_wholesale_cost, 79:ws_bill_customer_sk, 96:ws_sales_price]
+                                            Estimates: {row: 647996699, cpu: ?, memory: ?, network: ?, cost: 2.6416216434037734E12}
+                                            predicate: 122:wr_order_number IS NULL
+                                        - EXCHANGE(SHUFFLE) [92, 78]
+                                                Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 2.0217497013792002E12}
+                                            - HIVE-SCAN [web_sales] => [75:ws_sold_date_sk, 92:ws_order_number, 93:ws_quantity, 78:ws_item_sk, 94:ws_wholesale_cost, 79:ws_bill_customer_sk, 96:ws_sales_price]
+                                                    Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 1.3478331342528E12}
+                                                    predicate: 75:ws_sold_date_sk IS NOT NULL
+                                        - EXCHANGE(SHUFFLE) [122, 111]
+                                                Estimates: {row: 720020485, cpu: ?, memory: ?, network: ?, cost: 6.912196656E10}
+                                            - HIVE-SCAN [web_returns] => [122:wr_order_number, 111:wr_item_sk]
+                                                    Estimates: {row: 720020485, cpu: ?, memory: ?, network: ?, cost: 4.608131104E10}
+                                    - EXCHANGE(BROADCAST)
+                                            Estimates: {row: 32872, cpu: ?, memory: ?, network: ?, cost: 1.7356442400000002E7}
+                                        - HIVE-SCAN [date_dim] => [133:d_date_sk, 139:d_year]
+                                                Estimates: {row: 32872, cpu: ?, memory: ?, network: ?, cost: 1577858.4000000001}
+                                                predicate: 139:d_year = 2001 AND 133:d_date_sk IS NOT NULL
+                - AGGREGATE(GLOBAL) [231:d_year, 179:cs_item_sk, 167:cs_bill_customer_sk]
+                        Estimates: {row: 393823059, cpu: ?, memory: ?, network: ?, cost: 5.437547182502914E12}
+                        253:sum := sum(253:sum)
+                        254:sum := sum(254:sum)
+                        255:sum := sum(255:sum)
+                    - EXCHANGE(SHUFFLE) [231, 179, 167]
+                            Estimates: {row: 714418249, cpu: ?, memory: ?, network: ?, cost: 5.36885586784475E12}
+                        - AGGREGATE(LOCAL) [231:d_year, 179:cs_item_sk, 167:cs_bill_customer_sk]
+                                Estimates: {row: 714418249, cpu: ?, memory: ?, network: ?, cost: 5.360282848854651E12}
+                                253:sum := sum(182:cs_quantity)
+                                254:sum := sum(183:cs_wholesale_cost)
+                                255:sum := sum(185:cs_sales_price)
+                            - HASH/INNER JOIN [164:cs_sold_date_sk = 225:d_date_sk] => [179:cs_item_sk, 182:cs_quantity, 231:d_year, 167:cs_bill_customer_sk, 183:cs_wholesale_cost, 185:cs_sales_price]
+                                    Estimates: {row: 1295996823, cpu: ?, memory: ?, network: ?, cost: 5.348081038757633E12}
+                                - HASH/LEFT OUTER JOIN [181:cs_order_number = 214:cr_order_number AND 179:cs_item_sk = 200:cr_item_sk] => [179:cs_item_sk, 164:cs_sold_date_sk, 182:cs_quantity, 167:cs_bill_customer_sk, 183:cs_wholesale_cost, 185:cs_sales_price]
+                                        Estimates: {row: 1295996823, cpu: ?, memory: ?, network: ?, cost: 5.283255754595933E12}
+                                        predicate: 214:cr_order_number IS NULL
+                                    - EXCHANGE(SHUFFLE) [181, 179]
+                                            Estimates: {row: 12959968239, cpu: ?, memory: ?, network: ?, cost: 4.043510090568E12}
+                                        - HIVE-SCAN [catalog_sales] => [179:cs_item_sk, 164:cs_sold_date_sk, 181:cs_order_number, 182:cs_quantity, 167:cs_bill_customer_sk, 183:cs_wholesale_cost, 185:cs_sales_price]
+                                                Estimates: {row: 12959968239, cpu: ?, memory: ?, network: ?, cost: 2.695673393712E12}
+                                                predicate: 164:cs_sold_date_sk IS NOT NULL
+                                    - EXCHANGE(SHUFFLE) [214, 200]
+                                            Estimates: {row: 1440033112, cpu: ?, memory: ?, network: ?, cost: 1.38243178752E11}
+                                        - HIVE-SCAN [catalog_returns] => [214:cr_order_number, 200:cr_item_sk]
+                                                Estimates: {row: 1440033112, cpu: ?, memory: ?, network: ?, cost: 9.2162119168E10}
+                                - EXCHANGE(BROADCAST)
+                                        Estimates: {row: 32872, cpu: ?, memory: ?, network: ?, cost: 1.7356442400000002E7}
+                                    - HIVE-SCAN [date_dim] => [225:d_date_sk, 231:d_year]
+                                            Estimates: {row: 32872, cpu: ?, memory: ?, network: ?, cost: 1577858.4000000001}
+                                            predicate: 231:d_year = 2001 AND 225:d_date_sk IS NOT NULL

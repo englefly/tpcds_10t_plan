@@ -1,0 +1,118 @@
+Explain String
+- Output => [153:sum, 287:sum, 288:expr]
+    - TOP-100(FINAL)[153: sum ASC NULLS FIRST, 287: sum ASC NULLS FIRST]
+            Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 1.3708926079321156E13}
+        - TOP-100(PARTIAL)[153: sum ASC NULLS FIRST, 287: sum ASC NULLS FIRST]
+                Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 1.3708926079129156E13}
+            - NESTLOOP/CROSS JOIN => [153:sum, 287:sum, 288:expr]
+                    Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 1.3708926078937156E13}
+                    288:expr := cast(cast(153:sum as decimal(15, 4)) as decimal(38, 4)) / cast(cast(287:sum as decimal(15, 4)) as decimal(38, 4)) * 100
+                - AGGREGATE(GLOBAL) []
+                        Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 7.476415788206978E12}
+                        153:sum := sum(153:sum)
+                    - EXCHANGE(GATHER)
+                            Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 7.476415788166978E12}
+                        - AGGREGATE(LOCAL) []
+                                Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 7.476415788134978E12}
+                                153:sum := sum(16:ss_ext_sales_price)
+                            - HASH/INNER JOIN [3:ss_item_sk = 131:i_item_sk] => [16:ss_ext_sales_price]
+                                    Estimates: {row: 6480000461, cpu: ?, memory: ?, network: ?, cost: 7.468639787578548E12}
+                                - HASH/INNER JOIN [104:c_current_addr_sk = 118:ca_address_sk] => [3:ss_item_sk, 16:ss_ext_sales_price]
+                                        Estimates: {row: 6480000461, cpu: ?, memory: ?, network: ?, cost: 7.318522563082534E12}
+                                    - EXCHANGE(SHUFFLE) [104]
+                                            Estimates: {row: 6480000461, cpu: ?, memory: ?, network: ?, cost: 7.135519841840501E12}
+                                        - HASH/INNER JOIN [4:ss_customer_sk = 100:c_customer_sk] => [3:ss_item_sk, 104:c_current_addr_sk, 16:ss_ext_sales_price]
+                                                Estimates: {row: 6480000461, cpu: ?, memory: ?, network: ?, cost: 6.824479819711301E12}
+                                            - EXCHANGE(SHUFFLE) [4]
+                                                    Estimates: {row: 6480000461, cpu: ?, memory: ?, network: ?, cost: 6.609612304958501E12}
+                                                - HASH/INNER JOIN [1:ss_sold_date_sk = 72:d_date_sk] => [3:ss_item_sk, 4:ss_customer_sk, 16:ss_ext_sales_price]
+                                                        Estimates: {row: 6480000461, cpu: ?, memory: ?, network: ?, cost: 6.298572282829301E12}
+                                                    - HASH/INNER JOIN [9:ss_promo_sk = 53:p_promo_sk] => [1:ss_sold_date_sk, 3:ss_item_sk, 4:ss_customer_sk, 16:ss_ext_sales_price]
+                                                            Estimates: {row: 6480000461, cpu: ?, memory: ?, network: ?, cost: 6.0652822585194E12}
+                                                        - HASH/INNER JOIN [8:ss_store_sk = 24:s_store_sk] => [1:ss_sold_date_sk, 3:ss_item_sk, 4:ss_customer_sk, 9:ss_promo_sk, 16:ss_ext_sales_price]
+                                                                Estimates: {row: 6480000461, cpu: ?, memory: ?, network: ?, cost: 5.780160822234301E12}
+                                                            - HIVE-SCAN [store_sales] => [1:ss_sold_date_sk, 3:ss_item_sk, 4:ss_customer_sk, 8:ss_store_sk, 9:ss_promo_sk, 16:ss_ext_sales_price]
+                                                                    Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 4.9766403540672E12}
+                                                                    predicate: 8:ss_store_sk IS NOT NULL
+                                                            - EXCHANGE(BROADCAST)
+                                                                    Estimates: {row: 750, cpu: ?, memory: ?, network: ?, cost: 288000.0}
+                                                                - HIVE-SCAN [store] => [24:s_store_sk]
+                                                                        Estimates: {row: 750, cpu: ?, memory: ?, network: ?, cost: 48000.0}
+                                                                        predicate: 51:s_gmt_offset = -6
+                                                        - EXCHANGE(BROADCAST)
+                                                                Estimates: {row: 2000, cpu: ?, memory: ?, network: ?, cost: 1088000.0}
+                                                            - HIVE-SCAN [promotion] => [53:p_promo_sk]
+                                                                    Estimates: {row: 2000, cpu: ?, memory: ?, network: ?, cost: 448000.0}
+                                                                    predicate: 61:p_channel_dmail = 'Y' OR 62:p_channel_email = 'Y' OR 64:p_channel_tv = 'Y'
+                                                    - EXCHANGE(BROADCAST)
+                                                            Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 7012704.0}
+                                                        - HIVE-SCAN [date_dim] => [72:d_date_sk]
+                                                                Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 1168784.0}
+                                                                predicate: 78:d_year = 2001 AND 80:d_moy = 12
+                                            - EXCHANGE(SHUFFLE) [100]
+                                                    Estimates: {row: 58500000, cpu: ?, memory: ?, network: ?, cost: 5.616E9}
+                                                - HIVE-SCAN [customer] => [100:c_customer_sk, 104:c_current_addr_sk]
+                                                        Estimates: {row: 58500000, cpu: ?, memory: ?, network: ?, cost: 3.744E9}
+                                                        predicate: 100:c_customer_sk IS NOT NULL
+                                    - EXCHANGE(SHUFFLE) [118]
+                                            Estimates: {row: 16250000, cpu: ?, memory: ?, network: ?, cost: 1.3E9}
+                                        - HIVE-SCAN [customer_address] => [118:ca_address_sk]
+                                                Estimates: {row: 16250000, cpu: ?, memory: ?, network: ?, cost: 1.04E9}
+                                                predicate: 129:ca_gmt_offset = -6
+                                - EXCHANGE(BROADCAST)
+                                        Estimates: {row: 402000, cpu: ?, memory: ?, network: ?, cost: 1.67232E8}
+                                    - HIVE-SCAN [item] => [131:i_item_sk]
+                                            Estimates: {row: 402000, cpu: ?, memory: ?, network: ?, cost: 3.8592E7}
+                                            predicate: 143:i_category = 'Sports'
+                - EXCHANGE(BROADCAST)
+                        Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 6.232254284330179E12}
+                    - AGGREGATE(GLOBAL) []
+                            Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 6.232254283690179E12}
+                            287:sum := sum(287:sum)
+                        - EXCHANGE(GATHER)
+                                Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 6.232254283650179E12}
+                            - AGGREGATE(LOCAL) []
+                                    Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 6.232254283618179E12}
+                                    287:sum := sum(169:ss_ext_sales_price)
+                                - HASH/INNER JOIN [156:ss_item_sk = 265:i_item_sk] => [169:ss_ext_sales_price]
+                                        Estimates: {row: 6480000461, cpu: ?, memory: ?, network: ?, cost: 6.224478283061749E12}
+                                    - HASH/INNER JOIN [238:c_current_addr_sk = 252:ca_address_sk] => [169:ss_ext_sales_price, 156:ss_item_sk]
+                                            Estimates: {row: 6480000461, cpu: ?, memory: ?, network: ?, cost: 6.074361058565735E12}
+                                        - EXCHANGE(SHUFFLE) [238]
+                                                Estimates: {row: 6480000461, cpu: ?, memory: ?, network: ?, cost: 5.891358337323702E12}
+                                            - HASH/INNER JOIN [157:ss_customer_sk = 234:c_customer_sk] => [169:ss_ext_sales_price, 156:ss_item_sk, 238:c_current_addr_sk]
+                                                    Estimates: {row: 6480000461, cpu: ?, memory: ?, network: ?, cost: 5.580318315194502E12}
+                                                - EXCHANGE(SHUFFLE) [157]
+                                                        Estimates: {row: 6480000461, cpu: ?, memory: ?, network: ?, cost: 5.365450800441702E12}
+                                                    - HASH/INNER JOIN [154:ss_sold_date_sk = 206:d_date_sk] => [169:ss_ext_sales_price, 156:ss_item_sk, 157:ss_customer_sk]
+                                                            Estimates: {row: 6480000461, cpu: ?, memory: ?, network: ?, cost: 5.054410778312502E12}
+                                                        - HASH/INNER JOIN [161:ss_store_sk = 177:s_store_sk] => [169:ss_ext_sales_price, 154:ss_sold_date_sk, 156:ss_item_sk, 157:ss_customer_sk]
+                                                                Estimates: {row: 6480000461, cpu: ?, memory: ?, network: ?, cost: 4.821120754002602E12}
+                                                            - HIVE-SCAN [store_sales] => [161:ss_store_sk, 169:ss_ext_sales_price, 154:ss_sold_date_sk, 156:ss_item_sk, 157:ss_customer_sk]
+                                                                    Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 4.147200295056001E12}
+                                                                    predicate: 161:ss_store_sk IS NOT NULL
+                                                            - EXCHANGE(BROADCAST)
+                                                                    Estimates: {row: 750, cpu: ?, memory: ?, network: ?, cost: 288000.0}
+                                                                - HIVE-SCAN [store] => [177:s_store_sk]
+                                                                        Estimates: {row: 750, cpu: ?, memory: ?, network: ?, cost: 48000.0}
+                                                                        predicate: 204:s_gmt_offset = -6
+                                                        - EXCHANGE(BROADCAST)
+                                                                Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 7012704.0}
+                                                            - HIVE-SCAN [date_dim] => [206:d_date_sk]
+                                                                    Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 1168784.0}
+                                                                    predicate: 212:d_year = 2001 AND 214:d_moy = 12
+                                                - EXCHANGE(SHUFFLE) [234]
+                                                        Estimates: {row: 58500000, cpu: ?, memory: ?, network: ?, cost: 5.616E9}
+                                                    - HIVE-SCAN [customer] => [234:c_customer_sk, 238:c_current_addr_sk]
+                                                            Estimates: {row: 58500000, cpu: ?, memory: ?, network: ?, cost: 3.744E9}
+                                                            predicate: 234:c_customer_sk IS NOT NULL
+                                        - EXCHANGE(SHUFFLE) [252]
+                                                Estimates: {row: 16250000, cpu: ?, memory: ?, network: ?, cost: 1.3E9}
+                                            - HIVE-SCAN [customer_address] => [252:ca_address_sk]
+                                                    Estimates: {row: 16250000, cpu: ?, memory: ?, network: ?, cost: 1.04E9}
+                                                    predicate: 263:ca_gmt_offset = -6
+                                    - EXCHANGE(BROADCAST)
+                                            Estimates: {row: 402000, cpu: ?, memory: ?, network: ?, cost: 1.67232E8}
+                                        - HIVE-SCAN [item] => [265:i_item_sk]
+                                                Estimates: {row: 402000, cpu: ?, memory: ?, network: ?, cost: 3.8592E7}
+                                                predicate: 277:i_category = 'Sports'

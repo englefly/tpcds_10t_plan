@@ -1,0 +1,113 @@
+Explain String
+- Output => [136:s_store_name, 132:s_store_id, 93:d_week_seq, 310:expr, 311:expr, 312:expr, 313:expr, 314:expr, 315:expr, 316:expr]
+    - CTEAnchor[1]
+            Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 3.099132906234222E13}
+        - CTEProduce[1]
+            - AGGREGATE(GLOBAL) [28:d_week_seq, 8:ss_store_sk]
+                    Estimates: {row: 7144200508, cpu: ?, memory: ?, network: ?, cost: 7.62954048930777E12}
+                    65:sum := sum(65:sum)
+                    59:sum := sum(59:sum)
+                    60:sum := sum(60:sum)
+                    61:sum := sum(61:sum)
+                    62:sum := sum(62:sum)
+                    63:sum := sum(63:sum)
+                    64:sum := sum(64:sum)
+                - EXCHANGE(SHUFFLE) [28, 8]
+                        Estimates: {row: 13608000968, cpu: ?, memory: ?, network: ?, cost: 5.014082703228858E12}
+                    - AGGREGATE(LOCAL) [28:d_week_seq, 8:ss_store_sk]
+                            Estimates: {row: 13608000968, cpu: ?, memory: ?, network: ?, cost: 4.676604279218677E12}
+                            65:sum := sum(58:case)
+                            59:sum := sum(52:case)
+                            60:sum := sum(53:case)
+                            61:sum := sum(54:case)
+                            62:sum := sum(55:case)
+                            63:sum := sum(56:case)
+                            64:sum := sum(57:case)
+                        - HASH/INNER JOIN [1:ss_sold_date_sk = 24:d_date_sk] => [52:case, 53:case, 54:case, 55:case, 8:ss_store_sk, 56:case, 57:case, 58:case, 28:d_week_seq]
+                                Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 4.1991578452503545E12}
+                                52:case := if(38:d_day_name = 'Sunday', 14:ss_sales_price, null)
+                                53:case := if(38:d_day_name = 'Monday', 14:ss_sales_price, null)
+                                54:case := if(38:d_day_name = 'Tuesday', 14:ss_sales_price, null)
+                                55:case := if(38:d_day_name = 'Wednesday', 14:ss_sales_price, null)
+                                56:case := if(38:d_day_name = 'Thursday', 14:ss_sales_price, null)
+                                57:case := if(38:d_day_name = 'Friday', 14:ss_sales_price, null)
+                                58:case := if(38:d_day_name = 'Saturday', 14:ss_sales_price, null)
+                            - HIVE-SCAN [store_sales] => [1:ss_sold_date_sk, 8:ss_store_sk, 14:ss_sales_price]
+                                    Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 2.4883201770336E12}
+                                    predicate: 1:ss_sold_date_sk IS NOT NULL
+                            - EXCHANGE(BROADCAST)
+                                    Estimates: {row: 65086, cpu: ?, memory: ?, network: ?, cost: 8.018676388800001E7}
+                                - HIVE-SCAN [date_dim] => [38:d_day_name, 24:d_date_sk, 28:d_week_seq]
+                                        Estimates: {row: 65086, cpu: ?, memory: ?, network: ?, cost: 7289705.808000001}
+                                        predicate: (cast(28:d_week_seq as bigint(20)) - 52 IS NOT NULL OR cast(28:d_week_seq as bigint(20)) IS NOT NULL) AND 24:d_date_sk IS NOT NULL
+        - TOP-100(FINAL)[136: s_store_name ASC NULLS FIRST, 132: s_store_id ASC NULLS FIRST, 93: d_week_seq ASC NULLS FIRST]
+                Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 1.9109560430506156E13}
+            - TOP-100(PARTIAL)[136: s_store_name ASC NULLS FIRST, 132: s_store_id ASC NULLS FIRST, 93: d_week_seq ASC NULLS FIRST]
+                    Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 1.9109560320106156E13}
+                - HASH/INNER JOIN [132:s_store_id = 254:s_store_id AND 317:cast = 318:subtract] => [132:s_store_id, 310:expr, 311:expr, 136:s_store_name, 312:expr, 313:expr, 314:expr, 315:expr, 316:expr, 93:d_week_seq]
+                        Estimates: {row: 7144200508, cpu: ?, memory: ?, network: ?, cost: 1.3337046228615865E13}
+                        310:expr := 124:sum / 246:sum
+                        311:expr := 125:sum / 247:sum
+                        312:expr := 126:sum / 248:sum
+                        313:expr := 127:sum / 249:sum
+                        314:expr := 128:sum / 250:sum
+                        315:expr := 129:sum / 251:sum
+                        316:expr := 130:sum / 252:sum
+                    - EXCHANGE(SHUFFLE) [132, 317]
+                            Estimates: {row: 7144200508, cpu: ?, memory: ?, network: ?, cost: 4.3579702965216885E12}
+                        - HASH/INNER JOIN [93:d_week_seq = 164:d_week_seq] => [129:sum, 130:sum, 132:s_store_id, 136:s_store_name, 124:sum, 317:cast, 93:d_week_seq, 125:sum, 126:sum, 127:sum, 128:sum]
+                                Estimates: {row: 7144200508, cpu: ?, memory: ?, network: ?, cost: 2.1289797379383088E12}
+                                317:cast := cast(93:d_week_seq as bigint(20))
+                            - HASH/INNER JOIN [73:ss_store_sk = 131:s_store_sk] => [129:sum, 130:sum, 132:s_store_id, 136:s_store_name, 124:sum, 125:sum, 93:d_week_seq, 126:sum, 127:sum, 128:sum]
+                                    Estimates: {row: 7144200508, cpu: ?, memory: ?, network: ?, cost: 1.0287683561923291E12}
+                                - CTEConsume[1]
+                                        129:sum := 64:sum
+                                        130:sum := 65:sum
+                                        73:ss_store_sk := 8:ss_store_sk
+                                        124:sum := 59:sum
+                                        93:d_week_seq := 28:d_week_seq
+                                        125:sum := 60:sum
+                                        126:sum := 61:sum
+                                        127:sum := 62:sum
+                                        128:sum := 63:sum
+                                        Estimates: {row: 7144200508, cpu: ?, memory: ?, network: ?, cost: 0.0}
+                                        predicate: cast(93:d_week_seq as bigint(20)) IS NOT NULL
+                                - EXCHANGE(BROADCAST)
+                                        Estimates: {row: 1350, cpu: ?, memory: ?, network: ?, cost: 2376000.0}
+                                    - HIVE-SCAN [store] => [131:s_store_sk, 132:s_store_id, 136:s_store_name]
+                                            Estimates: {row: 1350, cpu: ?, memory: ?, network: ?, cost: 216000.0}
+                                            predicate: 132:s_store_id IS NOT NULL
+                            - EXCHANGE(BROADCAST)
+                                    Estimates: {row: 16436, cpu: ?, memory: ?, network: ?, cost: 3155716.8}
+                                - HIVE-SCAN [date_dim] => [164:d_week_seq]
+                                        Estimates: {row: 16436, cpu: ?, memory: ?, network: ?, cost: 525952.8}
+                                        predicate: 163:d_month_seq >= 1205 AND 163:d_month_seq <= 1216 AND cast(164:d_week_seq as bigint(20)) IS NOT NULL
+                    - EXCHANGE(SHUFFLE) [254, 318]
+                            Estimates: {row: 7144200508, cpu: ?, memory: ?, network: ?, cost: 3.9007400707917646E12}
+                        - HASH/INNER JOIN [215:d_week_seq = 286:d_week_seq] => [246:sum, 247:sum, 248:sum, 249:sum, 250:sum, 251:sum, 252:sum, 318:subtract, 254:s_store_id]
+                                Estimates: {row: 7144200508, cpu: ?, memory: ?, network: ?, cost: 1.9575175325395874E12}
+                                318:subtract := cast(215:d_week_seq as bigint(20)) - 52
+                            - HASH/INNER JOIN [195:ss_store_sk = 253:s_store_sk] => [246:sum, 247:sum, 215:d_week_seq, 248:sum, 249:sum, 250:sum, 251:sum, 252:sum, 254:s_store_id]
+                                    Estimates: {row: 7144200508, cpu: ?, memory: ?, network: ?, cost: 9.716133589260886E11}
+                                - CTEConsume[1]
+                                        195:ss_store_sk := 8:ss_store_sk
+                                        246:sum := 59:sum
+                                        215:d_week_seq := 28:d_week_seq
+                                        247:sum := 60:sum
+                                        248:sum := 61:sum
+                                        249:sum := 62:sum
+                                        250:sum := 63:sum
+                                        251:sum := 64:sum
+                                        252:sum := 65:sum
+                                        Estimates: {row: 7144200508, cpu: ?, memory: ?, network: ?, cost: 0.0}
+                                        predicate: cast(215:d_week_seq as bigint(20)) - 52 IS NOT NULL
+                                - EXCHANGE(BROADCAST)
+                                        Estimates: {row: 1350, cpu: ?, memory: ?, network: ?, cost: 1425600.0}
+                                    - HIVE-SCAN [store] => [253:s_store_sk, 254:s_store_id]
+                                            Estimates: {row: 1350, cpu: ?, memory: ?, network: ?, cost: 129600.0}
+                                            predicate: 254:s_store_id IS NOT NULL
+                            - EXCHANGE(BROADCAST)
+                                    Estimates: {row: 16436, cpu: ?, memory: ?, network: ?, cost: 3155716.8}
+                                - HIVE-SCAN [date_dim] => [286:d_week_seq]
+                                        Estimates: {row: 16436, cpu: ?, memory: ?, network: ?, cost: 525952.8}
+                                        predicate: 285:d_month_seq >= 1217 AND 285:d_month_seq <= 1228 AND cast(286:d_week_seq as bigint(20)) - 52 IS NOT NULL

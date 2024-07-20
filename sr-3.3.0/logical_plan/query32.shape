@@ -1,0 +1,51 @@
+Explain String
+- Output => [150:sum]
+    - LIMIT [100]
+        - AGGREGATE(GLOBAL) []
+                Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 4.589484297245074E12}
+                150:sum := sum(150:sum)
+                limit: 100
+            - EXCHANGE(GATHER)
+                    Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 4.589484297205074E12}
+                - AGGREGATE(LOCAL) []
+                        Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 4.589484297173074E12}
+                        150:sum := sum(23:cs_ext_discount_amt)
+                    - HASH/INNER JOIN [cast(23:cs_ext_discount_amt as decimal(38, 9)) > 1.3 * 147:avg AND 16:cs_item_sk = 35:i_item_sk] => [23:cs_ext_discount_amt]
+                            Estimates: {row: 6479984119, cpu: ?, memory: ?, network: ?, cost: 4.581708316226475E12}
+                        - EXCHANGE(SHUFFLE) [16]
+                                Estimates: {row: 12959968239, cpu: ?, memory: ?, network: ?, cost: 2.021764760801E12}
+                            - HASH/INNER JOIN [1:cs_sold_date_sk = 57:d_date_sk] => [23:cs_ext_discount_amt, 16:cs_item_sk]
+                                    Estimates: {row: 12959968239, cpu: ?, memory: ?, network: ?, cost: 1.607045777153E12}
+                                - HIVE-SCAN [catalog_sales] => [1:cs_sold_date_sk, 23:cs_ext_discount_amt, 16:cs_item_sk]
+                                        Estimates: {row: 12959968239, cpu: ?, memory: ?, network: ?, cost: 1.244156950944E12}
+                                        predicate: 16:cs_item_sk IS NOT NULL
+                                - EXCHANGE(BROADCAST)
+                                        Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 6720508.0}
+                                    - HIVE-SCAN [date_dim] => [57:d_date_sk]
+                                            Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 876588.0}
+                                            predicate: 59:d_date >= 2002-03-29 AND 59:d_date <= 2002-06-27
+                        - HASH/INNER JOIN [100:cs_item_sk = 35:i_item_sk] => [35:i_item_sk, 147:avg]
+                                Estimates: {row: 3239992059, cpu: ?, memory: ?, network: ?, cost: 2.0140048933576E12}
+                            - AGGREGATE(GLOBAL) [100:cs_item_sk]
+                                    Estimates: {row: 3239992059, cpu: ?, memory: ?, network: ?, cost: 1.9232690021846E12}
+                                    147:avg := avg(147:avg)
+                                - EXCHANGE(SHUFFLE) [100]
+                                        Estimates: {row: 6479984119, cpu: ?, memory: ?, network: ?, cost: 1.6899895738826E12}
+                                    - AGGREGATE(LOCAL) [100:cs_item_sk]
+                                            Estimates: {row: 6479984119, cpu: ?, memory: ?, network: ?, cost: 1.658885650109E12}
+                                            147:avg := avg(107:cs_ext_discount_amt)
+                                        - HASH/INNER JOIN [85:cs_sold_date_sk = 119:d_date_sk] => [100:cs_item_sk, 107:cs_ext_discount_amt]
+                                                Estimates: {row: 12959968239, cpu: ?, memory: ?, network: ?, cost: 1.607045777153E12}
+                                            - HIVE-SCAN [catalog_sales] => [100:cs_item_sk, 85:cs_sold_date_sk, 107:cs_ext_discount_amt]
+                                                    Estimates: {row: 12959968239, cpu: ?, memory: ?, network: ?, cost: 1.244156950944E12}
+                                                    predicate: 100:cs_item_sk IS NOT NULL
+                                            - EXCHANGE(BROADCAST)
+                                                    Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 6720508.0}
+                                                - HIVE-SCAN [date_dim] => [119:d_date_sk]
+                                                        Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 876588.0}
+                                                        predicate: 121:d_date >= 2002-03-29 AND 121:d_date <= 2002-06-27
+                            - EXCHANGE(SHUFFLE) [35]
+                                    Estimates: {row: 201000, cpu: ?, memory: ?, network: ?, cost: 1.2864E7}
+                                - HIVE-SCAN [item] => [35:i_item_sk]
+                                        Estimates: {row: 201000, cpu: ?, memory: ?, network: ?, cost: 9648000.0}
+                                        predicate: 48:i_manufact_id = 66

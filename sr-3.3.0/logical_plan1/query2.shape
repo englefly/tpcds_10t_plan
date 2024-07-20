@@ -1,0 +1,102 @@
+Explain String
+- Output => [187:d_week_seq, 393:round, 394:round, 395:round, 396:round, 397:round, 398:round, 399:round]
+    - CTEAnchor[1]
+            Estimates: {row: 9719967615, cpu: ?, memory: ?, network: ?, cost: 2.6458373407616914E13}
+        - CTEProduce[1]
+            - AGGREGATE(GLOBAL) [75:d_week_seq]
+                    Estimates: {row: 4859983807, cpu: ?, memory: ?, network: ?, cost: 4.611270183204475E12}
+                    106:sum := sum(106:sum)
+                    107:sum := sum(107:sum)
+                    108:sum := sum(108:sum)
+                    109:sum := sum(109:sum)
+                    110:sum := sum(110:sum)
+                    111:sum := sum(111:sum)
+                    112:sum := sum(112:sum)
+                - EXCHANGE(SHUFFLE) [75]
+                        Estimates: {row: 9719967615, cpu: ?, memory: ?, network: ?, cost: 2.9199958181422744E12}
+                    - AGGREGATE(LOCAL) [75:d_week_seq]
+                            Estimates: {row: 9719967615, cpu: ?, memory: ?, network: ?, cost: 2.6944925694673145E12}
+                            106:sum := sum(99:case)
+                            107:sum := sum(100:case)
+                            108:sum := sum(101:case)
+                            109:sum := sum(102:case)
+                            110:sum := sum(103:case)
+                            111:sum := sum(104:case)
+                            112:sum := sum(105:case)
+                        - HASH/INNER JOIN [69:ws_sold_date_sk = 71:d_date_sk] => [99:case, 100:case, 101:case, 102:case, 103:case, 104:case, 105:case, 75:d_week_seq]
+                                Estimates: {row: 19439935230, cpu: ?, memory: ?, network: ?, cost: 2.3717896446393545E12}
+                                99:case := if(85:d_day_name = 'Sunday', 70:ws_ext_sales_price, null)
+                                100:case := if(85:d_day_name = 'Monday', 70:ws_ext_sales_price, null)
+                                101:case := if(85:d_day_name = 'Tuesday', 70:ws_ext_sales_price, null)
+                                102:case := if(85:d_day_name = 'Wednesday', 70:ws_ext_sales_price, null)
+                                103:case := if(85:d_day_name = 'Thursday', 70:ws_ext_sales_price, null)
+                                104:case := if(85:d_day_name = 'Friday', 70:ws_ext_sales_price, null)
+                                105:case := if(85:d_day_name = 'Saturday', 70:ws_ext_sales_price, null)
+                            - UNION => [69: ws_sold_date_sk, 70: ws_ext_sales_price]
+                                    Estimates: {row: 19439935230, cpu: ?, memory: ?, network: ?, cost: 1.2441558547584E12}
+                                - HIVE-SCAN [web_sales] => [1:ws_sold_date_sk, 24:ws_ext_sales_price]
+                                        Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 4.147178874624E11}
+                                        predicate: 1:ws_sold_date_sk IS NOT NULL
+                                - HIVE-SCAN [catalog_sales] => [35:cs_sold_date_sk, 58:cs_ext_sales_price]
+                                        Estimates: {row: 12959968239, cpu: ?, memory: ?, network: ?, cost: 8.29437967296E11}
+                                        predicate: 35:cs_sold_date_sk IS NOT NULL
+                            - EXCHANGE(BROADCAST)
+                                    Estimates: {row: 65086, cpu: ?, memory: ?, network: ?, cost: 8.018676388800001E7}
+                                - HIVE-SCAN [date_dim] => [85:d_day_name, 71:d_date_sk, 75:d_week_seq]
+                                        Estimates: {row: 65086, cpu: ?, memory: ?, network: ?, cost: 7289705.808000001}
+                                        predicate: (cast(75:d_week_seq as bigint(20)) - 53 IS NOT NULL OR cast(75:d_week_seq as bigint(20)) IS NOT NULL) AND 71:d_date_sk IS NOT NULL
+        - SORT(FINAL)[187: d_week_seq ASC NULLS FIRST]
+                Estimates: {row: 9719967615, cpu: ?, memory: ?, network: ?, cost: 1.914106424031292E13}
+            - SORT(PARTIAL)[187: d_week_seq ASC NULLS FIRST]
+                    Estimates: {row: 4859983807, cpu: ?, memory: ?, network: ?, cost: 1.3425723282516523E13}
+                - HASH/INNER JOIN [400:cast = 401:subtract] => [393:round, 394:round, 187:d_week_seq, 395:round, 396:round, 397:round, 398:round, 399:round]
+                        Estimates: {row: 4859983807, cpu: ?, memory: ?, network: ?, cost: 6.505106340422924E12}
+                        393:round := round(218:sum / 358:sum, 2)
+                        394:round := round(219:sum / 359:sum, 2)
+                        395:round := round(220:sum / 360:sum, 2)
+                        396:round := round(221:sum / 361:sum, 2)
+                        397:round := round(222:sum / 362:sum, 2)
+                        398:round := round(223:sum / 363:sum, 2)
+                        399:round := round(224:sum / 364:sum, 2)
+                    - EXCHANGE(SHUFFLE) [400]
+                            Estimates: {row: 4859983807, cpu: ?, memory: ?, network: ?, cost: 1.7982030157721997E12}
+                        - HASH/INNER JOIN [187:d_week_seq = 229:d_week_seq] => [218:sum, 187:d_week_seq, 219:sum, 220:sum, 221:sum, 222:sum, 223:sum, 400:cast, 224:sum]
+                                Estimates: {row: 4859983807, cpu: ?, memory: ?, network: ?, cost: 5.929270314749999E11}
+                                400:cast := cast(187:d_week_seq as bigint(20))
+                            - CTEConsume[1]
+                                    218:sum := 106:sum
+                                    187:d_week_seq := 75:d_week_seq
+                                    219:sum := 107:sum
+                                    220:sum := 108:sum
+                                    221:sum := 109:sum
+                                    222:sum := 110:sum
+                                    223:sum := 111:sum
+                                    224:sum := 112:sum
+                                    Estimates: {row: 4859983807, cpu: ?, memory: ?, network: ?, cost: 0.0}
+                                    predicate: cast(187:d_week_seq as bigint(20)) IS NOT NULL
+                            - EXCHANGE(BROADCAST)
+                                    Estimates: {row: 32872, cpu: ?, memory: ?, network: ?, cost: 6311433.6}
+                                - HIVE-SCAN [date_dim] => [229:d_week_seq]
+                                        Estimates: {row: 32872, cpu: ?, memory: ?, network: ?, cost: 1051905.6}
+                                        predicate: 231:d_year = 1998 AND cast(229:d_week_seq as bigint(20)) IS NOT NULL
+                    - EXCHANGE(SHUFFLE) [401]
+                            Estimates: {row: 4859983807, cpu: ?, memory: ?, network: ?, cost: 1.759323145311E12}
+                        - HASH/INNER JOIN [327:d_week_seq = 369:d_week_seq] => [401:subtract, 358:sum, 359:sum, 360:sum, 361:sum, 362:sum, 363:sum, 364:sum]
+                                Estimates: {row: 4859983807, cpu: ?, memory: ?, network: ?, cost: 5.929270314749999E11}
+                                401:subtract := cast(327:d_week_seq as bigint(20)) - 53
+                            - CTEConsume[1]
+                                    358:sum := 106:sum
+                                    327:d_week_seq := 75:d_week_seq
+                                    359:sum := 107:sum
+                                    360:sum := 108:sum
+                                    361:sum := 109:sum
+                                    362:sum := 110:sum
+                                    363:sum := 111:sum
+                                    364:sum := 112:sum
+                                    Estimates: {row: 4859983807, cpu: ?, memory: ?, network: ?, cost: 0.0}
+                                    predicate: cast(327:d_week_seq as bigint(20)) - 53 IS NOT NULL
+                            - EXCHANGE(BROADCAST)
+                                    Estimates: {row: 32872, cpu: ?, memory: ?, network: ?, cost: 6311433.6}
+                                - HIVE-SCAN [date_dim] => [369:d_week_seq]
+                                        Estimates: {row: 32872, cpu: ?, memory: ?, network: ?, cost: 1051905.6}
+                                        predicate: 371:d_year = 1999 AND cast(369:d_week_seq as bigint(20)) - 53 IS NOT NULL

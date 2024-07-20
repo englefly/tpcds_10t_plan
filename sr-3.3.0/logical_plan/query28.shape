@@ -1,0 +1,184 @@
+Explain String
+- Output => [24:avg, 25:count, 26:count, 50:avg, 51:count, 52:count, 76:avg, 77:count, 78:count, 102:avg, 103:count, 104:count, 128:avg, 129:count, 130:count, 154:avg, 155:count, 156:count]
+    - LIMIT [100]
+        - NESTLOOP/CROSS JOIN
+                Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.7066653342689697E12}
+                limit: 100
+            - NESTLOOP/CROSS JOIN
+                    Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 3.086327776210808E12}
+                    limit: 100
+                - NESTLOOP/CROSS JOIN
+                        Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 2.4670142181526465E12}
+                        limit: 100
+                    - NESTLOOP/CROSS JOIN
+                            Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 1.8487246600944849E12}
+                            limit: 100
+                        - NESTLOOP/CROSS JOIN
+                                Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 1.2314591020363232E12}
+                                limit: 100
+                            - AGGREGATE(GLOBAL) []
+                                    Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 6.152175439781616E11}
+                                    24:avg := avg(24:avg)
+                                    25:count := count(25:count)
+                                    26:count := count(26:count)
+                                    limit: 100
+                                - EXCHANGE(GATHER)
+                                        Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 6.152175438981616E11}
+                                    - AGGREGATE(DISTINCT_LOCAL) []
+                                            Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 6.152175438341616E11}
+                                            24:avg := avg(24:avg)
+                                            25:count := count(25:count)
+                                            26:count := count(13:ss_list_price)
+                                        - AGGREGATE(DISTINCT_GLOBAL) [13:ss_list_price]
+                                                Estimates: {row: 1040625074, cpu: ?, memory: ?, network: ?, cost: 5.985675425855835E11}
+                                                24:avg := avg(24:avg)
+                                                25:count := count(25:count)
+                                            - EXCHANGE(SHUFFLE) [13]
+                                                    Estimates: {row: 2081250148, cpu: ?, memory: ?, network: ?, cost: 4.986675354781148E11}
+                                                - AGGREGATE(LOCAL) [13:ss_list_price]
+                                                        Estimates: {row: 2081250148, cpu: ?, memory: ?, network: ?, cost: 4.8534753453045233E11}
+                                                        24:avg := avg(13:ss_list_price)
+                                                        25:count := count(13:ss_list_price)
+                                                    - HIVE-SCAN [store_sales] => [13:ss_list_price]
+                                                            Estimates: {row: 4162500296, cpu: ?, memory: ?, network: ?, cost: 4.662000331681875E11}
+                                                            predicate: 11:ss_quantity >= 0 AND 11:ss_quantity <= 5 AND (13:ss_list_price >= 73 AND 13:ss_list_price <= 83 OR 20:ss_coupon_amt >= 7826 AND 20:ss_coupon_amt <= 8826 OR 12:ss_wholesale_cost >= 70 AND 12:ss_wholesale_cost <= 90)
+                            - EXCHANGE(BROADCAST)
+                                    Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 6.152175452581616E11}
+                                - AGGREGATE(GLOBAL) []
+                                        Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 6.152175439781616E11}
+                                        50:avg := avg(50:avg)
+                                        51:count := count(51:count)
+                                        52:count := count(52:count)
+                                        limit: 100
+                                    - EXCHANGE(GATHER)
+                                            Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 6.152175438981616E11}
+                                        - AGGREGATE(DISTINCT_LOCAL) []
+                                                Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 6.152175438341616E11}
+                                                50:avg := avg(50:avg)
+                                                51:count := count(51:count)
+                                                52:count := count(39:ss_list_price)
+                                            - AGGREGATE(DISTINCT_GLOBAL) [39:ss_list_price]
+                                                    Estimates: {row: 1040625074, cpu: ?, memory: ?, network: ?, cost: 5.985675425855835E11}
+                                                    50:avg := avg(50:avg)
+                                                    51:count := count(51:count)
+                                                - EXCHANGE(SHUFFLE) [39]
+                                                        Estimates: {row: 2081250148, cpu: ?, memory: ?, network: ?, cost: 4.986675354781148E11}
+                                                    - AGGREGATE(LOCAL) [39:ss_list_price]
+                                                            Estimates: {row: 2081250148, cpu: ?, memory: ?, network: ?, cost: 4.8534753453045233E11}
+                                                            50:avg := avg(39:ss_list_price)
+                                                            51:count := count(39:ss_list_price)
+                                                        - HIVE-SCAN [store_sales] => [39:ss_list_price]
+                                                                Estimates: {row: 4162500296, cpu: ?, memory: ?, network: ?, cost: 4.662000331681875E11}
+                                                                predicate: 37:ss_quantity >= 6 AND 37:ss_quantity <= 10 AND (39:ss_list_price >= 152 AND 39:ss_list_price <= 162 OR 46:ss_coupon_amt >= 2196 AND 46:ss_coupon_amt <= 3196 OR 38:ss_wholesale_cost >= 56 AND 38:ss_wholesale_cost <= 76)
+                        - EXCHANGE(BROADCAST)
+                                Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 6.152175452581616E11}
+                            - AGGREGATE(GLOBAL) []
+                                    Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 6.152175439781616E11}
+                                    76:avg := avg(76:avg)
+                                    77:count := count(77:count)
+                                    78:count := count(78:count)
+                                    limit: 100
+                                - EXCHANGE(GATHER)
+                                        Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 6.152175438981616E11}
+                                    - AGGREGATE(DISTINCT_LOCAL) []
+                                            Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 6.152175438341616E11}
+                                            76:avg := avg(76:avg)
+                                            77:count := count(77:count)
+                                            78:count := count(65:ss_list_price)
+                                        - AGGREGATE(DISTINCT_GLOBAL) [65:ss_list_price]
+                                                Estimates: {row: 1040625074, cpu: ?, memory: ?, network: ?, cost: 5.985675425855835E11}
+                                                76:avg := avg(76:avg)
+                                                77:count := count(77:count)
+                                            - EXCHANGE(SHUFFLE) [65]
+                                                    Estimates: {row: 2081250148, cpu: ?, memory: ?, network: ?, cost: 4.986675354781148E11}
+                                                - AGGREGATE(LOCAL) [65:ss_list_price]
+                                                        Estimates: {row: 2081250148, cpu: ?, memory: ?, network: ?, cost: 4.8534753453045233E11}
+                                                        76:avg := avg(65:ss_list_price)
+                                                        77:count := count(65:ss_list_price)
+                                                    - HIVE-SCAN [store_sales] => [65:ss_list_price]
+                                                            Estimates: {row: 4162500296, cpu: ?, memory: ?, network: ?, cost: 4.662000331681875E11}
+                                                            predicate: 63:ss_quantity >= 11 AND 63:ss_quantity <= 15 AND (65:ss_list_price >= 53 AND 65:ss_list_price <= 63 OR 72:ss_coupon_amt >= 3430 AND 72:ss_coupon_amt <= 4430 OR 64:ss_wholesale_cost >= 13 AND 64:ss_wholesale_cost <= 33)
+                    - EXCHANGE(BROADCAST)
+                            Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 6.152175452581616E11}
+                        - AGGREGATE(GLOBAL) []
+                                Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 6.152175439781616E11}
+                                102:avg := avg(102:avg)
+                                103:count := count(103:count)
+                                104:count := count(104:count)
+                                limit: 100
+                            - EXCHANGE(GATHER)
+                                    Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 6.152175438981616E11}
+                                - AGGREGATE(DISTINCT_LOCAL) []
+                                        Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 6.152175438341616E11}
+                                        102:avg := avg(102:avg)
+                                        103:count := count(103:count)
+                                        104:count := count(91:ss_list_price)
+                                    - AGGREGATE(DISTINCT_GLOBAL) [91:ss_list_price]
+                                            Estimates: {row: 1040625074, cpu: ?, memory: ?, network: ?, cost: 5.985675425855835E11}
+                                            102:avg := avg(102:avg)
+                                            103:count := count(103:count)
+                                        - EXCHANGE(SHUFFLE) [91]
+                                                Estimates: {row: 2081250148, cpu: ?, memory: ?, network: ?, cost: 4.986675354781148E11}
+                                            - AGGREGATE(LOCAL) [91:ss_list_price]
+                                                    Estimates: {row: 2081250148, cpu: ?, memory: ?, network: ?, cost: 4.8534753453045233E11}
+                                                    102:avg := avg(91:ss_list_price)
+                                                    103:count := count(91:ss_list_price)
+                                                - HIVE-SCAN [store_sales] => [91:ss_list_price]
+                                                        Estimates: {row: 4162500296, cpu: ?, memory: ?, network: ?, cost: 4.662000331681875E11}
+                                                        predicate: 89:ss_quantity >= 16 AND 89:ss_quantity <= 20 AND (91:ss_list_price >= 182 AND 91:ss_list_price <= 192 OR 98:ss_coupon_amt >= 3262 AND 98:ss_coupon_amt <= 4262 OR 90:ss_wholesale_cost >= 20 AND 90:ss_wholesale_cost <= 40)
+                - EXCHANGE(BROADCAST)
+                        Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 6.152175452581616E11}
+                    - AGGREGATE(GLOBAL) []
+                            Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 6.152175439781616E11}
+                            129:count := count(129:count)
+                            130:count := count(130:count)
+                            128:avg := avg(128:avg)
+                            limit: 100
+                        - EXCHANGE(GATHER)
+                                Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 6.152175438981616E11}
+                            - AGGREGATE(DISTINCT_LOCAL) []
+                                    Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 6.152175438341616E11}
+                                    129:count := count(129:count)
+                                    130:count := count(117:ss_list_price)
+                                    128:avg := avg(128:avg)
+                                - AGGREGATE(DISTINCT_GLOBAL) [117:ss_list_price]
+                                        Estimates: {row: 1040625074, cpu: ?, memory: ?, network: ?, cost: 5.985675425855835E11}
+                                        129:count := count(129:count)
+                                        128:avg := avg(128:avg)
+                                    - EXCHANGE(SHUFFLE) [117]
+                                            Estimates: {row: 2081250148, cpu: ?, memory: ?, network: ?, cost: 4.986675354781148E11}
+                                        - AGGREGATE(LOCAL) [117:ss_list_price]
+                                                Estimates: {row: 2081250148, cpu: ?, memory: ?, network: ?, cost: 4.8534753453045233E11}
+                                                129:count := count(117:ss_list_price)
+                                                128:avg := avg(117:ss_list_price)
+                                            - HIVE-SCAN [store_sales] => [117:ss_list_price]
+                                                    Estimates: {row: 4162500296, cpu: ?, memory: ?, network: ?, cost: 4.662000331681875E11}
+                                                    predicate: 115:ss_quantity >= 21 AND 115:ss_quantity <= 25 AND (117:ss_list_price >= 85 AND 117:ss_list_price <= 95 OR 124:ss_coupon_amt >= 3310 AND 124:ss_coupon_amt <= 4310 OR 116:ss_wholesale_cost >= 37 AND 116:ss_wholesale_cost <= 57)
+            - EXCHANGE(BROADCAST)
+                    Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 6.152175452581616E11}
+                - AGGREGATE(GLOBAL) []
+                        Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 6.152175439781616E11}
+                        154:avg := avg(154:avg)
+                        155:count := count(155:count)
+                        156:count := count(156:count)
+                        limit: 100
+                    - EXCHANGE(GATHER)
+                            Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 6.152175438981616E11}
+                        - AGGREGATE(DISTINCT_LOCAL) []
+                                Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 6.152175438341616E11}
+                                154:avg := avg(154:avg)
+                                155:count := count(155:count)
+                                156:count := count(143:ss_list_price)
+                            - AGGREGATE(DISTINCT_GLOBAL) [143:ss_list_price]
+                                    Estimates: {row: 1040625074, cpu: ?, memory: ?, network: ?, cost: 5.985675425855835E11}
+                                    154:avg := avg(154:avg)
+                                    155:count := count(155:count)
+                                - EXCHANGE(SHUFFLE) [143]
+                                        Estimates: {row: 2081250148, cpu: ?, memory: ?, network: ?, cost: 4.986675354781148E11}
+                                    - AGGREGATE(LOCAL) [143:ss_list_price]
+                                            Estimates: {row: 2081250148, cpu: ?, memory: ?, network: ?, cost: 4.8534753453045233E11}
+                                            154:avg := avg(143:ss_list_price)
+                                            155:count := count(143:ss_list_price)
+                                        - HIVE-SCAN [store_sales] => [143:ss_list_price]
+                                                Estimates: {row: 4162500296, cpu: ?, memory: ?, network: ?, cost: 4.662000331681875E11}
+                                                predicate: 141:ss_quantity >= 26 AND 141:ss_quantity <= 30 AND (143:ss_list_price >= 180 AND 143:ss_list_price <= 190 OR 150:ss_coupon_amt >= 12592 AND 150:ss_coupon_amt <= 13592 OR 142:ss_wholesale_cost >= 22 AND 142:ss_wholesale_cost <= 42)

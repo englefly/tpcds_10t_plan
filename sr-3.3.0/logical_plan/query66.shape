@@ -1,0 +1,349 @@
+Explain String
+- Output => [283:w_warehouse_name, 284:w_warehouse_sq_ft, 285:w_city, 286:w_county, 287:w_state, 288:w_country, 289:concat, 290:d_year, 327:sum, 328:sum, 329:sum, 330:sum, 331:sum, 332:sum, 333:sum, 334:sum, 335:sum, 336:sum, 337:sum, 338:sum, 339:sum, 340:sum, 341:sum, 342:sum, 343:sum, 344:sum, 345:sum, 346:sum, 347:sum, 348:sum, 349:sum, 350:sum, 351:sum, 352:sum, 353:sum, 354:sum, 355:sum, 356:sum, 357:sum, 358:sum, 359:sum, 360:sum, 361:sum, 362:sum]
+    - TOP-100(FINAL)[283: w_warehouse_name ASC NULLS FIRST]
+            Estimates: {row: 100, cpu: 67500.00, memory: 67500.00, network: 67500.00, cost: 7170273977565.32}
+        - TOP-100(PARTIAL)[283: w_warehouse_name ASC NULLS FIRST]
+                Estimates: {row: 100, cpu: 182255396716.89, memory: 67500.00, network: 182255396716.89, cost: 7170273707565.32}
+            - AGGREGATE(GLOBAL) [283:w_warehouse_name, 284:w_warehouse_sq_ft, 285:w_city, 286:w_county, 287:w_state, 288:w_country, 289:concat, 290:d_year]
+                    Estimates: {row: 270007995, cpu: 259051015524.31, memory: 182255396716.89, network: 0.00, cost: 6805762779131.54}
+                    353:sum := sum(353:sum)
+                    354:sum := sum(354:sum)
+                    355:sum := sum(355:sum)
+                    356:sum := sum(356:sum)
+                    357:sum := sum(357:sum)
+                    358:sum := sum(358:sum)
+                    359:sum := sum(359:sum)
+                    360:sum := sum(360:sum)
+                    361:sum := sum(361:sum)
+                    362:sum := sum(362:sum)
+                    327:sum := sum(327:sum)
+                    328:sum := sum(328:sum)
+                    329:sum := sum(329:sum)
+                    330:sum := sum(330:sum)
+                    331:sum := sum(331:sum)
+                    332:sum := sum(332:sum)
+                    333:sum := sum(333:sum)
+                    334:sum := sum(334:sum)
+                    335:sum := sum(335:sum)
+                    336:sum := sum(336:sum)
+                    337:sum := sum(337:sum)
+                    338:sum := sum(338:sum)
+                    339:sum := sum(339:sum)
+                    340:sum := sum(340:sum)
+                    341:sum := sum(341:sum)
+                    342:sum := sum(342:sum)
+                    343:sum := sum(343:sum)
+                    344:sum := sum(344:sum)
+                    345:sum := sum(345:sum)
+                    346:sum := sum(346:sum)
+                    347:sum := sum(347:sum)
+                    348:sum := sum(348:sum)
+                    349:sum := sum(349:sum)
+                    350:sum := sum(350:sum)
+                    351:sum := sum(351:sum)
+                    352:sum := sum(352:sum)
+                - EXCHANGE(SHUFFLE) [283, 284, 285, 286, 287, 288, 289, 290]
+                        Estimates: {row: 383779282, cpu: 25905101552.43, memory: 0.00, network: 25905101552.43, cost: 6311726477935.59}
+                    - AGGREGATE(LOCAL) [283:w_warehouse_name, 284:w_warehouse_sq_ft, 285:w_city, 286:w_county, 287:w_state, 288:w_country, 289:concat, 290:d_year]
+                            Estimates: {row: 383779282, cpu: 36820544056.88, memory: 25905101552.43, network: 0.00, cost: 6259916274830.73}
+                            353:sum := sum(305:sum)
+                            354:sum := sum(306:sum)
+                            355:sum := sum(307:sum)
+                            356:sum := sum(308:sum)
+                            357:sum := sum(309:sum)
+                            358:sum := sum(310:sum)
+                            359:sum := sum(311:sum)
+                            360:sum := sum(312:sum)
+                            361:sum := sum(313:sum)
+                            362:sum := sum(314:sum)
+                            327:sum := sum(291:sum)
+                            328:sum := sum(292:sum)
+                            329:sum := sum(293:sum)
+                            330:sum := sum(294:sum)
+                            331:sum := sum(295:sum)
+                            332:sum := sum(296:sum)
+                            333:sum := sum(297:sum)
+                            334:sum := sum(298:sum)
+                            335:sum := sum(299:sum)
+                            336:sum := sum(300:sum)
+                            337:sum := sum(301:sum)
+                            338:sum := sum(302:sum)
+                            339:sum := sum(315:expr)
+                            340:sum := sum(316:expr)
+                            341:sum := sum(317:expr)
+                            342:sum := sum(318:expr)
+                            343:sum := sum(319:expr)
+                            344:sum := sum(320:expr)
+                            345:sum := sum(321:expr)
+                            346:sum := sum(322:expr)
+                            347:sum := sum(323:expr)
+                            348:sum := sum(324:expr)
+                            349:sum := sum(325:expr)
+                            350:sum := sum(326:expr)
+                            351:sum := sum(303:sum)
+                            352:sum := sum(304:sum)
+                        - UNION => [283:w_warehouse_name, 284:w_warehouse_sq_ft, 285:w_city, 286:w_county, 287:w_state, 288:w_country, 289:concat, 290:d_year, 291:sum, 292:sum, 293:sum, 294:sum, 295:sum, 296:sum, 297:sum, 298:sum, 299:sum, 300:sum, 301:sum, 302:sum, 303:sum, 304:sum, 305:sum, 306:sum, 307:sum, 308:sum, 309:sum, 310:sum, 311:sum, 312:sum, 313:sum, 314:sum, 315:expr, 316:expr, 317:expr, 318:expr, 319:expr, 320:expr, 321:expr, 322:expr, 323:expr, 324:expr, 325:expr, 326:expr]
+                                Estimates: {row: 545489541, cpu: 0.00, memory: 0.00, network: 0.00, cost: 6189695799697.43}
+                                315:expr := 291:sum / 363:cast
+                                316:expr := 292:sum / 363:cast
+                                317:expr := 293:sum / 363:cast
+                                318:expr := 294:sum / 363:cast
+                                319:expr := 295:sum / 363:cast
+                                320:expr := 296:sum / 363:cast
+                                321:expr := 297:sum / 363:cast
+                                322:expr := 298:sum / 363:cast
+                                323:expr := 299:sum / 363:cast
+                                324:expr := 300:sum / 363:cast
+                                325:expr := 301:sum / 363:cast
+                                326:expr := 302:sum / 363:cast
+                                363:cast := cast(284:w_warehouse_sq_ft as decimal(38, 0)), 
+                            - AGGREGATE(GLOBAL) [37:w_warehouse_name, 38:w_warehouse_sq_ft, 43:w_city, 44:w_county, 45:w_state, 47:w_country, 55:d_year] => [37:w_warehouse_name, 38:w_warehouse_sq_ft, 43:w_city, 44:w_county, 45:w_state, 47:w_country, 117:sum, 118:sum, 55:d_year, 119:sum, 120:sum, 121:sum, 122:sum, 123:sum, 124:sum, 125:sum, 126:sum, 127:sum, 128:sum, 129:sum, 130:sum, 131:sum, 132:sum, 133:sum, 134:sum, 135:sum, 136:sum, 137:sum, 138:sum, 139:sum, 140:sum, 141:concat]
+                                    Estimates: {row: 181829526, cpu: 128085688873.35, memory: 87823661437.45, network: 0.00, cost: 2063244738862.52}
+                                    129:sum := sum(129:sum)
+                                    130:sum := sum(130:sum)
+                                    131:sum := sum(131:sum)
+                                    132:sum := sum(132:sum)
+                                    133:sum := sum(133:sum)
+                                    134:sum := sum(134:sum)
+                                    135:sum := sum(135:sum)
+                                    136:sum := sum(136:sum)
+                                    137:sum := sum(137:sum)
+                                    138:sum := sum(138:sum)
+                                    139:sum := sum(139:sum)
+                                    140:sum := sum(140:sum)
+                                    117:sum := sum(117:sum)
+                                    118:sum := sum(118:sum)
+                                    119:sum := sum(119:sum)
+                                    120:sum := sum(120:sum)
+                                    121:sum := sum(121:sum)
+                                    122:sum := sum(122:sum)
+                                    123:sum := sum(123:sum)
+                                    124:sum := sum(124:sum)
+                                    125:sum := sum(125:sum)
+                                    126:sum := sum(126:sum)
+                                    127:sum := sum(127:sum)
+                                    128:sum := sum(128:sum)
+                                    141:concat := 'MSC , GERMA'
+                                - EXCHANGE(SHUFFLE) [37, 38, 43, 44, 45, 47, 55]
+                                        Estimates: {row: 271367984, cpu: ?, memory: ?, network: ?, cost: 1.823554571550939E12}
+                                    - AGGREGATE(LOCAL) [37:w_warehouse_name, 38:w_warehouse_sq_ft, 43:w_city, 44:w_county, 45:w_state, 47:w_country, 55:d_year]
+                                            Estimates: {row: 271367984, cpu: ?, memory: ?, network: ?, cost: 1.7979374337762695E12}
+                                            129:sum := sum(105:case)
+                                            130:sum := sum(106:case)
+                                            131:sum := sum(107:case)
+                                            132:sum := sum(108:case)
+                                            133:sum := sum(109:case)
+                                            134:sum := sum(110:case)
+                                            135:sum := sum(111:case)
+                                            136:sum := sum(112:case)
+                                            137:sum := sum(113:case)
+                                            138:sum := sum(114:case)
+                                            139:sum := sum(115:case)
+                                            140:sum := sum(116:case)
+                                            117:sum := sum(93:case)
+                                            118:sum := sum(94:case)
+                                            119:sum := sum(95:case)
+                                            120:sum := sum(96:case)
+                                            121:sum := sum(97:case)
+                                            122:sum := sum(98:case)
+                                            123:sum := sum(99:case)
+                                            124:sum := sum(100:case)
+                                            125:sum := sum(101:case)
+                                            126:sum := sum(102:case)
+                                            127:sum := sum(103:case)
+                                            128:sum := sum(104:case)
+                                        - HASH/INNER JOIN [1:ws_sold_date_sk = 49:d_date_sk] => [37:w_warehouse_name, 38:w_warehouse_sq_ft, 43:w_city, 44:w_county, 45:w_state, 47:w_country, 55:d_year, 93:case, 94:case, 95:case, 96:case, 97:case, 98:case, 99:case, 100:case, 101:case, 102:case, 103:case, 104:case, 105:case, 106:case, 107:case, 108:case, 109:case, 110:case, 111:case, 112:case, 113:case, 114:case, 115:case, 116:case]
+                                                Estimates: {row: 404997936, cpu: ?, memory: ?, network: ?, cost: 1.7658403290100002E12}
+                                                93:case := if(373:expr, 377:multiply, 0)
+                                                94:case := if(374:expr, 377:multiply, 0)
+                                                95:case := if(375:expr, 377:multiply, 0)
+                                                96:case := if(376:expr, 377:multiply, 0)
+                                                97:case := if(365:expr, 377:multiply, 0)
+                                                98:case := if(366:expr, 377:multiply, 0)
+                                                99:case := if(367:expr, 377:multiply, 0)
+                                                100:case := if(368:expr, 377:multiply, 0)
+                                                101:case := if(369:expr, 377:multiply, 0)
+                                                102:case := if(370:expr, 377:multiply, 0)
+                                                103:case := if(371:expr, 377:multiply, 0)
+                                                104:case := if(372:expr, 377:multiply, 0)
+                                                105:case := if(373:expr, 378:multiply, 0)
+                                                106:case := if(374:expr, 378:multiply, 0)
+                                                107:case := if(375:expr, 378:multiply, 0)
+                                                108:case := if(376:expr, 378:multiply, 0)
+                                                109:case := if(365:expr, 378:multiply, 0)
+                                                110:case := if(366:expr, 378:multiply, 0)
+                                                111:case := if(367:expr, 378:multiply, 0)
+                                                112:case := if(368:expr, 378:multiply, 0)
+                                                113:case := if(369:expr, 378:multiply, 0)
+                                                114:case := if(370:expr, 378:multiply, 0)
+                                                115:case := if(371:expr, 378:multiply, 0)
+                                                116:case := if(372:expr, 378:multiply, 0)
+                                                364:cast := cast(19:ws_quantity as decimal(9, 0)), 
+                                                365:expr := 57:d_moy = 5, 
+                                                366:expr := 57:d_moy = 6, 
+                                                367:expr := 57:d_moy = 7, 
+                                                368:expr := 57:d_moy = 8, 
+                                                369:expr := 57:d_moy = 9, 
+                                                370:expr := 57:d_moy = 10, 
+                                                371:expr := 57:d_moy = 11, 
+                                                372:expr := 57:d_moy = 12, 
+                                                373:expr := 57:d_moy = 1, 
+                                                374:expr := 57:d_moy = 2, 
+                                                375:expr := 57:d_moy = 3, 
+                                                376:expr := 57:d_moy = 4, 
+                                                377:multiply := 22:ws_sales_price * 364:cast, 
+                                                378:multiply := 33:ws_net_paid_inc_ship_tax * 364:cast, 
+                                            - HASH/INNER JOIN [2:ws_sold_time_sk = 77:t_time_sk] => [33:ws_net_paid_inc_ship_tax, 1:ws_sold_date_sk, 19:ws_quantity, 37:w_warehouse_name, 38:w_warehouse_sq_ft, 22:ws_sales_price, 43:w_city, 44:w_county, 45:w_state, 47:w_country]
+                                                    Estimates: {row: 404997936, cpu: ?, memory: ?, network: ?, cost: 1.6783230813394001E12}
+                                                - HASH/INNER JOIN [16:ws_warehouse_sk = 35:w_warehouse_sk] => [33:ws_net_paid_inc_ship_tax, 1:ws_sold_date_sk, 2:ws_sold_time_sk, 19:ws_quantity, 37:w_warehouse_name, 38:w_warehouse_sq_ft, 22:ws_sales_price, 43:w_city, 44:w_county, 45:w_state, 47:w_country]
+                                                        Estimates: {row: 404997936, cpu: ?, memory: ?, network: ?, cost: 1.6280918459545002E12}
+                                                    - HASH/INNER JOIN [15:ws_ship_mode_sk = 87:sm_ship_mode_sk] => [1:ws_sold_date_sk, 33:ws_net_paid_inc_ship_tax, 2:ws_sold_time_sk, 19:ws_quantity, 22:ws_sales_price, 16:ws_warehouse_sk]
+                                                            Estimates: {row: 1619991747, cpu: ?, memory: ?, network: ?, cost: 1.5649120342714001E12}
+                                                        - HIVE-SCAN [web_sales] => [1:ws_sold_date_sk, 33:ws_net_paid_inc_ship_tax, 2:ws_sold_time_sk, 19:ws_quantity, 22:ws_sales_price, 15:ws_ship_mode_sk, 16:ws_warehouse_sk]
+                                                                Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 1.3478331342528E12}
+                                                                predicate: 16:ws_warehouse_sk IS NOT NULL
+                                                        - EXCHANGE(BROADCAST)
+                                                                Estimates: {row: 10, cpu: ?, memory: ?, network: ?, cost: 4160.0}
+                                                            - HIVE-SCAN [ship_mode] => [87:sm_ship_mode_sk]
+                                                                    Estimates: {row: 10, cpu: ?, memory: ?, network: ?, cost: 960.0}
+                                                                    predicate: 91:sm_carrier IN ('MSC', 'GERMA')
+                                                    - EXCHANGE(BROADCAST)
+                                                            Estimates: {row: 22, cpu: ?, memory: ?, network: ?, cost: 91080.0}
+                                                        - HIVE-SCAN [warehouse] => [35:w_warehouse_sk, 37:w_warehouse_name, 38:w_warehouse_sq_ft, 43:w_city, 44:w_county, 45:w_state, 47:w_country]
+                                                                Estimates: {row: 22, cpu: ?, memory: ?, network: ?, cost: 8280.0}
+                                                                predicate: 35:w_warehouse_sk IS NOT NULL
+                                                - EXCHANGE(BROADCAST)
+                                                        Estimates: {row: 21600, cpu: ?, memory: ?, network: ?, cost: 7948800.0}
+                                                    - HIVE-SCAN [time_dim] => [77:t_time_sk]
+                                                            Estimates: {row: 21600, cpu: ?, memory: ?, network: ?, cost: 1036800.0}
+                                                            predicate: 79:t_time >= 9453 AND 79:t_time <= 38253
+                                            - EXCHANGE(BROADCAST)
+                                                    Estimates: {row: 36524, cpu: ?, memory: ?, network: ?, cost: 2.5713248E7}
+                                                - HIVE-SCAN [date_dim] => [49:d_date_sk, 55:d_year, 57:d_moy]
+                                                        Estimates: {row: 36524, cpu: ?, memory: ?, network: ?, cost: 2337568.0}
+                                                        predicate: 55:d_year = 2001
+                            - AGGREGATE(GLOBAL) [178:w_warehouse_name, 179:w_warehouse_sq_ft, 184:w_city, 185:w_county, 186:w_state, 188:w_country, 196:d_year] => [178:w_warehouse_name, 179:w_warehouse_sq_ft, 184:w_city, 185:w_county, 186:w_state, 188:w_country, 258:sum, 259:sum, 196:d_year, 260:sum, 261:sum, 262:sum, 263:sum, 264:sum, 265:sum, 266:sum, 267:sum, 268:sum, 269:sum, 270:sum, 271:sum, 272:sum, 273:sum, 274:sum, 275:sum, 276:sum, 277:sum, 278:sum, 279:sum, 280:sum, 281:sum, 282:concat]
+                                    Estimates: {row: 363660014, cpu: 256172054860.90, memory: 175647787147.30, network: 0.00, cost: 4126451060834.91}
+                                    258:sum := sum(258:sum)
+                                    259:sum := sum(259:sum)
+                                    260:sum := sum(260:sum)
+                                    261:sum := sum(261:sum)
+                                    262:sum := sum(262:sum)
+                                    263:sum := sum(263:sum)
+                                    264:sum := sum(264:sum)
+                                    265:sum := sum(265:sum)
+                                    266:sum := sum(266:sum)
+                                    267:sum := sum(267:sum)
+                                    268:sum := sum(268:sum)
+                                    269:sum := sum(269:sum)
+                                    270:sum := sum(270:sum)
+                                    271:sum := sum(271:sum)
+                                    272:sum := sum(272:sum)
+                                    273:sum := sum(273:sum)
+                                    274:sum := sum(274:sum)
+                                    275:sum := sum(275:sum)
+                                    276:sum := sum(276:sum)
+                                    277:sum := sum(277:sum)
+                                    278:sum := sum(278:sum)
+                                    279:sum := sum(279:sum)
+                                    280:sum := sum(280:sum)
+                                    281:sum := sum(281:sum)
+                                    282:concat := 'MSC , GERMA'
+                                - EXCHANGE(SHUFFLE) [178, 179, 184, 185, 186, 188, 196]
+                                        Estimates: {row: 542737404, cpu: ?, memory: ?, network: ?, cost: 3.6470694591098623E12}
+                                    - AGGREGATE(LOCAL) [178:w_warehouse_name, 179:w_warehouse_sq_ft, 184:w_city, 185:w_county, 186:w_state, 188:w_country, 196:d_year]
+                                            Estimates: {row: 542737404, cpu: ?, memory: ?, network: ?, cost: 3.595835048137681E12}
+                                            258:sum := sum(234:case)
+                                            259:sum := sum(235:case)
+                                            260:sum := sum(236:case)
+                                            261:sum := sum(237:case)
+                                            262:sum := sum(238:case)
+                                            263:sum := sum(239:case)
+                                            264:sum := sum(240:case)
+                                            265:sum := sum(241:case)
+                                            266:sum := sum(242:case)
+                                            267:sum := sum(243:case)
+                                            268:sum := sum(244:case)
+                                            269:sum := sum(245:case)
+                                            270:sum := sum(246:case)
+                                            271:sum := sum(247:case)
+                                            272:sum := sum(248:case)
+                                            273:sum := sum(249:case)
+                                            274:sum := sum(250:case)
+                                            275:sum := sum(251:case)
+                                            276:sum := sum(252:case)
+                                            277:sum := sum(253:case)
+                                            278:sum := sum(254:case)
+                                            279:sum := sum(255:case)
+                                            280:sum := sum(256:case)
+                                            281:sum := sum(257:case)
+                                        - HASH/INNER JOIN [142:cs_sold_date_sk = 190:d_date_sk] => [178:w_warehouse_name, 179:w_warehouse_sq_ft, 184:w_city, 185:w_county, 186:w_state, 188:w_country, 196:d_year, 234:case, 235:case, 236:case, 237:case, 238:case, 239:case, 240:case, 241:case, 242:case, 243:case, 244:case, 245:case, 246:case, 247:case, 248:case, 249:case, 250:case, 251:case, 252:case, 253:case, 254:case, 255:case, 256:case, 257:case]
+                                                Estimates: {row: 809998014, cpu: ?, memory: ?, network: ?, cost: 3.5316406689265E12}
+                                                234:case := if(380:expr, 392:multiply, 0)
+                                                235:case := if(381:expr, 392:multiply, 0)
+                                                236:case := if(382:expr, 392:multiply, 0)
+                                                237:case := if(383:expr, 392:multiply, 0)
+                                                238:case := if(384:expr, 392:multiply, 0)
+                                                239:case := if(385:expr, 392:multiply, 0)
+                                                240:case := if(386:expr, 392:multiply, 0)
+                                                241:case := if(387:expr, 392:multiply, 0)
+                                                242:case := if(388:expr, 392:multiply, 0)
+                                                243:case := if(389:expr, 392:multiply, 0)
+                                                244:case := if(390:expr, 392:multiply, 0)
+                                                245:case := if(391:expr, 392:multiply, 0)
+                                                246:case := if(380:expr, 393:multiply, 0)
+                                                247:case := if(381:expr, 393:multiply, 0)
+                                                248:case := if(382:expr, 393:multiply, 0)
+                                                249:case := if(383:expr, 393:multiply, 0)
+                                                250:case := if(384:expr, 393:multiply, 0)
+                                                251:case := if(385:expr, 393:multiply, 0)
+                                                252:case := if(386:expr, 393:multiply, 0)
+                                                253:case := if(387:expr, 393:multiply, 0)
+                                                254:case := if(388:expr, 393:multiply, 0)
+                                                255:case := if(389:expr, 393:multiply, 0)
+                                                256:case := if(390:expr, 393:multiply, 0)
+                                                257:case := if(391:expr, 393:multiply, 0)
+                                                379:cast := cast(160:cs_quantity as decimal(9, 0)), 
+                                                380:expr := 198:d_moy = 1, 
+                                                381:expr := 198:d_moy = 2, 
+                                                382:expr := 198:d_moy = 3, 
+                                                383:expr := 198:d_moy = 4, 
+                                                384:expr := 198:d_moy = 5, 
+                                                385:expr := 198:d_moy = 6, 
+                                                386:expr := 198:d_moy = 7, 
+                                                387:expr := 198:d_moy = 8, 
+                                                388:expr := 198:d_moy = 9, 
+                                                389:expr := 198:d_moy = 10, 
+                                                390:expr := 198:d_moy = 11, 
+                                                391:expr := 198:d_moy = 12, 
+                                                392:multiply := 167:cs_ext_list_price * 379:cast, 
+                                                393:multiply := 173:cs_net_paid_inc_ship * 379:cast, 
+                                            - HASH/INNER JOIN [143:cs_sold_time_sk = 218:t_time_sk] => [178:w_warehouse_name, 179:w_warehouse_sq_ft, 167:cs_ext_list_price, 184:w_city, 185:w_county, 186:w_state, 188:w_country, 173:cs_net_paid_inc_ship, 142:cs_sold_date_sk, 160:cs_quantity]
+                                                    Estimates: {row: 809998014, cpu: ?, memory: ?, network: ?, cost: 3.356643404416E12}
+                                                - HASH/INNER JOIN [156:cs_warehouse_sk = 176:w_warehouse_sk] => [178:w_warehouse_name, 179:w_warehouse_sq_ft, 167:cs_ext_list_price, 184:w_city, 185:w_county, 186:w_state, 188:w_country, 173:cs_net_paid_inc_ship, 142:cs_sold_date_sk, 143:cs_sold_time_sk, 160:cs_quantity]
+                                                        Estimates: {row: 809998014, cpu: ?, memory: ?, network: ?, cost: 3.25619215936375E12}
+                                                    - HASH/INNER JOIN [155:cs_ship_mode_sk = 228:sm_ship_mode_sk] => [167:cs_ext_list_price, 156:cs_warehouse_sk, 173:cs_net_paid_inc_ship, 142:cs_sold_date_sk, 143:cs_sold_time_sk, 160:cs_quantity]
+                                                            Estimates: {row: 3239992059, cpu: ?, memory: ?, network: ?, cost: 3.1298323355185E12}
+                                                        - HIVE-SCAN [catalog_sales] => [167:cs_ext_list_price, 155:cs_ship_mode_sk, 156:cs_warehouse_sk, 173:cs_net_paid_inc_ship, 142:cs_sold_date_sk, 143:cs_sold_time_sk, 160:cs_quantity]
+                                                                Estimates: {row: 12959968239, cpu: ?, memory: ?, network: ?, cost: 2.695673393712E12}
+                                                                predicate: 156:cs_warehouse_sk IS NOT NULL
+                                                        - EXCHANGE(BROADCAST)
+                                                                Estimates: {row: 10, cpu: ?, memory: ?, network: ?, cost: 4160.0}
+                                                            - HIVE-SCAN [ship_mode] => [228:sm_ship_mode_sk]
+                                                                    Estimates: {row: 10, cpu: ?, memory: ?, network: ?, cost: 960.0}
+                                                                    predicate: 232:sm_carrier IN ('MSC', 'GERMA')
+                                                    - EXCHANGE(BROADCAST)
+                                                            Estimates: {row: 22, cpu: ?, memory: ?, network: ?, cost: 91080.0}
+                                                        - HIVE-SCAN [warehouse] => [178:w_warehouse_name, 179:w_warehouse_sq_ft, 184:w_city, 185:w_county, 186:w_state, 188:w_country, 176:w_warehouse_sk]
+                                                                Estimates: {row: 22, cpu: ?, memory: ?, network: ?, cost: 8280.0}
+                                                                predicate: 176:w_warehouse_sk IS NOT NULL
+                                                - EXCHANGE(BROADCAST)
+                                                        Estimates: {row: 21600, cpu: ?, memory: ?, network: ?, cost: 7948800.0}
+                                                    - HIVE-SCAN [time_dim] => [218:t_time_sk]
+                                                            Estimates: {row: 21600, cpu: ?, memory: ?, network: ?, cost: 1036800.0}
+                                                            predicate: 220:t_time >= 9453 AND 220:t_time <= 38253
+                                            - EXCHANGE(BROADCAST)
+                                                    Estimates: {row: 36524, cpu: ?, memory: ?, network: ?, cost: 2.5713248E7}
+                                                - HIVE-SCAN [date_dim] => [196:d_year, 198:d_moy, 190:d_date_sk]
+                                                        Estimates: {row: 36524, cpu: ?, memory: ?, network: ?, cost: 2337568.0}
+                                                        predicate: 196:d_year = 2001

@@ -1,0 +1,51 @@
+Explain String
+- Output => [93:i_category, 91:i_class, 89:i_brand, 102:i_product_name, 30:d_year, 34:d_qoy, 32:d_moy, 53:s_store_id, 104:sum, 106:rank()]
+    - TOP-100(FINAL)[93: i_category ASC NULLS FIRST, 91: i_class ASC NULLS FIRST, 89: i_brand ASC NULLS FIRST, 102: i_product_name ASC NULLS FIRST, 30: d_year ASC NULLS FIRST, 34: d_qoy ASC NULLS FIRST, 32: d_moy ASC NULLS FIRST, 53: s_store_id ASC NULLS FIRST, 104: sum ASC NULLS FIRST, 106: rank() ASC NULLS FIRST]
+            Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 4.511781745904478E13}
+        - TOP-100(PARTIAL)[93: i_category ASC NULLS FIRST, 91: i_class ASC NULLS FIRST, 89: i_brand ASC NULLS FIRST, 102: i_product_name ASC NULLS FIRST, 30: d_year ASC NULLS FIRST, 34: d_qoy ASC NULLS FIRST, 32: d_moy ASC NULLS FIRST, 53: s_store_id ASC NULLS FIRST, 104: sum ASC NULLS FIRST, 106: rank() ASC NULLS FIRST]
+                Estimates: {row: 100, cpu: 1973231453300.92, memory: 12400.00, network: 1973231453300.92, cost: 45117817411044.78}
+            - PREDICATE [106: rank() <= 100]
+                - ANALYTIC [ partition by (93:i_category), order by (104: sum DESC NULLS LAST)]
+                        Estimates: {row: 31826313762, cpu: 3946462906601.85, memory: 0.00, network: 0.00, cost: 41171354479642.94}
+                        106:rank() := rank() RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+                    - SORT(GLOBAL)[93: i_category ASC NULLS FIRST, 104: sum DESC NULLS LAST]
+                            Estimates: {row: 31826313762, cpu: 3691852396498.50, memory: 3691852396498.50, network: 3691852396498.50, cost: 39198123026342.02}
+                        - EXCHANGE(SHUFFLE) [93]
+                                Estimates: {row: 31826313762, cpu: 3437241886395.16, memory: 0.00, network: 3437241886395.16, cost: 39198123026342.02}
+                            - SORT(PARTIAL)[93: i_category ASC NULLS FIRST, 104: sum DESC NULLS LAST]
+                                    Estimates: {row: 31826313762, cpu: 3691852396498.50, memory: 3691852396498.50, network: 3691852396498.50, cost: 32323639253551.71}
+                                - AGGREGATE(GLOBAL) [93:i_category, 91:i_class, 89:i_brand, 102:i_product_name, 30:d_year, 34:d_qoy, 32:d_moy, 53:s_store_id, 105:GROUPING_ID] => [34:d_qoy, 53:s_store_id, 102:i_product_name, 104:sum, 89:i_brand, 91:i_class, 93:i_category, 30:d_year, 32:d_moy]
+                                        Estimates: {row: 31826313762, cpu: 4997582041500.25, memory: 3691852396498.50, network: 0.00, cost: 17556229667557.70}
+                                        104:sum := sum(104:sum)
+                                    - EXCHANGE(SHUFFLE) [93, 91, 89, 102, 30, 34, 32, 53, 105]
+                                            Estimates: {row: 43082603806, cpu: 499758204150.02, memory: 0.00, network: 499758204150.02, cost: 7673733853810.58}
+                                        - AGGREGATE(LOCAL) [93:i_category, 91:i_class, 89:i_brand, 102:i_product_name, 30:d_year, 34:d_qoy, 32:d_moy, 53:s_store_id, 105:GROUPING_ID]
+                                                Estimates: {row: 43082603806, cpu: 629856044811.63, memory: 499758204150.02, network: 0.00, cost: 6674217445510.53}
+                                                104:sum := sum(103:coalesce)
+                                            - REPEAT [[], [93:i_category], [93:i_category, 91:i_class], [93:i_category, 91:i_class, 89:i_brand], [93:i_category, 91:i_class, 89:i_brand, 102:i_product_name], [93:i_category, 91:i_class, 89:i_brand, 102:i_product_name, 30:d_year], [93:i_category, 91:i_class, 89:i_brand, 102:i_product_name, 30:d_year, 34:d_qoy], [93:i_category, 91:i_class, 89:i_brand, 102:i_product_name, 30:d_year, 34:d_qoy, 32:d_moy], [93:i_category, 91:i_class, 89:i_brand, 102:i_product_name, 30:d_year, 34:d_qoy, 32:d_moy, 53:s_store_id]] => [34:d_qoy, 53:s_store_id, 102:i_product_name, 105:GROUPING_ID, 89:i_brand, 91:i_class, 93:i_category, 30:d_year, 32:d_moy]
+                                                    Estimates: {row: 58320004149, cpu: 0.00, memory: 0.00, network: 0.00, cost: 5359773014804.66}
+                                                - HASH/INNER JOIN [3:ss_item_sk = 81:i_item_sk] => [34:d_qoy, 53:s_store_id, 102:i_product_name, 103:coalesce, 89:i_brand, 91:i_class, 93:i_category, 30:d_year, 32:d_moy]
+                                                        Estimates: {row: 6480000461, cpu: ?, memory: ?, network: ?, cost: 5.359773014804662E12}
+                                                        103:coalesce := coalesce(14:ss_sales_price * cast(11:ss_quantity as decimal(9, 0)), 0)
+                                                    - HASH/INNER JOIN [1:ss_sold_date_sk = 24:d_date_sk] => [34:d_qoy, 3:ss_item_sk, 53:s_store_id, 11:ss_quantity, 14:ss_sales_price, 30:d_year, 32:d_moy]
+                                                            Estimates: {row: 6480000461, cpu: ?, memory: ?, network: ?, cost: 4.7433862777688E12}
+                                                        - HASH/INNER JOIN [8:ss_store_sk = 52:s_store_sk] => [1:ss_sold_date_sk, 3:ss_item_sk, 53:s_store_id, 11:ss_quantity, 14:ss_sales_price]
+                                                                Estimates: {row: 6480000461, cpu: ?, memory: ?, network: ?, cost: 4.39344240237495E12}
+                                                            - HIVE-SCAN [store_sales] => [1:ss_sold_date_sk, 3:ss_item_sk, 8:ss_store_sk, 11:ss_quantity, 14:ss_sales_price]
+                                                                    Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 3.7324802655504004E12}
+                                                                    predicate: 1:ss_sold_date_sk IS NOT NULL
+                                                            - EXCHANGE(BROADCAST)
+                                                                    Estimates: {row: 1350, cpu: ?, memory: ?, network: ?, cost: 1425600.0}
+                                                                - HIVE-SCAN [store] => [52:s_store_sk, 53:s_store_id]
+                                                                        Estimates: {row: 1350, cpu: ?, memory: ?, network: ?, cost: 129600.0}
+                                                                        predicate: 52:s_store_sk IS NOT NULL
+                                                        - EXCHANGE(BROADCAST)
+                                                                Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 1.6362976E7}
+                                                            - HIVE-SCAN [date_dim] => [34:d_qoy, 24:d_date_sk, 30:d_year, 32:d_moy]
+                                                                    Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 1753176.0}
+                                                                    predicate: 27:d_month_seq >= 1185 AND 27:d_month_seq <= 1196
+                                                    - EXCHANGE(BROADCAST)
+                                                            Estimates: {row: 361800, cpu: ?, memory: ?, network: ?, cost: 1.1461824E9}
+                                                        - HIVE-SCAN [item] => [81:i_item_sk, 102:i_product_name, 89:i_brand, 91:i_class, 93:i_category]
+                                                                Estimates: {row: 361800, cpu: ?, memory: ?, network: ?, cost: 1.041984E8}
+                                                                predicate: 81:i_item_sk IS NOT NULL

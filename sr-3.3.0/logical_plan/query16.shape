@@ -1,0 +1,69 @@
+Explain String
+- Output => [170:count, 171:sum, 172:sum]
+    - TOP-100(FINAL)[170: count ASC NULLS FIRST]
+            Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 6.017144237807605E12}
+        - TOP-100(PARTIAL)[170: count ASC NULLS FIRST]
+                Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 6.017144237647605E12}
+            - AGGREGATE(GLOBAL) []
+                    Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 6.017144237487605E12}
+                    170:count := count(170:count)
+                    171:sum := sum(171:sum)
+                    172:sum := sum(172:sum)
+                - EXCHANGE(GATHER)
+                        Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 6.017144237387605E12}
+                    - AGGREGATE(DISTINCT_LOCAL) []
+                            Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 6.017144237307605E12}
+                            170:count := count(18:cs_order_number)
+                            171:sum := sum(171:sum)
+                            172:sum := sum(172:sum)
+                        - AGGREGATE(DISTINCT_GLOBAL) [18:cs_order_number]
+                                Estimates: {row: 287990133, cpu: ?, memory: ?, network: ?, cost: 6.011384434548605E12}
+                                171:sum := sum(171:sum)
+                                172:sum := sum(172:sum)
+                            - EXCHANGE(SHUFFLE) [18]
+                                    Estimates: {row: 575980267, cpu: ?, memory: ?, network: ?, cost: 5.976825618474605E12}
+                                - AGGREGATE(LOCAL) [18:cs_order_number]
+                                        Estimates: {row: 575980267, cpu: ?, memory: ?, network: ?, cost: 5.972217776331405E12}
+                                        171:sum := sum(29:cs_ext_ship_cost)
+                                        172:sum := sum(34:cs_net_profit)
+                                    - HASH/INNER JOIN [11:cs_ship_addr_sk = 63:ca_address_sk] => [18:cs_order_number, 34:cs_net_profit, 29:cs_ext_ship_cost]
+                                            Estimates: {row: 1151960535, cpu: ?, memory: ?, network: ?, cost: 5.965766797330925E12}
+                                        - EXCHANGE(SHUFFLE) [11]
+                                                Estimates: {row: 1151960535, cpu: ?, memory: ?, network: ?, cost: 5.924738643518658E12}
+                                            - HASH/RIGHT SEMI JOIN [124:cs_order_number = 18:cs_order_number AND 15:cs_warehouse_sk != 121:cs_warehouse_sk] => [18:cs_order_number, 34:cs_net_profit, 11:cs_ship_addr_sk, 29:cs_ext_ship_cost]
+                                                    Estimates: {row: 1151960535, cpu: ?, memory: ?, network: ?, cost: 5.851013169227458E12}
+                                                - EXCHANGE(SHUFFLE) [124]
+                                                        Estimates: {row: 12959968239, cpu: ?, memory: ?, network: ?, cost: 1.244156950944E12}
+                                                    - HIVE-SCAN [catalog_sales] => [121:cs_warehouse_sk, 124:cs_order_number]
+                                                            Estimates: {row: 12959968239, cpu: ?, memory: ?, network: ?, cost: 8.29437967296E11}
+                                                            predicate: 124:cs_order_number IS NOT NULL
+                                                - HASH/LEFT ANTI JOIN [18:cs_order_number = 158:cr_order_number] => [18:cs_order_number, 34:cs_net_profit, 11:cs_ship_addr_sk, 29:cs_ext_ship_cost, 15:cs_warehouse_sk]
+                                                        Estimates: {row: 1799958947, cpu: ?, memory: ?, network: ?, cost: 4.1272810882216665E12}
+                                                    - EXCHANGE(SHUFFLE) [18]
+                                                            Estimates: {row: 3239992059, cpu: ?, memory: ?, network: ?, cost: 3.797280425204E12}
+                                                        - HASH/INNER JOIN [3:cs_ship_date_sk = 35:d_date_sk] => [18:cs_order_number, 34:cs_net_profit, 11:cs_ship_addr_sk, 29:cs_ext_ship_cost, 15:cs_warehouse_sk]
+                                                                Estimates: {row: 3239992059, cpu: ?, memory: ?, network: ?, cost: 3.538081060424E12}
+                                                            - HASH/INNER JOIN [12:cs_call_center_sk = 76:cc_call_center_sk] => [18:cs_order_number, 34:cs_net_profit, 3:cs_ship_date_sk, 11:cs_ship_addr_sk, 29:cs_ext_ship_cost, 15:cs_warehouse_sk]
+                                                                    Estimates: {row: 3239992059, cpu: ?, memory: ?, network: ?, cost: 3.3695917578E12}
+                                                                - HIVE-SCAN [catalog_sales] => [18:cs_order_number, 34:cs_net_profit, 3:cs_ship_date_sk, 11:cs_ship_addr_sk, 12:cs_call_center_sk, 29:cs_ext_ship_cost, 15:cs_warehouse_sk]
+                                                                        Estimates: {row: 12959968239, cpu: ?, memory: ?, network: ?, cost: 2.903032885536E12}
+                                                                        predicate: 3:cs_ship_date_sk IS NOT NULL
+                                                                - EXCHANGE(BROADCAST)
+                                                                        Estimates: {row: 27, cpu: ?, memory: ?, network: ?, cost: 11232.0}
+                                                                    - HIVE-SCAN [call_center] => [76:cc_call_center_sk]
+                                                                            Estimates: {row: 27, cpu: ?, memory: ?, network: ?, cost: 2592.0}
+                                                                            predicate: 101:cc_county IN ('Richland County', 'Bronx County', 'Maverick County', 'Mesa County', 'Raleigh County')
+                                                            - EXCHANGE(BROADCAST)
+                                                                    Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 6720508.0}
+                                                                - HIVE-SCAN [date_dim] => [35:d_date_sk]
+                                                                        Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 876588.0}
+                                                                        predicate: 37:d_date >= 1999-04-01 AND 37:d_date <= 1999-05-31
+                                                    - EXCHANGE(SHUFFLE) [158]
+                                                            Estimates: {row: 1440033112, cpu: ?, memory: ?, network: ?, cost: 6.9121589376E10}
+                                                        - HIVE-SCAN [catalog_returns] => [158:cr_order_number]
+                                                                Estimates: {row: 1440033112, cpu: ?, memory: ?, network: ?, cost: 4.6081059584E10}
+                                        - EXCHANGE(SHUFFLE) [63]
+                                                Estimates: {row: 32500000, cpu: ?, memory: ?, network: ?, cost: 3.64E9}
+                                            - HIVE-SCAN [customer_address] => [63:ca_address_sk]
+                                                    Estimates: {row: 32500000, cpu: ?, memory: ?, network: ?, cost: 3.12E9}
+                                                    predicate: 71:ca_state = 'IL'

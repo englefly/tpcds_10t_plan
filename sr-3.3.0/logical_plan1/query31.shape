@@ -1,0 +1,136 @@
+Explain String
+- Output => [200:ca_county, 171:d_year, 565:expr, 566:expr, 567:expr, 568:expr]
+    - CTEAnchor[1]
+            Estimates: {row: 3572100254, cpu: ?, memory: ?, network: ?, cost: 2.4208271686787195E13}
+        - CTEProduce[1]
+            - AGGREGATE(GLOBAL) [59:ca_county, 34:d_qoy, 30:d_year]
+                    Estimates: {row: 7876481060, cpu: ?, memory: ?, network: ?, cost: 6.707413865757107E12}
+                    65:sum := sum(65:sum)
+                - EXCHANGE(SHUFFLE) [59, 34, 30]
+                        Estimates: {row: 14288401016, cpu: ?, memory: ?, network: ?, cost: 5.791527360595604E12}
+                    - AGGREGATE(LOCAL) [59:ca_county, 34:d_qoy, 30:d_year]
+                            Estimates: {row: 14288401016, cpu: ?, memory: ?, network: ?, cost: 5.677220152463122E12}
+                            65:sum := sum(16:ss_ext_sales_price)
+                        - HASH/INNER JOIN [7:ss_addr_sk = 52:ca_address_sk] => [34:d_qoy, 59:ca_county, 30:d_year, 16:ss_ext_sales_price]
+                                Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 5.500704939904801E12}
+                            - EXCHANGE(SHUFFLE) [7]
+                                    Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 4.5619542485172E12}
+                                - HASH/INNER JOIN [1:ss_sold_date_sk = 24:d_date_sk] => [34:d_qoy, 7:ss_addr_sk, 30:d_year, 16:ss_ext_sales_price]
+                                        Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 3.3177941600004004E12}
+                                    - HIVE-SCAN [store_sales] => [1:ss_sold_date_sk, 7:ss_addr_sk, 16:ss_ext_sales_price]
+                                            Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 2.4883201770336E12}
+                                            predicate: 1:ss_sold_date_sk IS NOT NULL
+                                    - EXCHANGE(BROADCAST)
+                                            Estimates: {row: 32872, cpu: ?, memory: ?, network: ?, cost: 2.31419232E7}
+                                        - HIVE-SCAN [date_dim] => [34:d_qoy, 24:d_date_sk, 30:d_year]
+                                                Estimates: {row: 32872, cpu: ?, memory: ?, network: ?, cost: 2103811.2}
+                                                predicate: 30:d_year = 1999 AND (34:d_qoy = 3 OR 34:d_qoy = 2 OR 34:d_qoy = 1) AND 34:d_qoy IN (3, 2, 1) AND 24:d_date_sk IS NOT NULL
+                            - EXCHANGE(SHUFFLE) [52]
+                                    Estimates: {row: 29250000, cpu: ?, memory: ?, network: ?, cost: 4.212E9}
+                                - HIVE-SCAN [customer_address] => [52:ca_address_sk, 59:ca_county]
+                                        Estimates: {row: 29250000, cpu: ?, memory: ?, network: ?, cost: 2.808E9}
+                                        predicate: 52:ca_address_sk IS NOT NULL
+        - CTEAnchor[2]
+                Estimates: {row: 3572100254, cpu: ?, memory: ?, network: ?, cost: 1.5909808646833574E13}
+            - CTEProduce[2]
+                - AGGREGATE(GLOBAL) [135:ca_county, 110:d_qoy, 106:d_year]
+                        Estimates: {row: 1969110094, cpu: ?, memory: ?, network: ?, cost: 1.6810932244646123E12}
+                        141:sum := sum(141:sum)
+                    - EXCHANGE(SHUFFLE) [135, 110, 106]
+                            Estimates: {row: 3572081804, cpu: ?, memory: ?, network: ?, cost: 1.4521227808205522E12}
+                        - AGGREGATE(LOCAL) [135:ca_county, 110:d_qoy, 106:d_year]
+                                Estimates: {row: 3572081804, cpu: ?, memory: ?, network: ?, cost: 1.4235461263875962E12}
+                                141:sum := sum(89:ws_ext_sales_price)
+                            - HASH/INNER JOIN [73:ws_bill_addr_sk = 128:ca_address_sk] => [135:ca_county, 89:ws_ext_sales_price, 106:d_year, 110:d_qoy]
+                                    Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 1.3794175511748003E12}
+                                - EXCHANGE(SHUFFLE) [73]
+                                        Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 1.1405081144772002E12}
+                                    - HASH/INNER JOIN [66:ws_sold_date_sk = 100:d_date_sk] => [73:ws_bill_addr_sk, 89:ws_ext_sales_price, 106:d_year, 110:d_qoy]
+                                            Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 8.294696988804E11}
+                                        - HIVE-SCAN [web_sales] => [66:ws_sold_date_sk, 73:ws_bill_addr_sk, 89:ws_ext_sales_price]
+                                                Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 6.220768311936001E11}
+                                                predicate: 66:ws_sold_date_sk IS NOT NULL
+                                        - EXCHANGE(BROADCAST)
+                                                Estimates: {row: 32872, cpu: ?, memory: ?, network: ?, cost: 2.31419232E7}
+                                            - HIVE-SCAN [date_dim] => [100:d_date_sk, 106:d_year, 110:d_qoy]
+                                                    Estimates: {row: 32872, cpu: ?, memory: ?, network: ?, cost: 2103811.2}
+                                                    predicate: 106:d_year = 1999 AND (110:d_qoy = 3 OR 110:d_qoy = 2 OR 110:d_qoy = 1) AND 110:d_qoy IN (3, 2, 1) AND 100:d_date_sk IS NOT NULL
+                                - EXCHANGE(SHUFFLE) [128]
+                                        Estimates: {row: 29250000, cpu: ?, memory: ?, network: ?, cost: 4.212E9}
+                                    - HIVE-SCAN [customer_address] => [135:ca_county, 128:ca_address_sk]
+                                            Estimates: {row: 29250000, cpu: ?, memory: ?, network: ?, cost: 2.808E9}
+                                            predicate: 128:ca_address_sk IS NOT NULL
+            - SORT(FINAL)[171: d_year ASC NULLS FIRST]
+                    Estimates: {row: 3572100254, cpu: ?, memory: ?, network: ?, cost: 1.3830955183275746E13}
+                - SORT(PARTIAL)[171: d_year ASC NULLS FIRST]
+                        Estimates: {row: 1969120265, cpu: ?, memory: ?, network: ?, cost: 1.2364429423938557E13}
+                    - HASH/INNER JOIN [406:ca_county = 558:ca_county AND if(488:sum > 0, 564:sum / 488:sum, null) > if(271:sum > 0, 336:sum / 271:sum, null)] => [565:expr, 566:expr, 567:expr, 200:ca_county, 568:expr, 171:d_year]
+                            Estimates: {row: 1969120265, cpu: ?, memory: ?, network: ?, cost: 1.0631603590655227E13}
+                            565:expr := 488:sum / 412:sum
+                            566:expr := 271:sum / 206:sum
+                            567:expr := 564:sum / 488:sum
+                            568:expr := 336:sum / 271:sum
+                        - EXCHANGE(SHUFFLE) [406]
+                                Estimates: {row: 3938240530, cpu: ?, memory: ?, network: ?, cost: 9.41304796903975E12}
+                            - HASH/INNER JOIN [406:ca_county = 482:ca_county AND if(412:sum > 0, 488:sum / 412:sum, null) > if(206:sum > 0, 271:sum / 206:sum, null)] => [406:ca_county, 200:ca_county, 488:sum, 171:d_year, 412:sum, 206:sum, 271:sum, 336:sum]
+                                    Estimates: {row: 3938240530, cpu: ?, memory: ?, network: ?, cost: 8.499376166035813E12}
+                                - HASH/INNER JOIN [200:ca_county = 406:ca_county] => [406:ca_county, 200:ca_county, 171:d_year, 412:sum, 206:sum, 271:sum, 336:sum]
+                                        Estimates: {row: 7876481060, cpu: ?, memory: ?, network: ?, cost: 6.725528629663634E12}
+                                    - HASH/INNER JOIN [265:ca_county = 330:ca_county] => [200:ca_county, 171:d_year, 206:sum, 271:sum, 336:sum]
+                                            Estimates: {row: 7876481060, cpu: ?, memory: ?, network: ?, cost: 5.180099044042438E12}
+                                        - HASH/INNER JOIN [200:ca_county = 265:ca_county] => [200:ca_county, 265:ca_county, 171:d_year, 206:sum, 271:sum]
+                                                Estimates: {row: 7876481060, cpu: ?, memory: ?, network: ?, cost: 2.6845672947457646E12}
+                                            - EXCHANGE(SHUFFLE) [200]
+                                                    Estimates: {row: 7876481060, cpu: ?, memory: ?, network: ?, cost: 6.301184848303016E11}
+                                                - CTEConsume[1]
+                                                        200:ca_county := 59:ca_county
+                                                        171:d_year := 30:d_year
+                                                        206:sum := 65:sum
+                                                        175:d_qoy := 34:d_qoy
+                                                        Estimates: {row: 7876481060, cpu: ?, memory: ?, network: ?, cost: 0.0}
+                                                        predicate: 175:d_qoy = 1 AND 171:d_year = 1999
+                                            - EXCHANGE(SHUFFLE) [265]
+                                                    Estimates: {row: 7876481060, cpu: ?, memory: ?, network: ?, cost: 6.301184848303016E11}
+                                                - CTEConsume[1]
+                                                        265:ca_county := 59:ca_county
+                                                        236:d_year := 30:d_year
+                                                        271:sum := 65:sum
+                                                        240:d_qoy := 34:d_qoy
+                                                        Estimates: {row: 7876481060, cpu: ?, memory: ?, network: ?, cost: 0.0}
+                                                        predicate: 240:d_qoy = 2 AND 236:d_year = 1999
+                                        - EXCHANGE(SHUFFLE) [330]
+                                                Estimates: {row: 7876481060, cpu: ?, memory: ?, network: ?, cost: 6.301184848303016E11}
+                                            - CTEConsume[1]
+                                                    305:d_qoy := 34:d_qoy
+                                                    330:ca_county := 59:ca_county
+                                                    301:d_year := 30:d_year
+                                                    336:sum := 65:sum
+                                                    Estimates: {row: 7876481060, cpu: ?, memory: ?, network: ?, cost: 0.0}
+                                                    predicate: 305:d_qoy = 3 AND 301:d_year = 1999
+                                    - EXCHANGE(SHUFFLE) [406]
+                                            Estimates: {row: 1969110094, cpu: ?, memory: ?, network: ?, cost: 1.5752880756166995E11}
+                                        - CTEConsume[2]
+                                                406:ca_county := 135:ca_county
+                                                377:d_year := 106:d_year
+                                                412:sum := 141:sum
+                                                381:d_qoy := 110:d_qoy
+                                                Estimates: {row: 1969110094, cpu: ?, memory: ?, network: ?, cost: 0.0}
+                                                predicate: 381:d_qoy = 1 AND 377:d_year = 1999
+                                - EXCHANGE(SHUFFLE) [482]
+                                        Estimates: {row: 1969110094, cpu: ?, memory: ?, network: ?, cost: 1.5752880756166995E11}
+                                    - CTEConsume[2]
+                                            482:ca_county := 135:ca_county
+                                            453:d_year := 106:d_year
+                                            488:sum := 141:sum
+                                            457:d_qoy := 110:d_qoy
+                                            Estimates: {row: 1969110094, cpu: ?, memory: ?, network: ?, cost: 0.0}
+                                            predicate: 457:d_qoy = 2 AND 453:d_year = 1999
+                        - EXCHANGE(SHUFFLE) [558]
+                                Estimates: {row: 1969110094, cpu: ?, memory: ?, network: ?, cost: 1.5752880756166995E11}
+                            - CTEConsume[2]
+                                    529:d_year := 106:d_year
+                                    564:sum := 141:sum
+                                    533:d_qoy := 110:d_qoy
+                                    558:ca_county := 135:ca_county
+                                    Estimates: {row: 1969110094, cpu: ?, memory: ?, network: ?, cost: 0.0}
+                                    predicate: 533:d_qoy = 3 AND 529:d_year = 1999

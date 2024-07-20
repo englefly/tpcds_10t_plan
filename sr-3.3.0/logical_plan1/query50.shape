@@ -1,0 +1,61 @@
+Explain String
+- Output => [49:s_store_name, 60:s_company_id, 62:s_street_number, 63:s_street_name, 64:s_street_type, 65:s_suite_number, 66:s_city, 67:s_county, 68:s_state, 69:s_zip, 134:sum, 135:sum, 136:sum, 137:sum, 138:sum]
+    - TOP-100(FINAL)[49: s_store_name ASC NULLS FIRST, 60: s_company_id ASC NULLS FIRST, 62: s_street_number ASC NULLS FIRST, 63: s_street_name ASC NULLS FIRST, 64: s_street_type ASC NULLS FIRST, 65: s_suite_number ASC NULLS FIRST, 66: s_city ASC NULLS FIRST, 67: s_county ASC NULLS FIRST, 68: s_state ASC NULLS FIRST, 69: s_zip ASC NULLS FIRST]
+            Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 1.1663433228561688E13}
+        - TOP-100(PARTIAL)[49: s_store_name ASC NULLS FIRST, 60: s_company_id ASC NULLS FIRST, 62: s_street_number ASC NULLS FIRST, 63: s_street_name ASC NULLS FIRST, 64: s_street_type ASC NULLS FIRST, 65: s_suite_number ASC NULLS FIRST, 66: s_city ASC NULLS FIRST, 67: s_county ASC NULLS FIRST, 68: s_state ASC NULLS FIRST, 69: s_zip ASC NULLS FIRST]
+                Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 1.1663433153361688E13}
+            - AGGREGATE(GLOBAL) [49:s_store_name, 60:s_company_id, 62:s_street_number, 63:s_street_name, 64:s_street_type, 65:s_suite_number, 66:s_city, 67:s_county, 68:s_state, 69:s_zip]
+                    Estimates: {row: 3157965983, cpu: ?, memory: ?, network: ?, cost: 1.0476037906106482E13}
+                    134:sum := sum(134:sum)
+                    135:sum := sum(135:sum)
+                    136:sum := sum(136:sum)
+                    137:sum := sum(137:sum)
+                    138:sum := sum(138:sum)
+                - EXCHANGE(SHUFFLE) [49, 60, 62, 63, 64, 65, 66, 67, 68, 69]
+                        Estimates: {row: 4071306059, cpu: ?, memory: ?, network: ?, cost: 8.905939926842254E12}
+                    - AGGREGATE(LOCAL) [49:s_store_name, 60:s_company_id, 62:s_street_number, 63:s_street_name, 64:s_street_type, 65:s_suite_number, 66:s_city, 67:s_county, 68:s_state, 69:s_zip]
+                            Estimates: {row: 4071306059, cpu: ?, memory: ?, network: ?, cost: 8.752858818998645E12}
+                            134:sum := sum(129:case)
+                            135:sum := sum(130:case)
+                            136:sum := sum(131:case)
+                            137:sum := sum(132:case)
+                            138:sum := sum(133:case)
+                        - HASH/INNER JOIN [8:ss_store_sk = 44:s_store_sk] => [49:s_store_name, 60:s_company_id, 62:s_street_number, 63:s_street_name, 64:s_street_type, 65:s_suite_number, 66:s_city, 67:s_county, 68:s_state, 69:s_zip, 129:case, 130:case, 131:case, 132:case, 133:case]
+                                Estimates: {row: 5248800373, cpu: ?, memory: ?, network: ?, cost: 8.553325827850178E12}
+                                129:case := if(139:subtract <= 30, 1, 0)
+                                130:case := if(139:subtract > 30 AND 139:subtract <= 60, 1, 0)
+                                131:case := if(139:subtract > 60 AND 139:subtract <= 90, 1, 0)
+                                132:case := if(139:subtract > 90 AND 139:subtract <= 120, 1, 0)
+                                133:case := if(139:subtract > 120, 1, 0)
+                                139:subtract := 24:sr_returned_date_sk - 1:ss_sold_date_sk, 
+                            - HASH/INNER JOIN [1:ss_sold_date_sk = 73:d_date_sk] => [1:ss_sold_date_sk, 8:ss_store_sk, 24:sr_returned_date_sk]
+                                    Estimates: {row: 20995201493, cpu: ?, memory: ?, network: ?, cost: 7.836850993176948E12}
+                                - HASH/INNER JOIN [10:ss_ticket_number = 33:sr_ticket_number AND 3:ss_item_sk = 26:sr_item_sk AND 4:ss_customer_sk = 27:sr_customer_sk] => [1:ss_sold_date_sk, 8:ss_store_sk, 24:sr_returned_date_sk]
+                                        Estimates: {row: 20995201493, cpu: ?, memory: ?, network: ?, cost: 7.24895142739716E12}
+                                    - EXCHANGE(SHUFFLE) [10, 3, 4]
+                                            Estimates: {row: 20995201493, cpu: ?, memory: ?, network: ?, cost: 5.038848358493041E12}
+                                        - HIVE-SCAN [store_sales] => [1:ss_sold_date_sk, 3:ss_item_sk, 4:ss_customer_sk, 8:ss_store_sk, 10:ss_ticket_number]
+                                                Estimates: {row: 20995201493, cpu: ?, memory: ?, network: ?, cost: 3.359232238995361E12}
+                                                predicate: 10:ss_ticket_number IS NOT NULL AND 3:ss_item_sk IS NOT NULL AND 4:ss_customer_sk IS NOT NULL
+                                    - EXCHANGE(SHUFFLE) [33, 26, 27]
+                                            Estimates: {row: 2099513944, cpu: ?, memory: ?, network: ?, cost: 4.7869918698991614E11}
+                                        - HASH/INNER JOIN [24:sr_returned_date_sk = 101:d_date_sk] => [33:sr_ticket_number, 24:sr_returned_date_sk, 26:sr_item_sk, 27:sr_customer_sk]
+                                                Estimates: {row: 2099513944, cpu: ?, memory: ?, network: ?, cost: 3.443302945613081E11}
+                                            - HIVE-SCAN [store_returns] => [33:sr_ticket_number, 24:sr_returned_date_sk, 26:sr_item_sk, 27:sr_customer_sk]
+                                                    Estimates: {row: 2099513944, cpu: ?, memory: ?, network: ?, cost: 2.6873778485721606E11}
+                                                    predicate: 33:sr_ticket_number IS NOT NULL AND 26:sr_item_sk IS NOT NULL AND 27:sr_customer_sk IS NOT NULL
+                                            - EXCHANGE(BROADCAST)
+                                                    Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 7012704.0}
+                                                - HIVE-SCAN [date_dim] => [101:d_date_sk]
+                                                        Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 1168784.0}
+                                                        predicate: 107:d_year = 1998 AND 109:d_moy = 9
+                                - EXCHANGE(BROADCAST)
+                                        Estimates: {row: 65744, cpu: ?, memory: ?, network: ?, cost: 2.31419232E7}
+                                    - HIVE-SCAN [date_dim] => [73:d_date_sk]
+                                            Estimates: {row: 65744, cpu: ?, memory: ?, network: ?, cost: 2103811.2}
+                                            predicate: 73:d_date_sk IS NOT NULL
+                            - EXCHANGE(BROADCAST)
+                                    Estimates: {row: 1350, cpu: ?, memory: ?, network: ?, cost: 9266400.0}
+                                - HIVE-SCAN [store] => [49:s_store_name, 65:s_suite_number, 66:s_city, 67:s_county, 68:s_state, 69:s_zip, 44:s_store_sk, 60:s_company_id, 62:s_street_number, 63:s_street_name, 64:s_street_type]
+                                        Estimates: {row: 1350, cpu: ?, memory: ?, network: ?, cost: 842400.0}
+                                        predicate: 44:s_store_sk IS NOT NULL

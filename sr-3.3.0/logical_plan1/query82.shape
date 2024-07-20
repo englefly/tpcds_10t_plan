@@ -1,0 +1,38 @@
+Explain String
+- Output => [2:i_item_id, 5:i_item_desc, 6:i_current_price]
+    - TOP-100(FINAL)[2: i_item_id ASC NULLS FIRST]
+            Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 4.157741584007825E12}
+        - TOP-100(PARTIAL)[2: i_item_id ASC NULLS FIRST]
+                Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 4.157741568007825E12}
+            - AGGREGATE(GLOBAL) [2:i_item_id, 5:i_item_desc, 6:i_current_price]
+                    Estimates: {row: 7876481060, cpu: ?, memory: ?, network: ?, cost: 3.5276230751775234E12}
+                - EXCHANGE(SHUFFLE) [2, 5, 6]
+                        Estimates: {row: 14288401016, cpu: ?, memory: ?, network: ?, cost: 2.6117365700160195E12}
+                    - AGGREGATE(LOCAL) [2:i_item_id, 5:i_item_desc, 6:i_current_price]
+                            Estimates: {row: 14288401016, cpu: ?, memory: ?, network: ?, cost: 2.4974293618835386E12}
+                        - HASH/INNER JOIN [57:ss_item_sk = 1:i_item_sk] => [2:i_item_id, 5:i_item_desc, 6:i_current_price]
+                                Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 2.3105461485875776E12}
+                            - EXCHANGE(SHUFFLE) [57]
+                                    Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 1.2441600885168E12}
+                                - HIVE-SCAN [store_sales] => [57:ss_item_sk]
+                                        Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 8.294400590112001E11}
+                                        predicate: 57:ss_item_sk IS NOT NULL
+                            - HASH/INNER JOIN [24:inv_item_sk = 1:i_item_sk] => [1:i_item_sk, 2:i_item_id, 5:i_item_desc, 6:i_current_price]
+                                    Estimates: {row: 327881250, cpu: ?, memory: ?, network: ?, cost: 4.8556290767E10}
+                                - EXCHANGE(SHUFFLE) [24]
+                                        Estimates: {row: 327881250, cpu: ?, memory: ?, network: ?, cost: 3.8043940517E10}
+                                    - HASH/INNER JOIN [23:inv_date_sk = 27:d_date_sk] => [24:inv_item_sk]
+                                            Estimates: {row: 327881250, cpu: ?, memory: ?, network: ?, cost: 3.2797840517E10}
+                                        - HIVE-SCAN [inventory] => [23:inv_date_sk, 24:inv_item_sk]
+                                                Estimates: {row: 327881250, cpu: ?, memory: ?, network: ?, cost: 2.62305E10}
+                                                predicate: 26:inv_quantity_on_hand >= 100 AND 26:inv_quantity_on_hand <= 500
+                                        - EXCHANGE(BROADCAST)
+                                                Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 6720508.0}
+                                            - HIVE-SCAN [date_dim] => [27:d_date_sk]
+                                                    Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 876588.0}
+                                                    predicate: 29:d_date >= 2001-01-28 AND 29:d_date <= 2001-03-29
+                                - EXCHANGE(SHUFFLE) [1]
+                                        Estimates: {row: 50250, cpu: ?, memory: ?, network: ?, cost: 1.5276E7}
+                                    - HIVE-SCAN [item] => [1:i_item_sk, 2:i_item_id, 5:i_item_desc, 6:i_current_price]
+                                            Estimates: {row: 50250, cpu: ?, memory: ?, network: ?, cost: 1.0452E7}
+                                            predicate: 6:i_current_price >= 49 AND 6:i_current_price <= 79 AND 14:i_manufact_id IN (80, 675, 292, 17)

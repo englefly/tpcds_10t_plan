@@ -1,0 +1,387 @@
+Explain String
+RESOURCE GROUP: default_wg
+
+PLAN FRAGMENT 0(F16)
+  Fragment Cost: 4.825678521001732E12
+  Output Exprs:131: i_category | 127: i_brand | 181: d_year | 183: d_moy | 235: avg(234: sum) | 234: sum | 352: sum | 470: sum
+  Input Partition: UNPARTITIONED
+  RESULT SINK
+
+  41:Project
+  |  output columns:
+  |  127 <-> [127: i_brand, VARCHAR, true]
+  |  131 <-> [131: i_category, VARCHAR, true]
+  |  181 <-> [181: d_year, INT, true]
+  |  183 <-> [183: d_moy, INT, true]
+  |  234 <-> [234: sum, DECIMAL128(38,2), true]
+  |  235 <-> [235: avg(234: sum), DECIMAL128(38,8), true]
+  |  352 <-> [352: sum, DECIMAL128(38,2), true]
+  |  470 <-> [470: sum, DECIMAL128(38,2), true]
+  |  limit: 100
+  |  cardinality: 100
+  |  
+  40:MERGING-EXCHANGE
+     distribution type: GATHER
+     limit: 100
+     cardinality: 100
+
+PLAN FRAGMENT 1(F13)
+  Fragment Cost: 1.4015062865556147E12
+
+  Input Partition: HASH_PARTITIONED: 249: i_category, 245: i_brand, 327: cc_name, 475: add
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 40
+
+  39:TOP-N
+  |  order by: [473, DECIMAL128(38,8), true] ASC, [235, DECIMAL128(38,8), true] ASC
+  |  offset: 0
+  |  limit: 100
+  |  cardinality: 100
+  |  
+  38:Project
+  |  output columns:
+  |  127 <-> [127: i_brand, VARCHAR, true]
+  |  131 <-> [131: i_category, VARCHAR, true]
+  |  181 <-> [181: d_year, INT, true]
+  |  183 <-> [183: d_moy, INT, true]
+  |  234 <-> [234: sum, DECIMAL128(38,2), true]
+  |  235 <-> [235: avg(234: sum), DECIMAL128(38,8), true]
+  |  352 <-> [352: sum, DECIMAL128(38,2), true]
+  |  470 <-> [470: sum, DECIMAL128(38,2), true]
+  |  473 <-> [234: sum, DECIMAL128(38,2), true] - [235: avg(234: sum), DECIMAL128(38,8), true]
+  |  cardinality: 1077062379
+  |  
+  37:HASH JOIN
+  |  join op: INNER JOIN (BUCKET_SHUFFLE(S))
+  |  equal join conjunct: [131: i_category, VARCHAR, true] = [367: i_category, VARCHAR, true]
+  |  equal join conjunct: [127: i_brand, VARCHAR, true] = [363: i_brand, VARCHAR, true]
+  |  equal join conjunct: [209: cc_name, VARCHAR, true] = [445: cc_name, VARCHAR, true]
+  |  equal join conjunct: [236: rank(), BIGINT, true] = [474: subtract, BIGINT, true]
+  |  output columns: 127, 131, 181, 183, 234, 235, 352, 470
+  |  can local shuffle: false
+  |  cardinality: 1077062379
+  |  
+  |----36:EXCHANGE
+  |       distribution type: SHUFFLE
+  |       partition exprs: [367: i_category, VARCHAR, true], [363: i_brand, VARCHAR, true], [445: cc_name, VARCHAR, true], [474: subtract, BIGINT, true]
+  |       cardinality: 1077062379
+  |    
+  31:Project
+  |  output columns:
+  |  127 <-> [127: i_brand, VARCHAR, true]
+  |  131 <-> [131: i_category, VARCHAR, true]
+  |  181 <-> [181: d_year, INT, true]
+  |  183 <-> [183: d_moy, INT, true]
+  |  209 <-> [209: cc_name, VARCHAR, true]
+  |  234 <-> [234: sum, DECIMAL128(38,2), true]
+  |  235 <-> [235: avg(234: sum), DECIMAL128(38,8), true]
+  |  236 <-> [236: rank(), BIGINT, true]
+  |  352 <-> [352: sum, DECIMAL128(38,2), true]
+  |  cardinality: 1077062379
+  |  
+  30:HASH JOIN
+  |  join op: INNER JOIN (PARTITIONED)
+  |  equal join conjunct: [249: i_category, VARCHAR, true] = [131: i_category, VARCHAR, true]
+  |  equal join conjunct: [245: i_brand, VARCHAR, true] = [127: i_brand, VARCHAR, true]
+  |  equal join conjunct: [327: cc_name, VARCHAR, true] = [209: cc_name, VARCHAR, true]
+  |  equal join conjunct: [475: add, BIGINT, true] = [236: rank(), BIGINT, true]
+  |  output columns: 127, 131, 181, 183, 209, 234, 235, 236, 352
+  |  can local shuffle: false
+  |  cardinality: 1077062379
+  |  
+  |----29:EXCHANGE
+  |       distribution type: SHUFFLE
+  |       partition exprs: [131: i_category, VARCHAR, true], [127: i_brand, VARCHAR, true], [209: cc_name, VARCHAR, true], [236: rank(), BIGINT, true]
+  |       cardinality: 149591997
+  |    
+  25:EXCHANGE
+     distribution type: SHUFFLE
+     partition exprs: [249: i_category, VARCHAR, true], [245: i_brand, VARCHAR, true], [327: cc_name, VARCHAR, true], [475: add, BIGINT, true]
+     cardinality: 1077062379
+
+PLAN FRAGMENT 2(F14)
+  Fragment Cost: -4.305539827484067E12
+
+  Input Partition: HASH_PARTITIONED: 13: i_category, 9: i_brand, 91: cc_name
+  OutPut Partition: HASH_PARTITIONED: 367: i_category, 363: i_brand, 445: cc_name, 474: subtract
+  OutPut Exchange Id: 36
+
+  35:Project
+  |  output columns:
+  |  363 <-> [363: i_brand, VARCHAR, true]
+  |  367 <-> [367: i_category, VARCHAR, true]
+  |  445 <-> [445: cc_name, VARCHAR, true]
+  |  470 <-> [470: sum, DECIMAL128(38,2), true]
+  |  474 <-> [472: rank(), BIGINT, true] - 1
+  |  cardinality: 1077062379
+  |  
+  34:SELECT
+  |  predicates: 367: i_category IS NOT NULL, 363: i_brand IS NOT NULL, 445: cc_name IS NOT NULL, 472: rank() - 1 IS NOT NULL
+  |  cardinality: 1077062379
+  |  
+  33:Project
+  |  output columns:
+  |  363 <-> [9: i_brand, VARCHAR, true]
+  |  367 <-> [13: i_category, VARCHAR, true]
+  |  445 <-> [91: cc_name, VARCHAR, true]
+  |  470 <-> [116: sum, DECIMAL128(38,2), true]
+  |  472 <-> [118: rank(), BIGINT, true]
+  |  cardinality: 1077062379
+  |  
+  32:EXCHANGE
+     distribution type: SHUFFLE
+     partition exprs: [13: i_category, VARCHAR, true], [9: i_brand, VARCHAR, true], [91: cc_name, VARCHAR, true]
+     cardinality: 1072893180
+
+PLAN FRAGMENT 3(F11)
+  Fragment Cost: -4.305539827484067E12
+
+  Input Partition: HASH_PARTITIONED: 13: i_category, 9: i_brand, 91: cc_name
+  OutPut Partition: HASH_PARTITIONED: 131: i_category, 127: i_brand, 209: cc_name, 236: rank()
+  OutPut Exchange Id: 29
+
+  28:SELECT
+  |  predicates: 181: d_year = 1999, 235: avg(234: sum) > 0, if(235: avg(234: sum) > 0, abs(234: sum - 235: avg(234: sum)) / 235: avg(234: sum), NULL) > 0.1
+  |  cardinality: 149591997
+  |  
+  27:Project
+  |  output columns:
+  |  127 <-> [9: i_brand, VARCHAR, true]
+  |  131 <-> [13: i_category, VARCHAR, true]
+  |  181 <-> [63: d_year, INT, true]
+  |  183 <-> [65: d_moy, INT, true]
+  |  209 <-> [91: cc_name, VARCHAR, true]
+  |  234 <-> [116: sum, DECIMAL128(38,2), true]
+  |  235 <-> [117: avg(116: sum), DECIMAL128(38,8), true]
+  |  236 <-> [118: rank(), BIGINT, true]
+  |  cardinality: 149591997
+  |  
+  26:EXCHANGE
+     distribution type: SHUFFLE
+     partition exprs: [13: i_category, VARCHAR, true], [9: i_brand, VARCHAR, true], [91: cc_name, VARCHAR, true]
+     cardinality: 1072893180
+
+PLAN FRAGMENT 4(F09)
+  Fragment Cost: -4.305539827484067E12
+
+  Input Partition: HASH_PARTITIONED: 13: i_category, 9: i_brand, 91: cc_name
+  OutPut Partition: HASH_PARTITIONED: 249: i_category, 245: i_brand, 327: cc_name, 475: add
+  OutPut Exchange Id: 25
+
+  24:Project
+  |  output columns:
+  |  245 <-> [245: i_brand, VARCHAR, true]
+  |  249 <-> [249: i_category, VARCHAR, true]
+  |  327 <-> [327: cc_name, VARCHAR, true]
+  |  352 <-> [352: sum, DECIMAL128(38,2), true]
+  |  475 <-> [354: rank(), BIGINT, true] + 1
+  |  cardinality: 1077062379
+  |  
+  23:SELECT
+  |  predicates: 249: i_category IS NOT NULL, 245: i_brand IS NOT NULL, 327: cc_name IS NOT NULL, 354: rank() + 1 IS NOT NULL
+  |  cardinality: 1077062379
+  |  
+  22:Project
+  |  output columns:
+  |  245 <-> [9: i_brand, VARCHAR, true]
+  |  249 <-> [13: i_category, VARCHAR, true]
+  |  327 <-> [91: cc_name, VARCHAR, true]
+  |  352 <-> [116: sum, DECIMAL128(38,2), true]
+  |  354 <-> [118: rank(), BIGINT, true]
+  |  cardinality: 1077062379
+  |  
+  21:EXCHANGE
+     distribution type: SHUFFLE
+     partition exprs: [13: i_category, VARCHAR, true], [9: i_brand, VARCHAR, true], [91: cc_name, VARCHAR, true]
+     cardinality: 1072893180
+
+PLAN FRAGMENT 5(F08)
+  Fragment Cost: 2.776427465776367E11
+  Output Exprs:9: i_brand | 13: i_category | 63: d_year | 65: d_moy | 91: cc_name | 116: sum | 117: avg(116: sum) | 118: rank()
+  Input Partition: HASH_PARTITIONED: 13: i_category, 9: i_brand, 91: cc_name
+  MultiCastDataSinks:
+  OutPut Partition: RANDOM
+  OutPut Exchange Id: 21
+  OutPut Partition: RANDOM
+  OutPut Exchange Id: 26
+  OutPut Partition: RANDOM
+  OutPut Exchange Id: 32
+
+  20:SELECT
+  |  predicates: ((((13: i_category IS NOT NULL) AND (9: i_brand IS NOT NULL)) AND ((91: cc_name IS NOT NULL) AND (118: rank() - 1 IS NOT NULL))) OR (((13: i_category IS NOT NULL) AND (9: i_brand IS NOT NULL)) AND ((91: cc_name IS NOT NULL) AND (118: rank() + 1 IS NOT NULL)))) OR (((63: d_year = 1999) AND (117: avg(116: sum) > 0)) AND (if(117: avg(116: sum) > 0, abs(116: sum - 117: avg(116: sum)) / 117: avg(116: sum), NULL) > 0.1))
+  |  cardinality: 1072893180
+  |  
+  19:ANALYTIC
+  |  functions: [, avg[([116: sum, DECIMAL128(38,2), true]); args: DECIMAL128; result: DECIMAL128(38,8); args nullable: true; result nullable: true], ]
+  |  partition by: [13: i_category, VARCHAR, true], [9: i_brand, VARCHAR, true], [91: cc_name, VARCHAR, true], [63: d_year, INT, true]
+  |  cardinality: 1196735977
+  |  
+  18:ANALYTIC
+  |  functions: [, rank[(); args: ; result: BIGINT; args nullable: false; result nullable: true], ]
+  |  partition by: [13: i_category, VARCHAR, true], [9: i_brand, VARCHAR, true], [91: cc_name, VARCHAR, true]
+  |  order by: [63: d_year, INT, true] ASC, [65: d_moy, INT, true] ASC
+  |  window: RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+  |  cardinality: 1196735977
+  |  
+  17:SORT
+  |  order by: [13, VARCHAR, true] ASC, [9, VARCHAR, true] ASC, [91, VARCHAR, true] ASC, [63, INT, true] ASC, [65, INT, true] ASC
+  |  analytic partition by: [13: i_category, VARCHAR, true], [9: i_brand, VARCHAR, true], [91: cc_name, VARCHAR, true]
+  |  offset: 0
+  |  cardinality: 1196735977
+  |  
+  16:EXCHANGE
+     distribution type: SHUFFLE
+     partition exprs: [13: i_category, VARCHAR, true], [9: i_brand, VARCHAR, true], [91: cc_name, VARCHAR, true]
+     cardinality: 1196735977
+
+PLAN FRAGMENT 6(F07)
+  Fragment Cost: 2.7157339171852295E11
+
+  Input Partition: HASH_PARTITIONED: 13: i_category, 9: i_brand, 91: cc_name, 63: d_year, 65: d_moy
+  OutPut Partition: HASH_PARTITIONED: 13: i_category, 9: i_brand, 91: cc_name
+  OutPut Exchange Id: 16
+
+  15:AGGREGATE (merge finalize)
+  |  aggregate: sum[([116: sum, DECIMAL128(38,2), true]); args: DECIMAL64; result: DECIMAL128(38,2); args nullable: true; result nullable: true]
+  |  group by: [13: i_category, VARCHAR, true], [9: i_brand, VARCHAR, true], [91: cc_name, VARCHAR, true], [63: d_year, INT, true], [65: d_moy, INT, true]
+  |  cardinality: 1196735977
+  |  
+  14:EXCHANGE
+     distribution type: SHUFFLE
+     partition exprs: [13: i_category, VARCHAR, true], [9: i_brand, VARCHAR, true], [91: cc_name, VARCHAR, true], [63: d_year, INT, true], [65: d_moy, INT, true]
+     cardinality: 1969115299
+
+PLAN FRAGMENT 7(F00)
+  Fragment Cost: 3.756323689187907E12
+
+  Input Partition: RANDOM
+  OutPut Partition: HASH_PARTITIONED: 13: i_category, 9: i_brand, 91: cc_name, 63: d_year, 65: d_moy
+  OutPut Exchange Id: 14
+
+  13:AGGREGATE (update serialize)
+  |  STREAMING
+  |  aggregate: sum[([44: cs_sales_price, DECIMAL64(7,2), true]); args: DECIMAL64; result: DECIMAL128(38,2); args nullable: true; result nullable: true]
+  |  group by: [13: i_category, VARCHAR, true], [9: i_brand, VARCHAR, true], [91: cc_name, VARCHAR, true], [63: d_year, INT, true], [65: d_moy, INT, true]
+  |  cardinality: 1969115299
+  |  
+  12:Project
+  |  output columns:
+  |  9 <-> [9: i_brand, VARCHAR, true]
+  |  13 <-> [13: i_category, VARCHAR, true]
+  |  44 <-> [44: cs_sales_price, DECIMAL64(7,2), true]
+  |  63 <-> [63: d_year, INT, true]
+  |  65 <-> [65: d_moy, INT, true]
+  |  91 <-> [91: cc_name, VARCHAR, true]
+  |  cardinality: 3239992060
+  |  
+  11:HASH JOIN
+  |  join op: INNER JOIN (BROADCAST)
+  |  equal join conjunct: [34: cs_call_center_sk, BIGINT, true] = [85: cc_call_center_sk, BIGINT, true]
+  |  build runtime filters:
+  |  - filter_id = 2, build_expr = (85: cc_call_center_sk), remote = false
+  |  output columns: 9, 13, 44, 63, 65, 91
+  |  can local shuffle: true
+  |  cardinality: 3239992060
+  |  
+  |----10:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 49
+  |    
+  8:Project
+  |  output columns:
+  |  9 <-> [9: i_brand, VARCHAR, true]
+  |  13 <-> [13: i_category, VARCHAR, true]
+  |  34 <-> [34: cs_call_center_sk, BIGINT, true]
+  |  44 <-> [44: cs_sales_price, DECIMAL64(7,2), true]
+  |  63 <-> [63: d_year, INT, true]
+  |  65 <-> [65: d_moy, INT, true]
+  |  cardinality: 12959968239
+  |  
+  7:HASH JOIN
+  |  join op: INNER JOIN (BROADCAST)
+  |  equal join conjunct: [23: cs_sold_date_sk, BIGINT, true] = [57: d_date_sk, BIGINT, true]
+  |  build runtime filters:
+  |  - filter_id = 1, build_expr = (57: d_date_sk), remote = false
+  |  output columns: 9, 13, 34, 44, 63, 65
+  |  can local shuffle: false
+  |  cardinality: 12959968239
+  |  
+  |----6:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 73047
+  |    
+  4:Project
+  |  output columns:
+  |  9 <-> [9: i_brand, VARCHAR, true]
+  |  13 <-> [13: i_category, VARCHAR, true]
+  |  23 <-> [23: cs_sold_date_sk, BIGINT, true]
+  |  34 <-> [34: cs_call_center_sk, BIGINT, true]
+  |  44 <-> [44: cs_sales_price, DECIMAL64(7,2), true]
+  |  cardinality: 12959968239
+  |  
+  3:HASH JOIN
+  |  join op: INNER JOIN (BROADCAST)
+  |  equal join conjunct: [38: cs_item_sk, BIGINT, true] = [1: i_item_sk, BIGINT, true]
+  |  build runtime filters:
+  |  - filter_id = 0, build_expr = (1: i_item_sk), remote = false
+  |  output columns: 9, 13, 23, 34, 44
+  |  can local shuffle: false
+  |  cardinality: 12959968239
+  |  
+  |----2:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 361800
+  |    
+  0:HdfsScanNode
+     TABLE: catalog_sales
+     NON-PARTITION PREDICATES: 38: cs_item_sk IS NOT NULL
+     partitions=1/1
+     avgRowSize=4.0
+     cardinality: 12959968239
+     probe runtime filters:
+     - filter_id = 0, probe_expr = (38: cs_item_sk)
+     - filter_id = 1, probe_expr = (23: cs_sold_date_sk)
+     - filter_id = 2, probe_expr = (34: cs_call_center_sk)
+
+PLAN FRAGMENT 8(F05)
+  Fragment Cost: 4665.6
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 10
+
+  9:HdfsScanNode
+     TABLE: call_center
+     NON-PARTITION PREDICATES: 85: cc_call_center_sk IS NOT NULL
+     partitions=1/1
+     avgRowSize=2.0
+     cardinality: 49
+
+PLAN FRAGMENT 9(F03)
+  Fragment Cost: 4675008.0
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 06
+
+  5:HdfsScanNode
+     TABLE: date_dim
+     NON-PARTITION PREDICATES: ((63: d_year = 1999) OR ((63: d_year = 1998) AND (65: d_moy = 12))) OR ((63: d_year = 2000) AND (65: d_moy = 1)), 63: d_year IN (1999, 1998, 2000)
+     MIN/MAX PREDICATES: 63: d_year >= 1998, 63: d_year <= 2000
+     partitions=1/1
+     avgRowSize=3.0
+     cardinality: 73047
+
+PLAN FRAGMENT 10(F01)
+  Fragment Cost: 5.7888E7
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 02
+
+  1:HdfsScanNode
+     TABLE: item
+     NON-PARTITION PREDICATES: 1: i_item_sk IS NOT NULL
+     partitions=1/1
+     avgRowSize=3.0
+     cardinality: 361800

@@ -1,0 +1,171 @@
+Explain String
+RESOURCE GROUP: default_wg
+
+PLAN FRAGMENT 0(F08)
+  Fragment Cost: 32.0
+  Output Exprs:68: count
+  Input Partition: UNPARTITIONED
+  RESULT SINK
+
+  20:MERGING-EXCHANGE
+     distribution type: GATHER
+     limit: 100
+     cardinality: 1
+
+PLAN FRAGMENT 1(F07)
+  Fragment Cost: 68.0
+
+  Input Partition: UNPARTITIONED
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 20
+
+  19:TOP-N
+  |  order by: [68, BIGINT, false] ASC
+  |  offset: 0
+  |  limit: 100
+  |  cardinality: 1
+  |  
+  18:AGGREGATE (merge finalize)
+  |  aggregate: count[([68: count, BIGINT, false]); args: ; result: BIGINT; args nullable: true; result nullable: false]
+  |  cardinality: 1
+  |  
+  17:EXCHANGE
+     distribution type: GATHER
+     cardinality: 1
+
+PLAN FRAGMENT 2(F00)
+  Fragment Cost: 3.119162843915984E12
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 17
+
+  16:AGGREGATE (update serialize)
+  |  aggregate: count[(*); args: ; result: BIGINT; args nullable: false; result nullable: false]
+  |  cardinality: 1
+  |  
+  15:Project
+  |  output columns:
+  |  70 <-> 1
+  |  cardinality: 6480000461
+  |  
+  14:HASH JOIN
+  |  join op: INNER JOIN (BROADCAST)
+  |  equal join conjunct: [2: ss_sold_time_sk, BIGINT, true] = [29: t_time_sk, BIGINT, true]
+  |  build runtime filters:
+  |  - filter_id = 2, build_expr = (29: t_time_sk), remote = false
+  |  output columns: 29
+  |  can local shuffle: true
+  |  cardinality: 6480000461
+  |  
+  |----13:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 21600
+  |    
+  10:Project
+  |  output columns:
+  |  2 <-> [2: ss_sold_time_sk, BIGINT, true]
+  |  cardinality: 6480000461
+  |  
+  9:HASH JOIN
+  |  join op: INNER JOIN (BROADCAST)
+  |  equal join conjunct: [6: ss_hdemo_sk, BIGINT, true] = [24: hd_demo_sk, BIGINT, true]
+  |  build runtime filters:
+  |  - filter_id = 1, build_expr = (24: hd_demo_sk), remote = false
+  |  output columns: 2
+  |  can local shuffle: false
+  |  cardinality: 6480000461
+  |  
+  |----8:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 3600
+  |    
+  5:Project
+  |  output columns:
+  |  2 <-> [2: ss_sold_time_sk, BIGINT, true]
+  |  6 <-> [6: ss_hdemo_sk, BIGINT, true]
+  |  cardinality: 6480000461
+  |  
+  4:HASH JOIN
+  |  join op: INNER JOIN (BROADCAST)
+  |  equal join conjunct: [8: ss_store_sk, BIGINT, true] = [39: s_store_sk, BIGINT, true]
+  |  build runtime filters:
+  |  - filter_id = 0, build_expr = (39: s_store_sk), remote = false
+  |  output columns: 2, 6
+  |  can local shuffle: false
+  |  cardinality: 6480000461
+  |  
+  |----3:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 1500
+  |    
+  0:HdfsScanNode
+     TABLE: store_sales
+     NON-PARTITION PREDICATES: 6: ss_hdemo_sk IS NOT NULL
+     partitions=1/1
+     avgRowSize=3.0
+     cardinality: 25920001844
+     probe runtime filters:
+     - filter_id = 0, probe_expr = (8: ss_store_sk)
+     - filter_id = 1, probe_expr = (6: ss_hdemo_sk)
+     - filter_id = 2, probe_expr = (2: ss_sold_time_sk)
+
+PLAN FRAGMENT 3(F05)
+  Fragment Cost: 1382400.0
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 13
+
+  12:Project
+  |  output columns:
+  |  29 <-> [29: t_time_sk, BIGINT, true]
+  |  cardinality: 21600
+  |  
+  11:HdfsScanNode
+     TABLE: time_dim
+     NON-PARTITION PREDICATES: 32: t_hour = 16, 33: t_minute >= 30
+     MIN/MAX PREDICATES: 32: t_hour <= 16, 32: t_hour >= 16, 33: t_minute >= 30
+     partitions=1/1
+     avgRowSize=3.0
+     cardinality: 21600
+
+PLAN FRAGMENT 4(F03)
+  Fragment Cost: 172800.0
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 08
+
+  7:Project
+  |  output columns:
+  |  24 <-> [24: hd_demo_sk, BIGINT, true]
+  |  cardinality: 3600
+  |  
+  6:HdfsScanNode
+     TABLE: household_demographics
+     NON-PARTITION PREDICATES: 27: hd_dep_count = 6
+     MIN/MAX PREDICATES: 27: hd_dep_count <= 6, 27: hd_dep_count >= 6
+     partitions=1/1
+     avgRowSize=2.0
+     cardinality: 3600
+
+PLAN FRAGMENT 5(F01)
+  Fragment Cost: 144000.0
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 03
+
+  2:Project
+  |  output columns:
+  |  39 <-> [39: s_store_sk, BIGINT, true]
+  |  cardinality: 1500
+  |  
+  1:HdfsScanNode
+     TABLE: store
+     NON-PARTITION PREDICATES: 44: s_store_name = 'ese'
+     MIN/MAX PREDICATES: 44: s_store_name <= 'ese', 44: s_store_name >= 'ese'
+     partitions=1/1
+     avgRowSize=2.0
+     cardinality: 1500

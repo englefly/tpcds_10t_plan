@@ -1,0 +1,379 @@
+Explain String
+RESOURCE GROUP: default_wg
+
+PLAN FRAGMENT 0(F17)
+  Fragment Cost: 1.1881768742236062E13
+  Output Exprs:136: s_store_name | 132: s_store_id | 93: d_week_seq | 310: expr | 311: expr | 312: expr | 313: expr | 314: expr | 315: expr | 316: expr
+  Input Partition: UNPARTITIONED
+  RESULT SINK
+
+  37:MERGING-EXCHANGE
+     distribution type: GATHER
+     limit: 100
+     cardinality: 100
+
+PLAN FRAGMENT 1(F16)
+  Fragment Cost: 1.502306304962826E13
+
+  Input Partition: HASH_PARTITIONED: 132: s_store_id, 317: cast
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 37
+
+  36:TOP-N
+  |  order by: [136, VARCHAR, true] ASC, [132, VARCHAR, true] ASC, [93, INT, true] ASC
+  |  offset: 0
+  |  limit: 100
+  |  cardinality: 100
+  |  
+  35:Project
+  |  output columns:
+  |  93 <-> [93: d_week_seq, INT, true]
+  |  132 <-> [132: s_store_id, VARCHAR, true]
+  |  136 <-> [136: s_store_name, VARCHAR, true]
+  |  310 <-> [124: sum, DECIMAL128(38,2), true] / [246: sum, DECIMAL128(38,2), true]
+  |  311 <-> [125: sum, DECIMAL128(38,2), true] / [247: sum, DECIMAL128(38,2), true]
+  |  312 <-> [126: sum, DECIMAL128(38,2), true] / [248: sum, DECIMAL128(38,2), true]
+  |  313 <-> [127: sum, DECIMAL128(38,2), true] / [249: sum, DECIMAL128(38,2), true]
+  |  314 <-> [128: sum, DECIMAL128(38,2), true] / [250: sum, DECIMAL128(38,2), true]
+  |  315 <-> [129: sum, DECIMAL128(38,2), true] / [251: sum, DECIMAL128(38,2), true]
+  |  316 <-> [130: sum, DECIMAL128(38,2), true] / [252: sum, DECIMAL128(38,2), true]
+  |  cardinality: 7144200508
+  |  
+  34:HASH JOIN
+  |  join op: INNER JOIN (PARTITIONED)
+  |  equal join conjunct: [132: s_store_id, VARCHAR, true] = [254: s_store_id, VARCHAR, true]
+  |  equal join conjunct: [317: cast, BIGINT, true] = [318: subtract, BIGINT, true]
+  |  output columns: 93, 124, 125, 126, 127, 128, 129, 130, 132, 136, 246, 247, 248, 249, 250, 251, 252
+  |  can local shuffle: false
+  |  cardinality: 7144200508
+  |  
+  |----33:EXCHANGE
+  |       distribution type: SHUFFLE
+  |       partition exprs: [254: s_store_id, VARCHAR, true], [318: subtract, BIGINT, true]
+  |       cardinality: 7144200508
+  |    
+  20:EXCHANGE
+     distribution type: SHUFFLE
+     partition exprs: [132: s_store_id, VARCHAR, true], [317: cast, BIGINT, true]
+     cardinality: 7144200508
+
+PLAN FRAGMENT 2(F10)
+  Fragment Cost: -5.672023612320982E12
+
+  Input Partition: HASH_PARTITIONED: 28: d_week_seq, 8: ss_store_sk
+  OutPut Partition: HASH_PARTITIONED: 254: s_store_id, 318: subtract
+  OutPut Exchange Id: 33
+
+  32:Project
+  |  output columns:
+  |  246 <-> [246: sum, DECIMAL128(38,2), true]
+  |  247 <-> [247: sum, DECIMAL128(38,2), true]
+  |  248 <-> [248: sum, DECIMAL128(38,2), true]
+  |  249 <-> [249: sum, DECIMAL128(38,2), true]
+  |  250 <-> [250: sum, DECIMAL128(38,2), true]
+  |  251 <-> [251: sum, DECIMAL128(38,2), true]
+  |  252 <-> [252: sum, DECIMAL128(38,2), true]
+  |  254 <-> [254: s_store_id, VARCHAR, true]
+  |  318 <-> cast([215: d_week_seq, INT, true] as BIGINT) - 52
+  |  cardinality: 7144200508
+  |  
+  31:HASH JOIN
+  |  join op: INNER JOIN (BROADCAST)
+  |  equal join conjunct: [215: d_week_seq, INT, true] = [286: d_week_seq, INT, true]
+  |  build runtime filters:
+  |  - filter_id = 4, build_expr = (286: d_week_seq), remote = false
+  |  output columns: 215, 246, 247, 248, 249, 250, 251, 252, 254
+  |  can local shuffle: false
+  |  cardinality: 7144200508
+  |  
+  |----30:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 16436
+  |    
+  27:Project
+  |  output columns:
+  |  215 <-> [215: d_week_seq, INT, true]
+  |  246 <-> [246: sum, DECIMAL128(38,2), true]
+  |  247 <-> [247: sum, DECIMAL128(38,2), true]
+  |  248 <-> [248: sum, DECIMAL128(38,2), true]
+  |  249 <-> [249: sum, DECIMAL128(38,2), true]
+  |  250 <-> [250: sum, DECIMAL128(38,2), true]
+  |  251 <-> [251: sum, DECIMAL128(38,2), true]
+  |  252 <-> [252: sum, DECIMAL128(38,2), true]
+  |  254 <-> [254: s_store_id, VARCHAR, true]
+  |  cardinality: 7144200508
+  |  
+  26:HASH JOIN
+  |  join op: INNER JOIN (BROADCAST)
+  |  equal join conjunct: [195: ss_store_sk, BIGINT, true] = [253: s_store_sk, BIGINT, true]
+  |  build runtime filters:
+  |  - filter_id = 3, build_expr = (253: s_store_sk), remote = false
+  |  output columns: 215, 246, 247, 248, 249, 250, 251, 252, 254
+  |  can local shuffle: false
+  |  cardinality: 7144200508
+  |  
+  |----25:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 1350
+  |    
+  23:SELECT
+  |  predicates: CAST(215: d_week_seq AS BIGINT) - 52 IS NOT NULL
+  |  cardinality: 7144200508
+  |  
+  22:Project
+  |  output columns:
+  |  195 <-> [8: ss_store_sk, BIGINT, true]
+  |  215 <-> [28: d_week_seq, INT, true]
+  |  246 <-> [59: sum, DECIMAL128(38,2), true]
+  |  247 <-> [60: sum, DECIMAL128(38,2), true]
+  |  248 <-> [61: sum, DECIMAL128(38,2), true]
+  |  249 <-> [62: sum, DECIMAL128(38,2), true]
+  |  250 <-> [63: sum, DECIMAL128(38,2), true]
+  |  251 <-> [64: sum, DECIMAL128(38,2), true]
+  |  252 <-> [65: sum, DECIMAL128(38,2), true]
+  |  cardinality: 7144200508
+  |  
+  21:EXCHANGE
+     distribution type: SHUFFLE
+     partition exprs: [28: d_week_seq, INT, true], [8: ss_store_sk, BIGINT, true]
+     cardinality: 7144200508
+     probe runtime filters:
+     - filter_id = 3, probe_expr = (8: ss_store_sk)
+     - filter_id = 4, probe_expr = (28: d_week_seq)
+
+PLAN FRAGMENT 3(F13)
+  Fragment Cost: 525952.8
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 30
+
+  29:Project
+  |  output columns:
+  |  286 <-> [286: d_week_seq, INT, true]
+  |  cardinality: 16436
+  |  
+  28:HdfsScanNode
+     TABLE: date_dim
+     NON-PARTITION PREDICATES: 285: d_month_seq >= 1217, 285: d_month_seq <= 1228, CAST(286: d_week_seq AS BIGINT) - 52 IS NOT NULL
+     MIN/MAX PREDICATES: 285: d_month_seq >= 1217, 285: d_month_seq <= 1228
+     partitions=1/1
+     avgRowSize=2.0
+     cardinality: 16436
+
+PLAN FRAGMENT 4(F11)
+  Fragment Cost: 129600.0
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 25
+
+  24:HdfsScanNode
+     TABLE: store
+     NON-PARTITION PREDICATES: 254: s_store_id IS NOT NULL
+     partitions=1/1
+     avgRowSize=2.0
+     cardinality: 1350
+
+PLAN FRAGMENT 5(F04)
+  Fragment Cost: -5.500561493322261E12
+
+  Input Partition: HASH_PARTITIONED: 28: d_week_seq, 8: ss_store_sk
+  OutPut Partition: HASH_PARTITIONED: 132: s_store_id, 317: cast
+  OutPut Exchange Id: 20
+
+  19:Project
+  |  output columns:
+  |  93 <-> [93: d_week_seq, INT, true]
+  |  124 <-> [124: sum, DECIMAL128(38,2), true]
+  |  125 <-> [125: sum, DECIMAL128(38,2), true]
+  |  126 <-> [126: sum, DECIMAL128(38,2), true]
+  |  127 <-> [127: sum, DECIMAL128(38,2), true]
+  |  128 <-> [128: sum, DECIMAL128(38,2), true]
+  |  129 <-> [129: sum, DECIMAL128(38,2), true]
+  |  130 <-> [130: sum, DECIMAL128(38,2), true]
+  |  132 <-> [132: s_store_id, VARCHAR, true]
+  |  136 <-> [136: s_store_name, VARCHAR, true]
+  |  317 <-> cast([93: d_week_seq, INT, true] as BIGINT)
+  |  cardinality: 7144200508
+  |  
+  18:HASH JOIN
+  |  join op: INNER JOIN (BROADCAST)
+  |  equal join conjunct: [93: d_week_seq, INT, true] = [164: d_week_seq, INT, true]
+  |  build runtime filters:
+  |  - filter_id = 2, build_expr = (164: d_week_seq), remote = false
+  |  output columns: 93, 124, 125, 126, 127, 128, 129, 130, 132, 136
+  |  can local shuffle: false
+  |  cardinality: 7144200508
+  |  
+  |----17:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 16436
+  |    
+  14:Project
+  |  output columns:
+  |  93 <-> [93: d_week_seq, INT, true]
+  |  124 <-> [124: sum, DECIMAL128(38,2), true]
+  |  125 <-> [125: sum, DECIMAL128(38,2), true]
+  |  126 <-> [126: sum, DECIMAL128(38,2), true]
+  |  127 <-> [127: sum, DECIMAL128(38,2), true]
+  |  128 <-> [128: sum, DECIMAL128(38,2), true]
+  |  129 <-> [129: sum, DECIMAL128(38,2), true]
+  |  130 <-> [130: sum, DECIMAL128(38,2), true]
+  |  132 <-> [132: s_store_id, VARCHAR, true]
+  |  136 <-> [136: s_store_name, VARCHAR, true]
+  |  cardinality: 7144200508
+  |  
+  13:HASH JOIN
+  |  join op: INNER JOIN (BROADCAST)
+  |  equal join conjunct: [73: ss_store_sk, BIGINT, true] = [131: s_store_sk, BIGINT, true]
+  |  build runtime filters:
+  |  - filter_id = 1, build_expr = (131: s_store_sk), remote = false
+  |  output columns: 93, 124, 125, 126, 127, 128, 129, 130, 132, 136
+  |  can local shuffle: false
+  |  cardinality: 7144200508
+  |  
+  |----12:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 1350
+  |    
+  10:SELECT
+  |  predicates: CAST(93: d_week_seq AS BIGINT) IS NOT NULL
+  |  cardinality: 7144200508
+  |  
+  9:Project
+  |  output columns:
+  |  73 <-> [8: ss_store_sk, BIGINT, true]
+  |  93 <-> [28: d_week_seq, INT, true]
+  |  124 <-> [59: sum, DECIMAL128(38,2), true]
+  |  125 <-> [60: sum, DECIMAL128(38,2), true]
+  |  126 <-> [61: sum, DECIMAL128(38,2), true]
+  |  127 <-> [62: sum, DECIMAL128(38,2), true]
+  |  128 <-> [63: sum, DECIMAL128(38,2), true]
+  |  129 <-> [64: sum, DECIMAL128(38,2), true]
+  |  130 <-> [65: sum, DECIMAL128(38,2), true]
+  |  cardinality: 7144200508
+  |  
+  8:EXCHANGE
+     distribution type: SHUFFLE
+     partition exprs: [28: d_week_seq, INT, true], [8: ss_store_sk, BIGINT, true]
+     cardinality: 7144200508
+     probe runtime filters:
+     - filter_id = 1, probe_expr = (8: ss_store_sk)
+     - filter_id = 2, probe_expr = (28: d_week_seq)
+
+PLAN FRAGMENT 6(F07)
+  Fragment Cost: 525952.8
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 17
+
+  16:Project
+  |  output columns:
+  |  164 <-> [164: d_week_seq, INT, true]
+  |  cardinality: 16436
+  |  
+  15:HdfsScanNode
+     TABLE: date_dim
+     NON-PARTITION PREDICATES: 163: d_month_seq >= 1205, 163: d_month_seq <= 1216, CAST(164: d_week_seq AS BIGINT) IS NOT NULL
+     MIN/MAX PREDICATES: 163: d_month_seq >= 1205, 163: d_month_seq <= 1216
+     partitions=1/1
+     avgRowSize=2.0
+     cardinality: 16436
+
+PLAN FRAGMENT 7(F05)
+  Fragment Cost: 216000.0
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 12
+
+  11:HdfsScanNode
+     TABLE: store
+     NON-PARTITION PREDICATES: 132: s_store_id IS NOT NULL
+     partitions=1/1
+     avgRowSize=3.0
+     cardinality: 1350
+
+PLAN FRAGMENT 8(F03)
+  Fragment Cost: 2.952936210089093E12
+  Output Exprs:8: ss_store_sk | 28: d_week_seq | 59: sum | 60: sum | 61: sum | 62: sum | 63: sum | 64: sum | 65: sum
+  Input Partition: HASH_PARTITIONED: 28: d_week_seq, 8: ss_store_sk
+  MultiCastDataSinks:
+  OutPut Partition: RANDOM
+  OutPut Exchange Id: 08
+  OutPut Partition: RANDOM
+  OutPut Exchange Id: 21
+
+  7:AGGREGATE (merge finalize)
+  |  aggregate: sum[([65: sum, DECIMAL128(38,2), true]); args: DECIMAL64; result: DECIMAL128(38,2); args nullable: true; result nullable: true], sum[([59: sum, DECIMAL128(38,2), true]); args: DECIMAL64; result: DECIMAL128(38,2); args nullable: true; result nullable: true], sum[([60: sum, DECIMAL128(38,2), true]); args: DECIMAL64; result: DECIMAL128(38,2); args nullable: true; result nullable: true], sum[([61: sum, DECIMAL128(38,2), true]); args: DECIMAL64; result: DECIMAL128(38,2); args nullable: true; result nullable: true], sum[([62: sum, DECIMAL128(38,2), true]); args: DECIMAL64; result: DECIMAL128(38,2); args nullable: true; result nullable: true], sum[([63: sum, DECIMAL128(38,2), true]); args: DECIMAL64; result: DECIMAL128(38,2); args nullable: true; result nullable: true], sum[([64: sum, DECIMAL128(38,2), true]); args: DECIMAL64; result: DECIMAL128(38,2); args nullable: true; result nullable: true]
+  |  group by: [28: d_week_seq, INT, true], [8: ss_store_sk, BIGINT, true]
+  |  cardinality: 7144200508
+  |  
+  6:EXCHANGE
+     distribution type: SHUFFLE
+     partition exprs: [28: d_week_seq, INT, true], [8: ss_store_sk, BIGINT, true]
+     cardinality: 13608000968
+
+PLAN FRAGMENT 9(F00)
+  Fragment Cost: 4.676604279218677E12
+
+  Input Partition: RANDOM
+  OutPut Partition: HASH_PARTITIONED: 28: d_week_seq, 8: ss_store_sk
+  OutPut Exchange Id: 06
+
+  5:AGGREGATE (update serialize)
+  |  STREAMING
+  |  aggregate: sum[([58: case, DECIMAL64(7,2), true]); args: DECIMAL64; result: DECIMAL128(38,2); args nullable: true; result nullable: true], sum[([52: case, DECIMAL64(7,2), true]); args: DECIMAL64; result: DECIMAL128(38,2); args nullable: true; result nullable: true], sum[([53: case, DECIMAL64(7,2), true]); args: DECIMAL64; result: DECIMAL128(38,2); args nullable: true; result nullable: true], sum[([54: case, DECIMAL64(7,2), true]); args: DECIMAL64; result: DECIMAL128(38,2); args nullable: true; result nullable: true], sum[([55: case, DECIMAL64(7,2), true]); args: DECIMAL64; result: DECIMAL128(38,2); args nullable: true; result nullable: true], sum[([56: case, DECIMAL64(7,2), true]); args: DECIMAL64; result: DECIMAL128(38,2); args nullable: true; result nullable: true], sum[([57: case, DECIMAL64(7,2), true]); args: DECIMAL64; result: DECIMAL128(38,2); args nullable: true; result nullable: true]
+  |  group by: [28: d_week_seq, INT, true], [8: ss_store_sk, BIGINT, true]
+  |  cardinality: 13608000968
+  |  
+  4:Project
+  |  output columns:
+  |  8 <-> [8: ss_store_sk, BIGINT, true]
+  |  28 <-> [28: d_week_seq, INT, true]
+  |  52 <-> if[([38: d_day_name, VARCHAR, true] = 'Sunday', [14: ss_sales_price, DECIMAL64(7,2), true], NULL); args: BOOLEAN,DECIMAL64,DECIMAL64; result: DECIMAL64(7,2); args nullable: true; result nullable: true]
+  |  53 <-> if[([38: d_day_name, VARCHAR, true] = 'Monday', [14: ss_sales_price, DECIMAL64(7,2), true], NULL); args: BOOLEAN,DECIMAL64,DECIMAL64; result: DECIMAL64(7,2); args nullable: true; result nullable: true]
+  |  54 <-> if[([38: d_day_name, VARCHAR, true] = 'Tuesday', [14: ss_sales_price, DECIMAL64(7,2), true], NULL); args: BOOLEAN,DECIMAL64,DECIMAL64; result: DECIMAL64(7,2); args nullable: true; result nullable: true]
+  |  55 <-> if[([38: d_day_name, VARCHAR, true] = 'Wednesday', [14: ss_sales_price, DECIMAL64(7,2), true], NULL); args: BOOLEAN,DECIMAL64,DECIMAL64; result: DECIMAL64(7,2); args nullable: true; result nullable: true]
+  |  56 <-> if[([38: d_day_name, VARCHAR, true] = 'Thursday', [14: ss_sales_price, DECIMAL64(7,2), true], NULL); args: BOOLEAN,DECIMAL64,DECIMAL64; result: DECIMAL64(7,2); args nullable: true; result nullable: true]
+  |  57 <-> if[([38: d_day_name, VARCHAR, true] = 'Friday', [14: ss_sales_price, DECIMAL64(7,2), true], NULL); args: BOOLEAN,DECIMAL64,DECIMAL64; result: DECIMAL64(7,2); args nullable: true; result nullable: true]
+  |  58 <-> if[([38: d_day_name, VARCHAR, true] = 'Saturday', [14: ss_sales_price, DECIMAL64(7,2), true], NULL); args: BOOLEAN,DECIMAL64,DECIMAL64; result: DECIMAL64(7,2); args nullable: true; result nullable: true]
+  |  cardinality: 25920001844
+  |  
+  3:HASH JOIN
+  |  join op: INNER JOIN (BROADCAST)
+  |  equal join conjunct: [1: ss_sold_date_sk, BIGINT, true] = [24: d_date_sk, BIGINT, true]
+  |  build runtime filters:
+  |  - filter_id = 0, build_expr = (24: d_date_sk), remote = false
+  |  output columns: 8, 14, 28, 38
+  |  can local shuffle: true
+  |  cardinality: 25920001844
+  |  
+  |----2:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 65087
+  |    
+  0:HdfsScanNode
+     TABLE: store_sales
+     NON-PARTITION PREDICATES: 1: ss_sold_date_sk IS NOT NULL
+     partitions=1/1
+     avgRowSize=3.0
+     cardinality: 25920001844
+     probe runtime filters:
+     - filter_id = 0, probe_expr = (1: ss_sold_date_sk)
+
+PLAN FRAGMENT 10(F01)
+  Fragment Cost: 7289705.808000001
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 02
+
+  1:HdfsScanNode
+     TABLE: date_dim
+     NON-PARTITION PREDICATES: (CAST(28: d_week_seq AS BIGINT) - 52 IS NOT NULL) OR (CAST(28: d_week_seq AS BIGINT) IS NOT NULL), 24: d_date_sk IS NOT NULL
+     partitions=1/1
+     avgRowSize=3.0
+     cardinality: 65087

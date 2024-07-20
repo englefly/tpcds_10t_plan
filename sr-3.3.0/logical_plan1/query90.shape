@@ -1,0 +1,77 @@
+Explain String
+- Output => [129:expr]
+    - TOP-100(FINAL)[129: expr ASC NULLS FIRST]
+            Estimates: {row: 1, cpu: 32.00, memory: 16.00, network: 32.00, cost: 2039337493407.72}
+        - TOP-100(PARTIAL)[129: expr ASC NULLS FIRST]
+                Estimates: {row: 1, cpu: 32.00, memory: 32.00, network: 32.00, cost: 2039337493311.72}
+            - NESTLOOP/CROSS JOIN => [129:expr]
+                    Estimates: {row: 1, cpu: 128000000.00, memory: 1600.00, network: 0.00, cost: 2039337493183.72}
+                    129:expr := cast(cast(64:count as decimal(15, 4)) as decimal(38, 4)) / cast(cast(128:count as decimal(15, 4)) as decimal(38, 4))
+                - AGGREGATE(GLOBAL) []
+                        Estimates: {row: 1, cpu: 8.00, memory: 8.00, network: 0.00, cost: 1019636744831.86}
+                        64:count := count(64:count)
+                    - EXCHANGE(GATHER)
+                            Estimates: {row: 1, cpu: 8.00, memory: 0.00, network: 8.00, cost: 1019636744811.86}
+                        - AGGREGATE(LOCAL) []
+                                Estimates: {row: 1, cpu: 11015943885.72, memory: 0.80, network: 0.00, cost: 1019636744795.86}
+                                64:count := count()
+                            - HASH/INNER JOIN [13:ws_web_page_sk = 50:wp_web_page_sk] => [133:auto_fill_col]
+                                    Estimates: {row: 6479966991, cpu: 161999182794.00, memory: 8004.00, network: 0.00, cost: 1014128772851.40}
+                                    133:auto_fill_col := 1
+                                - HASH/INNER JOIN [2:ws_sold_time_sk = 40:t_time_sk] => [13:ws_web_page_sk]
+                                        Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 9.331286531904001E11}
+                                    - HASH/INNER JOIN [11:ws_ship_hdemo_sk = 35:hd_demo_sk] => [2:ws_sold_time_sk, 13:ws_web_page_sk]
+                                            Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 8.035178221584001E11}
+                                        - HIVE-SCAN [web_sales] => [2:ws_sold_time_sk, 11:ws_ship_hdemo_sk, 13:ws_web_page_sk]
+                                                Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 6.220768311936001E11}
+                                                predicate: 11:ws_ship_hdemo_sk IS NOT NULL
+                                        - EXCHANGE(BROADCAST)
+                                                Estimates: {row: 3600, cpu: ?, memory: ?, network: ?, cost: 1324800.0}
+                                            - HIVE-SCAN [household_demographics] => [35:hd_demo_sk]
+                                                    Estimates: {row: 3600, cpu: ?, memory: ?, network: ?, cost: 172800.0}
+                                                    predicate: 38:hd_dep_count = 3
+                                    - EXCHANGE(BROADCAST)
+                                            Estimates: {row: 21600, cpu: ?, memory: ?, network: ?, cost: 7948800.0}
+                                        - HIVE-SCAN [time_dim] => [40:t_time_sk]
+                                                Estimates: {row: 21600, cpu: ?, memory: ?, network: ?, cost: 1036800.0}
+                                                predicate: 43:t_hour >= 9 AND 43:t_hour <= 10
+                                - EXCHANGE(BROADCAST)
+                                        Estimates: {row: 1000, cpu: ?, memory: ?, network: ?, cost: 368184.0}
+                                    - HIVE-SCAN [web_page] => [50:wp_web_page_sk]
+                                            Estimates: {row: 1000, cpu: ?, memory: ?, network: ?, cost: 48024.0}
+                                            predicate: 60:wp_char_count >= 5000 AND 60:wp_char_count <= 5200
+                - EXCHANGE(BROADCAST)
+                        Estimates: {row: 1, cpu: 80.00, memory: 80.00, network: 80.00, cost: 1019636745151.86}
+                    - AGGREGATE(GLOBAL) []
+                            Estimates: {row: 1, cpu: 8.00, memory: 8.00, network: 0.00, cost: 1019636744831.86}
+                            128:count := count(128:count)
+                        - EXCHANGE(GATHER)
+                                Estimates: {row: 1, cpu: 8.00, memory: 0.00, network: 8.00, cost: 1019636744811.86}
+                            - AGGREGATE(LOCAL) []
+                                    Estimates: {row: 1, cpu: 11015943885.72, memory: 0.80, network: 0.00, cost: 1019636744795.86}
+                                    128:count := count()
+                                - HASH/INNER JOIN [77:ws_web_page_sk = 114:wp_web_page_sk] => [132:auto_fill_col]
+                                        Estimates: {row: 6479966991, cpu: 161999182794.00, memory: 8004.00, network: 0.00, cost: 1014128772851.40}
+                                        132:auto_fill_col := 1
+                                    - HASH/INNER JOIN [66:ws_sold_time_sk = 104:t_time_sk] => [77:ws_web_page_sk]
+                                            Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 9.331286531904001E11}
+                                        - HASH/INNER JOIN [75:ws_ship_hdemo_sk = 99:hd_demo_sk] => [66:ws_sold_time_sk, 77:ws_web_page_sk]
+                                                Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 8.035178221584001E11}
+                                            - HIVE-SCAN [web_sales] => [66:ws_sold_time_sk, 75:ws_ship_hdemo_sk, 77:ws_web_page_sk]
+                                                    Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 6.220768311936001E11}
+                                                    predicate: 75:ws_ship_hdemo_sk IS NOT NULL
+                                            - EXCHANGE(BROADCAST)
+                                                    Estimates: {row: 3600, cpu: ?, memory: ?, network: ?, cost: 1324800.0}
+                                                - HIVE-SCAN [household_demographics] => [99:hd_demo_sk]
+                                                        Estimates: {row: 3600, cpu: ?, memory: ?, network: ?, cost: 172800.0}
+                                                        predicate: 102:hd_dep_count = 3
+                                        - EXCHANGE(BROADCAST)
+                                                Estimates: {row: 21600, cpu: ?, memory: ?, network: ?, cost: 7948800.0}
+                                            - HIVE-SCAN [time_dim] => [104:t_time_sk]
+                                                    Estimates: {row: 21600, cpu: ?, memory: ?, network: ?, cost: 1036800.0}
+                                                    predicate: 107:t_hour >= 16 AND 107:t_hour <= 17
+                                    - EXCHANGE(BROADCAST)
+                                            Estimates: {row: 1000, cpu: ?, memory: ?, network: ?, cost: 368184.0}
+                                        - HIVE-SCAN [web_page] => [114:wp_web_page_sk]
+                                                Estimates: {row: 1000, cpu: ?, memory: ?, network: ?, cost: 48024.0}
+                                                predicate: 124:wp_char_count >= 5000 AND 124:wp_char_count <= 5200

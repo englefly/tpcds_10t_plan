@@ -1,0 +1,50 @@
+Explain String
+- Output => [97:c_last_name, 96:c_first_name, 106:substr, 10:ss_ticket_number, 86:sum, 87:sum]
+    - TOP-100(FINAL)[97: c_last_name ASC NULLS FIRST, 96: c_first_name ASC NULLS FIRST, 106: substr ASC NULLS FIRST, 87: sum ASC NULLS FIRST]
+            Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 1.0279613565467084E13}
+        - TOP-100(PARTIAL)[97: c_last_name ASC NULLS FIRST, 96: c_first_name ASC NULLS FIRST, 106: substr ASC NULLS FIRST, 87: sum ASC NULLS FIRST]
+                Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 1.0279613523867084E13}
+            - HASH/INNER JOIN [4:ss_customer_sk = 88:c_customer_sk] => [97:c_last_name, 86:sum, 87:sum, 106:substr, 10:ss_ticket_number, 96:c_first_name]
+                    Estimates: {row: 2170955092, cpu: ?, memory: ?, network: ?, cost: 9.758584277723027E12}
+                    106:substr := substr(74:s_city, 1, 30)
+                - EXCHANGE(SHUFFLE) [4]
+                        Estimates: {row: 2170955092, cpu: ?, memory: ?, network: ?, cost: 9.540087659234473E12}
+                    - AGGREGATE(GLOBAL) [10:ss_ticket_number, 4:ss_customer_sk, 7:ss_addr_sk, 74:s_city] => [4:ss_customer_sk, 86:sum, 87:sum, 10:ss_ticket_number, 74:s_city]
+                            Estimates: {row: 2170955092, cpu: ?, memory: ?, network: ?, cost: 9.26220540742431E12}
+                            86:sum := sum(86:sum)
+                            87:sum := sum(87:sum)
+                        - EXCHANGE(SHUFFLE) [10, 4, 7, 74]
+                                Estimates: {row: 3750705266, cpu: ?, memory: ?, network: ?, cost: 8.814562484531385E12}
+                            - AGGREGATE(LOCAL) [10:ss_ticket_number, 4:ss_customer_sk, 7:ss_addr_sk, 74:s_city]
+                                    Estimates: {row: 3750705266, cpu: ?, memory: ?, network: ?, cost: 8.760552328688788E12}
+                                    86:sum := sum(20:ss_coupon_amt)
+                                    87:sum := sum(23:ss_net_profit)
+                                - HASH/INNER JOIN [6:ss_hdemo_sk = 81:hd_demo_sk] => [4:ss_customer_sk, 20:ss_coupon_amt, 7:ss_addr_sk, 23:ss_net_profit, 10:ss_ticket_number, 74:s_city]
+                                        Estimates: {row: 6480000461, cpu: ?, memory: ?, network: ?, cost: 8.683214171186501E12}
+                                    - HASH/INNER JOIN [1:ss_sold_date_sk = 24:d_date_sk] => [4:ss_customer_sk, 20:ss_coupon_amt, 6:ss_hdemo_sk, 7:ss_addr_sk, 23:ss_net_profit, 10:ss_ticket_number, 74:s_city]
+                                            Estimates: {row: 6480000461, cpu: ?, memory: ?, network: ?, cost: 8.242571180636801E12}
+                                        - HASH/INNER JOIN [8:ss_store_sk = 52:s_store_sk] => [1:ss_sold_date_sk, 4:ss_customer_sk, 20:ss_coupon_amt, 6:ss_hdemo_sk, 7:ss_addr_sk, 23:ss_net_profit, 10:ss_ticket_number, 74:s_city]
+                                                Estimates: {row: 6480000461, cpu: ?, memory: ?, network: ?, cost: 7.7500811378859E12}
+                                            - HIVE-SCAN [store_sales] => [1:ss_sold_date_sk, 4:ss_customer_sk, 20:ss_coupon_amt, 6:ss_hdemo_sk, 7:ss_addr_sk, 23:ss_net_profit, 8:ss_store_sk, 10:ss_ticket_number]
+                                                    Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 6.635520472089601E12}
+                                                    predicate: 4:ss_customer_sk IS NOT NULL
+                                            - EXCHANGE(BROADCAST)
+                                                    Estimates: {row: 375, cpu: ?, memory: ?, network: ?, cost: 402000.0}
+                                                - HIVE-SCAN [store] => [52:s_store_sk, 74:s_city]
+                                                        Estimates: {row: 375, cpu: ?, memory: ?, network: ?, cost: 42000.0}
+                                                        predicate: 58:s_number_employees >= 200 AND 58:s_number_employees <= 295
+                                        - EXCHANGE(BROADCAST)
+                                                Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 7012704.0}
+                                            - HIVE-SCAN [date_dim] => [24:d_date_sk]
+                                                    Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 1168784.0}
+                                                    predicate: 31:d_dow = 1 AND 30:d_year IN (1998, 1999, 2000)
+                                    - EXCHANGE(BROADCAST)
+                                            Estimates: {row: 5400, cpu: ?, memory: ?, network: ?, cost: 2073600.0}
+                                        - HIVE-SCAN [household_demographics] => [81:hd_demo_sk]
+                                                Estimates: {row: 5400, cpu: ?, memory: ?, network: ?, cost: 345600.0}
+                                                predicate: 84:hd_dep_count = 0 OR 85:hd_vehicle_count > 3
+                - EXCHANGE(SHUFFLE) [88]
+                        Estimates: {row: 58500000, cpu: ?, memory: ?, network: ?, cost: 1.404E10}
+                    - HIVE-SCAN [customer] => [97:c_last_name, 88:c_customer_sk, 96:c_first_name]
+                            Estimates: {row: 58500000, cpu: ?, memory: ?, network: ?, cost: 9.36E9}
+                            predicate: 88:c_customer_sk IS NOT NULL

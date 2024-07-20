@@ -1,0 +1,94 @@
+Explain String
+- Output => [332:count, 333:sum, 334:sum]
+    - CTEAnchor[1]
+            Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 4.381847873331529E12}
+        - CTEProduce[1]
+            - HASH/INNER JOIN [18:ws_order_number = 52:ws_order_number AND 16:ws_warehouse_sk != 50:ws_warehouse_sk] => [18:ws_order_number]
+                    Estimates: {row: 5183973593, cpu: ?, memory: ?, network: ?, cost: 1.6921353804064802E12}
+                - EXCHANGE(SHUFFLE) [18]
+                        Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 6.220768311936001E11}
+                    - HIVE-SCAN [web_sales] => [18:ws_order_number, 16:ws_warehouse_sk]
+                            Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 4.147178874624E11}
+                            predicate: 18:ws_order_number IS NOT NULL
+                - EXCHANGE(SHUFFLE) [52]
+                        Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 6.220768311936001E11}
+                    - HIVE-SCAN [web_sales] => [50:ws_warehouse_sk, 52:ws_order_number]
+                            Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 4.147178874624E11}
+                            predicate: 52:ws_order_number IS NOT NULL
+        - TOP-100(FINAL)[332: count ASC NULLS FIRST]
+                Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 2.4906479069430967E12}
+            - TOP-100(PARTIAL)[332: count ASC NULLS FIRST]
+                    Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 2.4906479067830967E12}
+                - AGGREGATE(GLOBAL) []
+                        Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 2.4906479066230967E12}
+                        332:count := count(332:count)
+                        333:sum := sum(333:sum)
+                        334:sum := sum(334:sum)
+                    - EXCHANGE(GATHER)
+                            Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 2.4906479065230967E12}
+                        - AGGREGATE(DISTINCT_LOCAL) []
+                                Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 2.4906479064430967E12}
+                                332:count := count(86:ws_order_number)
+                                333:sum := sum(333:sum)
+                                334:sum := sum(334:sum)
+                            - AGGREGATE(DISTINCT_GLOBAL) [86:ws_order_number]
+                                    Estimates: {row: 404997936, cpu: ?, memory: ?, network: ?, cost: 2.4825479476235967E12}
+                                    333:sum := sum(333:sum)
+                                    334:sum := sum(334:sum)
+                                - EXCHANGE(SHUFFLE) [86]
+                                        Estimates: {row: 809995873, cpu: ?, memory: ?, network: ?, cost: 2.4339481951865967E12}
+                                    - AGGREGATE(LOCAL) [86:ws_order_number]
+                                            Estimates: {row: 809995873, cpu: ?, memory: ?, network: ?, cost: 2.4274682281949966E12}
+                                            333:sum := sum(97:ws_ext_ship_cost)
+                                            334:sum := sum(102:ws_net_profit)
+                                        - HASH/RIGHT SEMI JOIN [252:wr_order_number = 86:ws_order_number] => [97:ws_ext_ship_cost, 86:ws_order_number, 102:ws_net_profit]
+                                                Estimates: {row: 1619991747, cpu: ?, memory: ?, network: ?, cost: 2.4177482777075967E12}
+                                            - HASH/INNER JOIN [280:ws_order_number = 252:wr_order_number] => [252:wr_order_number]
+                                                    Estimates: {row: 5183973593, cpu: ?, memory: ?, network: ?, cost: 2.2820423236683002E11}
+                                                - EXCHANGE(SHUFFLE) [280]
+                                                        Estimates: {row: 5183973593, cpu: ?, memory: ?, network: ?, cost: 8.294357749248001E10}
+                                                    - CTEConsume[1]
+                                                            280:ws_order_number := 18:ws_order_number
+                                                            Estimates: {row: 5183973593, cpu: ?, memory: ?, network: ?, cost: 0.0}
+                                                            predicate: 280:ws_order_number IS NOT NULL
+                                                - EXCHANGE(SHUFFLE) [252]
+                                                        Estimates: {row: 648018436, cpu: ?, memory: ?, network: ?, cost: 3.1104884952E10}
+                                                    - HIVE-SCAN [web_returns] => [252:wr_order_number]
+                                                            Estimates: {row: 648018436, cpu: ?, memory: ?, network: ?, cost: 2.0736589968E10}
+                                                            predicate: 252:wr_order_number IS NOT NULL
+                                            - HASH/RIGHT SEMI JOIN [187:ws_order_number = 86:ws_order_number] => [97:ws_ext_ship_cost, 86:ws_order_number, 102:ws_net_profit]
+                                                    Estimates: {row: 1619991747, cpu: ?, memory: ?, network: ?, cost: 2.016366927490257E12}
+                                                - EXCHANGE(SHUFFLE) [187]
+                                                        Estimates: {row: 5183973593, cpu: ?, memory: ?, network: ?, cost: 8.294357749248001E10}
+                                                    - CTEConsume[1]
+                                                            187:ws_order_number := 18:ws_order_number
+                                                            Estimates: {row: 5183973593, cpu: ?, memory: ?, network: ?, cost: 0.0}
+                                                            predicate: 187:ws_order_number IS NOT NULL
+                                                - EXCHANGE(SHUFFLE) [86]
+                                                        Estimates: {row: 1619991747, cpu: ?, memory: ?, network: ?, cost: 1.760246232147267E12}
+                                                    - HASH/INNER JOIN [80:ws_ship_addr_sk = 131:ca_address_sk] => [97:ws_ext_ship_cost, 86:ws_order_number, 102:ws_net_profit]
+                                                            Estimates: {row: 1619991747, cpu: ?, memory: ?, network: ?, cost: 1.6824866282480671E12}
+                                                        - EXCHANGE(SHUFFLE) [80]
+                                                                Estimates: {row: 1619991747, cpu: ?, memory: ?, network: ?, cost: 1.6200015086570005E12}
+                                                            - HASH/INNER JOIN [71:ws_ship_date_sk = 103:d_date_sk] => [97:ws_ext_ship_cost, 102:ws_net_profit, 86:ws_order_number, 80:ws_ship_addr_sk]
+                                                                    Estimates: {row: 1619991747, cpu: ?, memory: ?, network: ?, cost: 1.5163220367914004E12}
+                                                                - HASH/INNER JOIN [82:ws_web_site_sk = 144:web_site_sk] => [97:ws_ext_ship_cost, 86:ws_order_number, 102:ws_net_profit, 71:ws_ship_date_sk, 80:ws_ship_addr_sk]
+                                                                        Estimates: {row: 1619991747, cpu: ?, memory: ?, network: ?, cost: 1.4450326843668003E12}
+                                                                    - HIVE-SCAN [web_sales] => [97:ws_ext_ship_cost, 82:ws_web_site_sk, 86:ws_order_number, 102:ws_net_profit, 71:ws_ship_date_sk, 80:ws_ship_addr_sk]
+                                                                            Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 1.2441536623872002E12}
+                                                                            predicate: 71:ws_ship_date_sk IS NOT NULL
+                                                                    - EXCHANGE(BROADCAST)
+                                                                            Estimates: {row: 78, cpu: ?, memory: ?, network: ?, cost: 32448.0}
+                                                                        - HIVE-SCAN [web_site] => [144:web_site_sk]
+                                                                                Estimates: {row: 78, cpu: ?, memory: ?, network: ?, cost: 7488.0}
+                                                                                predicate: 158:web_company_name = 'pri'
+                                                                - EXCHANGE(BROADCAST)
+                                                                        Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 6720508.0}
+                                                                    - HIVE-SCAN [date_dim] => [103:d_date_sk]
+                                                                            Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 876588.0}
+                                                                            predicate: 105:d_date >= 2002-04-01 AND 105:d_date <= 2002-05-31
+                                                        - EXCHANGE(SHUFFLE) [131]
+                                                                Estimates: {row: 32500000, cpu: ?, memory: ?, network: ?, cost: 3.64E9}
+                                                            - HIVE-SCAN [customer_address] => [131:ca_address_sk]
+                                                                    Estimates: {row: 32500000, cpu: ?, memory: ?, network: ?, cost: 3.12E9}
+                                                                    predicate: 139:ca_state = 'AL'

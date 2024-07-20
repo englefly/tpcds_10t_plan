@@ -1,0 +1,50 @@
+Explain String
+- Output => [57:s_store_name, 53:s_store_id, 88:sum, 89:sum, 90:sum, 91:sum, 92:sum, 93:sum, 94:sum]
+    - TOP-100(FINAL)[57: s_store_name ASC NULLS FIRST, 53: s_store_id ASC NULLS FIRST, 88: sum ASC NULLS FIRST, 89: sum ASC NULLS FIRST, 90: sum ASC NULLS FIRST, 91: sum ASC NULLS FIRST, 92: sum ASC NULLS FIRST, 93: sum ASC NULLS FIRST, 94: sum ASC NULLS FIRST]
+            Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 5.08815553171483E12}
+        - TOP-100(PARTIAL)[57: s_store_name ASC NULLS FIRST, 53: s_store_id ASC NULLS FIRST, 88: sum ASC NULLS FIRST, 89: sum ASC NULLS FIRST, 90: sum ASC NULLS FIRST, 91: sum ASC NULLS FIRST, 92: sum ASC NULLS FIRST, 93: sum ASC NULLS FIRST, 94: sum ASC NULLS FIRST]
+                Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 5.08815547411483E12}
+            - AGGREGATE(GLOBAL) [57:s_store_name, 53:s_store_id]
+                    Estimates: {row: 1786050127, cpu: ?, memory: ?, network: ?, cost: 4.573773008718666E12}
+                    88:sum := sum(88:sum)
+                    89:sum := sum(89:sum)
+                    90:sum := sum(90:sum)
+                    91:sum := sum(91:sum)
+                    92:sum := sum(92:sum)
+                    93:sum := sum(93:sum)
+                    94:sum := sum(94:sum)
+                - EXCHANGE(SHUFFLE) [57, 53]
+                        Estimates: {row: 3402000242, cpu: ?, memory: ?, network: ?, cost: 3.8144465546957563E12}
+                    - AGGREGATE(LOCAL) [57:s_store_name, 53:s_store_id]
+                            Estimates: {row: 3402000242, cpu: ?, memory: ?, network: ?, cost: 3.716468947725058E12}
+                            88:sum := sum(81:case)
+                            89:sum := sum(82:case)
+                            90:sum := sum(83:case)
+                            91:sum := sum(84:case)
+                            92:sum := sum(85:case)
+                            93:sum := sum(86:case)
+                            94:sum := sum(87:case)
+                        - HASH/INNER JOIN [29:ss_sold_date_sk = 1:d_date_sk] => [81:case, 82:case, 83:case, 84:case, 53:s_store_id, 85:case, 86:case, 87:case, 57:s_store_name]
+                                Estimates: {row: 6480000461, cpu: ?, memory: ?, network: ?, cost: 3.5770193378038003E12}
+                                81:case := if(15:d_day_name = 'Sunday', 42:ss_sales_price, null)
+                                82:case := if(15:d_day_name = 'Monday', 42:ss_sales_price, null)
+                                83:case := if(15:d_day_name = 'Tuesday', 42:ss_sales_price, null)
+                                84:case := if(15:d_day_name = 'Wednesday', 42:ss_sales_price, null)
+                                85:case := if(15:d_day_name = 'Thursday', 42:ss_sales_price, null)
+                                86:case := if(15:d_day_name = 'Friday', 42:ss_sales_price, null)
+                                87:case := if(15:d_day_name = 'Saturday', 42:ss_sales_price, null)
+                            - HASH/INNER JOIN [36:ss_store_sk = 52:s_store_sk] => [53:s_store_id, 57:s_store_name, 42:ss_sales_price, 29:ss_sold_date_sk]
+                                    Estimates: {row: 6480000461, cpu: ?, memory: ?, network: ?, cost: 3.0067221729156E12}
+                                - HIVE-SCAN [store_sales] => [36:ss_store_sk, 42:ss_sales_price, 29:ss_sold_date_sk]
+                                        Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 2.4883201770336E12}
+                                        predicate: 29:ss_sold_date_sk IS NOT NULL
+                                - EXCHANGE(BROADCAST)
+                                        Estimates: {row: 750, cpu: ?, memory: ?, network: ?, cost: 1344000.0}
+                                    - HIVE-SCAN [store] => [52:s_store_sk, 53:s_store_id, 57:s_store_name]
+                                            Estimates: {row: 750, cpu: ?, memory: ?, network: ?, cost: 144000.0}
+                                            predicate: 79:s_gmt_offset = -6
+                            - EXCHANGE(BROADCAST)
+                                    Estimates: {row: 36524, cpu: ?, memory: ?, network: ?, cost: 3.9154264E7}
+                                - HIVE-SCAN [date_dim] => [1:d_date_sk, 15:d_day_name]
+                                        Estimates: {row: 36524, cpu: ?, memory: ?, network: ?, cost: 4090744.0}
+                                        predicate: 7:d_year = 2001

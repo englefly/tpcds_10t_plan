@@ -1,0 +1,230 @@
+Explain String
+RESOURCE GROUP: default_wg
+
+PLAN FRAGMENT 0(F12)
+  Fragment Cost: 1.7146081219872168E11
+  Output Exprs:96: c_last_name | 95: c_first_name | 94: c_salutation | 97: c_preferred_cust_flag | 10: ss_ticket_number | 86: count
+  Input Partition: UNPARTITIONED
+  RESULT SINK
+
+  25:MERGING-EXCHANGE
+     distribution type: GATHER
+     cardinality: 446512532
+
+PLAN FRAGMENT 1(F11)
+  Fragment Cost: 2.3661991562961133E11
+
+  Input Partition: HASH_PARTITIONED: 4: ss_customer_sk
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 25
+
+  24:SORT
+  |  order by: [96, VARCHAR, true] ASC, [95, VARCHAR, true] ASC, [94, VARCHAR, true] ASC, [97, VARCHAR, true] DESC, [10, BIGINT, true] ASC
+  |  offset: 0
+  |  cardinality: 446512532
+  |  
+  23:Project
+  |  output columns:
+  |  10 <-> [10: ss_ticket_number, BIGINT, true]
+  |  86 <-> [86: count, BIGINT, false]
+  |  94 <-> [94: c_salutation, VARCHAR, true]
+  |  95 <-> [95: c_first_name, VARCHAR, true]
+  |  96 <-> [96: c_last_name, VARCHAR, true]
+  |  97 <-> [97: c_preferred_cust_flag, VARCHAR, true]
+  |  cardinality: 446512532
+  |  
+  22:HASH JOIN
+  |  join op: INNER JOIN (PARTITIONED)
+  |  equal join conjunct: [4: ss_customer_sk, BIGINT, true] = [87: c_customer_sk, BIGINT, true]
+  |  build runtime filters:
+  |  - filter_id = 3, build_expr = (87: c_customer_sk), remote = true
+  |  output columns: 10, 86, 94, 95, 96, 97
+  |  can local shuffle: false
+  |  cardinality: 446512532
+  |  
+  |----21:EXCHANGE
+  |       distribution type: SHUFFLE
+  |       partition exprs: [87: c_customer_sk, BIGINT, true]
+  |       cardinality: 58500000
+  |    
+  19:EXCHANGE
+     distribution type: SHUFFLE
+     partition exprs: [4: ss_customer_sk, BIGINT, true]
+     cardinality: 446512532
+
+PLAN FRAGMENT 2(F09)
+  Fragment Cost: 1.6848E10
+
+  Input Partition: RANDOM
+  OutPut Partition: HASH_PARTITIONED: 87: c_customer_sk
+  OutPut Exchange Id: 21
+
+  20:HdfsScanNode
+     TABLE: customer
+     NON-PARTITION PREDICATES: 87: c_customer_sk IS NOT NULL
+     partitions=1/1
+     avgRowSize=5.0
+     cardinality: 58500000
+
+PLAN FRAGMENT 3(F07)
+  Fragment Cost: 7.858620559108105E10
+
+  Input Partition: HASH_PARTITIONED: 10: ss_ticket_number, 4: ss_customer_sk
+  OutPut Partition: HASH_PARTITIONED: 4: ss_customer_sk
+  OutPut Exchange Id: 19
+
+  18:AGGREGATE (merge finalize)
+  |  aggregate: count[([86: count, BIGINT, false]); args: ; result: BIGINT; args nullable: true; result nullable: false]
+  |  group by: [10: ss_ticket_number, BIGINT, true], [4: ss_customer_sk, BIGINT, true]
+  |  having: [86: count, BIGINT, false] >= 15, [86: count, BIGINT, false] <= 20
+  |  cardinality: 446512532
+  |  
+  17:EXCHANGE
+     distribution type: SHUFFLE
+     partition exprs: [10: ss_ticket_number, BIGINT, true], [4: ss_customer_sk, BIGINT, true]
+     cardinality: 3402000242
+
+PLAN FRAGMENT 4(F00)
+  Fragment Cost: 5.262548967646625E12
+
+  Input Partition: RANDOM
+  OutPut Partition: HASH_PARTITIONED: 10: ss_ticket_number, 4: ss_customer_sk
+  OutPut Exchange Id: 17
+
+  16:AGGREGATE (update serialize)
+  |  STREAMING
+  |  aggregate: count[(*); args: ; result: BIGINT; args nullable: false; result nullable: false]
+  |  group by: [10: ss_ticket_number, BIGINT, true], [4: ss_customer_sk, BIGINT, true]
+  |  cardinality: 3402000242
+  |  
+  15:Project
+  |  output columns:
+  |  4 <-> [4: ss_customer_sk, BIGINT, true]
+  |  10 <-> [10: ss_ticket_number, BIGINT, true]
+  |  cardinality: 6480000461
+  |  
+  14:HASH JOIN
+  |  join op: INNER JOIN (BROADCAST)
+  |  equal join conjunct: [6: ss_hdemo_sk, BIGINT, true] = [81: hd_demo_sk, BIGINT, true]
+  |  build runtime filters:
+  |  - filter_id = 2, build_expr = (81: hd_demo_sk), remote = false
+  |  output columns: 4, 10
+  |  can local shuffle: true
+  |  cardinality: 6480000461
+  |  
+  |----13:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 900
+  |    
+  10:Project
+  |  output columns:
+  |  4 <-> [4: ss_customer_sk, BIGINT, true]
+  |  6 <-> [6: ss_hdemo_sk, BIGINT, true]
+  |  10 <-> [10: ss_ticket_number, BIGINT, true]
+  |  cardinality: 6480000461
+  |  
+  9:HASH JOIN
+  |  join op: INNER JOIN (BROADCAST)
+  |  equal join conjunct: [1: ss_sold_date_sk, BIGINT, true] = [24: d_date_sk, BIGINT, true]
+  |  build runtime filters:
+  |  - filter_id = 1, build_expr = (24: d_date_sk), remote = false
+  |  output columns: 4, 6, 10
+  |  can local shuffle: false
+  |  cardinality: 6480000461
+  |  
+  |----8:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 18262
+  |    
+  5:Project
+  |  output columns:
+  |  1 <-> [1: ss_sold_date_sk, BIGINT, true]
+  |  4 <-> [4: ss_customer_sk, BIGINT, true]
+  |  6 <-> [6: ss_hdemo_sk, BIGINT, true]
+  |  10 <-> [10: ss_ticket_number, BIGINT, true]
+  |  cardinality: 6480000461
+  |  
+  4:HASH JOIN
+  |  join op: INNER JOIN (BROADCAST)
+  |  equal join conjunct: [8: ss_store_sk, BIGINT, true] = [52: s_store_sk, BIGINT, true]
+  |  build runtime filters:
+  |  - filter_id = 0, build_expr = (52: s_store_sk), remote = false
+  |  output columns: 1, 4, 6, 10
+  |  can local shuffle: false
+  |  cardinality: 6480000461
+  |  
+  |----3:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 750
+  |    
+  0:HdfsScanNode
+     TABLE: store_sales
+     NON-PARTITION PREDICATES: 1: ss_sold_date_sk IS NOT NULL
+     partitions=1/1
+     avgRowSize=5.0
+     cardinality: 25920001844
+     probe runtime filters:
+     - filter_id = 0, probe_expr = (8: ss_store_sk)
+     - filter_id = 1, probe_expr = (1: ss_sold_date_sk)
+     - filter_id = 2, probe_expr = (6: ss_hdemo_sk)
+     - filter_id = 3, probe_expr = (4: ss_customer_sk)
+
+PLAN FRAGMENT 5(F05)
+  Fragment Cost: 115200.0
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 13
+
+  12:Project
+  |  output columns:
+  |  81 <-> [81: hd_demo_sk, BIGINT, true]
+  |  cardinality: 900
+  |  
+  11:HdfsScanNode
+     TABLE: household_demographics
+     NON-PARTITION PREDICATES: 83: hd_buy_potential IN ('>10000', 'Unknown'), 85: hd_vehicle_count > 0, if(85: hd_vehicle_count > 0, CAST(84: hd_dep_count AS DOUBLE) / CAST(85: hd_vehicle_count AS DOUBLE), NULL) > 1.2
+     MIN/MAX PREDICATES: 83: hd_buy_potential >= '>10000', 83: hd_buy_potential <= 'Unknown', 85: hd_vehicle_count > 0
+     partitions=1/1
+     avgRowSize=4.0
+     cardinality: 900
+
+PLAN FRAGMENT 6(F03)
+  Fragment Cost: 1168752.0
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 08
+
+  7:Project
+  |  output columns:
+  |  24 <-> [24: d_date_sk, BIGINT, true]
+  |  cardinality: 18262
+  |  
+  6:HdfsScanNode
+     TABLE: date_dim
+     NON-PARTITION PREDICATES: ((33: d_dom >= 1) AND (33: d_dom <= 3)) OR ((33: d_dom >= 25) AND (33: d_dom <= 28)), 33: d_dom >= 1, 33: d_dom <= 28, 30: d_year IN (2000, 2001, 2002)
+     MIN/MAX PREDICATES: 33: d_dom >= 1, 33: d_dom <= 28, 30: d_year >= 2000, 30: d_year <= 2002
+     partitions=1/1
+     avgRowSize=3.0
+     cardinality: 18262
+
+PLAN FRAGMENT 7(F01)
+  Fragment Cost: 72000.0
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 03
+
+  2:Project
+  |  output columns:
+  |  52 <-> [52: s_store_sk, BIGINT, true]
+  |  cardinality: 750
+  |  
+  1:HdfsScanNode
+     TABLE: store
+     NON-PARTITION PREDICATES: 75: s_county IN ('Salem County', 'Terrell County', 'Arthur County', 'Oglethorpe County', 'Lunenburg County', 'Perry County', 'Halifax County', 'Sumner County')
+     MIN/MAX PREDICATES: 75: s_county >= 'Arthur County', 75: s_county <= 'Terrell County'
+     partitions=1/1
+     avgRowSize=2.0
+     cardinality: 750

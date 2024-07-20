@@ -1,0 +1,149 @@
+Explain String
+- Output => [25:i_item_id, 132:sum, 419:expr, 275:sum, 420:expr, 418:sum, 421:expr, 422:expr]
+    - TOP-100(FINAL)[25: i_item_id ASC NULLS FIRST, 132: sum ASC NULLS FIRST]
+            Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 1.2226510293116184E13}
+        - TOP-100(PARTIAL)[25: i_item_id ASC NULLS FIRST, 132: sum ASC NULLS FIRST]
+                Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 1.2226510238716184E13}
+            - HASH/INNER JOIN [25:i_item_id = 311:i_item_id AND cast(132:sum as double) >= cast(0.9 * 418:sum as double) AND cast(132:sum as double) <= cast(1.1 * 418:sum as double) AND cast(275:sum as double) >= cast(0.9 * 418:sum as double) AND cast(275:sum as double) <= cast(1.1 * 418:sum as double) AND cast(418:sum as double) >= cast(0.9 * 132:sum as double) AND cast(418:sum as double) <= cast(1.1 * 132:sum as double) AND cast(418:sum as double) >= cast(0.9 * 275:sum as double) AND cast(418:sum as double) <= cast(1.1 * 275:sum as double)] => [25:i_item_id, 132:sum, 275:sum, 418:sum, 419:expr, 420:expr, 421:expr, 422:expr]
+                    Estimates: {row: 1620000115, cpu: ?, memory: ?, network: ?, cost: 1.1759950176722383E13}
+                    419:expr := 132:sum / 425:divide * 100
+                    420:expr := 275:sum / 425:divide * 100
+                    421:expr := 418:sum / 425:divide * 100
+                    422:expr := 425:divide
+                    423:add := 132:sum + 275:sum, 
+                    424:add := 423:add + 418:sum, 
+                    425:divide := 424:add / 3, 
+                - HASH/INNER JOIN [25:i_item_id = 168:i_item_id AND cast(132:sum as double) >= cast(0.9 * 275:sum as double) AND cast(132:sum as double) <= cast(1.1 * 275:sum as double) AND cast(275:sum as double) >= cast(0.9 * 132:sum as double) AND cast(275:sum as double) <= cast(1.1 * 132:sum as double)] => [275:sum, 132:sum, 25:i_item_id]
+                        Estimates: {row: 3240000230, cpu: ?, memory: ?, network: ?, cost: 9.779054124734492E12}
+                    - AGGREGATE(GLOBAL) [25:i_item_id]
+                            Estimates: {row: 6480000461, cpu: ?, memory: ?, network: ?, cost: 6.103004507242326E12}
+                            132:sum := sum(132:sum)
+                        - EXCHANGE(SHUFFLE) [25]
+                                Estimates: {row: 12960000922, cpu: ?, memory: ?, network: ?, cost: 5.480924462983926E12}
+                            - AGGREGATE(LOCAL) [25:i_item_id]
+                                    Estimates: {row: 12960000922, cpu: ?, memory: ?, network: ?, cost: 5.397980457082806E12}
+                                    132:sum := sum(16:ss_ext_sales_price)
+                                - HASH/LEFT SEMI JOIN [48:d_date = 76:d_date] => [25:i_item_id, 16:ss_ext_sales_price]
+                                        Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 5.273564448231126E12}
+                                    - HASH/INNER JOIN [1:ss_sold_date_sk = 46:d_date_sk] => [25:i_item_id, 16:ss_ext_sales_price, 48:d_date]
+                                            Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 4.495944260361726E12}
+                                        - HASH/INNER JOIN [3:ss_item_sk = 24:i_item_sk] => [1:ss_sold_date_sk, 25:i_item_id, 16:ss_ext_sales_price]
+                                                Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 3.510933304352526E12}
+                                            - HIVE-SCAN [store_sales] => [1:ss_sold_date_sk, 3:ss_item_sk, 16:ss_ext_sales_price]
+                                                    Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 2.4883201770336E12}
+                                                    predicate: 3:ss_item_sk IS NOT NULL
+                                            - EXCHANGE(BROADCAST)
+                                                    Estimates: {row: 361800, cpu: ?, memory: ?, network: ?, cost: 3.820608E8}
+                                                - HIVE-SCAN [item] => [24:i_item_sk, 25:i_item_id]
+                                                        Estimates: {row: 361800, cpu: ?, memory: ?, network: ?, cost: 3.47328E7}
+                                                        predicate: 25:i_item_id IS NOT NULL
+                                        - EXCHANGE(BROADCAST)
+                                                Estimates: {row: 65744, cpu: ?, memory: ?, network: ?, cost: 3.4712884800000004E7}
+                                            - HIVE-SCAN [date_dim] => [46:d_date_sk, 48:d_date]
+                                                    Estimates: {row: 65744, cpu: ?, memory: ?, network: ?, cost: 3155716.8000000003}
+                                                    predicate: 46:d_date_sk IS NOT NULL
+                                    - EXCHANGE(BROADCAST)
+                                            Estimates: {row: 65744, cpu: ?, memory: ?, network: ?, cost: 1.47415302E7}
+                                        - HASH/INNER JOIN [78:d_week_seq = 106:d_week_seq] => [76:d_date]
+                                                Estimates: {row: 65744, cpu: ?, memory: ?, network: ?, cost: 4222474.2}
+                                            - HIVE-SCAN [date_dim] => [76:d_date, 78:d_week_seq]
+                                                    Estimates: {row: 65744, cpu: ?, memory: ?, network: ?, cost: 2103811.2}
+                                                    predicate: 76:d_date IS NOT NULL
+                                            - EXCHANGE(BROADCAST)
+                                                    Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 1461140.0}
+                                                - PREDICATE [106: d_week_seq IS NOT NULL]
+                                                    - ASSERT LE 1
+                                                            Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 1460980.0}
+                                                        - EXCHANGE(GATHER)
+                                                                Estimates: {row: 36524, cpu: ?, memory: ?, network: ?, cost: 1460980.0}
+                                                            - HIVE-SCAN [date_dim] => [106:d_week_seq]
+                                                                    Estimates: {row: 36524, cpu: ?, memory: ?, network: ?, cost: 1168784.0}
+                                                                    predicate: 104:d_date = 1998-02-21
+                    - AGGREGATE(GLOBAL) [168:i_item_id]
+                            Estimates: {row: 3239992059, cpu: ?, memory: ?, network: ?, cost: 3.0518101014560674E12}
+                            275:sum := sum(275:sum)
+                        - EXCHANGE(SHUFFLE) [168]
+                                Estimates: {row: 6479984119, cpu: ?, memory: ?, network: ?, cost: 2.7407708637200674E12}
+                            - AGGREGATE(LOCAL) [168:i_item_id]
+                                    Estimates: {row: 6479984119, cpu: ?, memory: ?, network: ?, cost: 2.6992989653552676E12}
+                                    275:sum := sum(156:cs_ext_sales_price)
+                                - HASH/LEFT SEMI JOIN [191:d_date = 219:d_date] => [168:i_item_id, 156:cs_ext_sales_price]
+                                        Estimates: {row: 12959968239, cpu: ?, memory: ?, network: ?, cost: 2.6370911178080674E12}
+                                    - HASH/INNER JOIN [133:cs_sold_date_sk = 189:d_date_sk] => [168:i_item_id, 156:cs_ext_sales_price, 191:d_date]
+                                            Estimates: {row: 12959968239, cpu: ?, memory: ?, network: ?, cost: 2.248271938091667E12}
+                                        - HASH/INNER JOIN [148:cs_item_sk = 167:i_item_sk] => [133:cs_sold_date_sk, 168:i_item_id, 156:cs_ext_sales_price]
+                                                Estimates: {row: 12959968239, cpu: ?, memory: ?, network: ?, cost: 1.755742259076267E12}
+                                            - HIVE-SCAN [catalog_sales] => [148:cs_item_sk, 133:cs_sold_date_sk, 156:cs_ext_sales_price]
+                                                    Estimates: {row: 12959968239, cpu: ?, memory: ?, network: ?, cost: 1.244156950944E12}
+                                                    predicate: 148:cs_item_sk IS NOT NULL
+                                            - EXCHANGE(BROADCAST)
+                                                    Estimates: {row: 361800, cpu: ?, memory: ?, network: ?, cost: 3.820608E8}
+                                                - HIVE-SCAN [item] => [167:i_item_sk, 168:i_item_id]
+                                                        Estimates: {row: 361800, cpu: ?, memory: ?, network: ?, cost: 3.47328E7}
+                                                        predicate: 168:i_item_id IS NOT NULL
+                                        - EXCHANGE(BROADCAST)
+                                                Estimates: {row: 65744, cpu: ?, memory: ?, network: ?, cost: 3.4712884800000004E7}
+                                            - HIVE-SCAN [date_dim] => [189:d_date_sk, 191:d_date]
+                                                    Estimates: {row: 65744, cpu: ?, memory: ?, network: ?, cost: 3155716.8000000003}
+                                                    predicate: 189:d_date_sk IS NOT NULL
+                                    - EXCHANGE(BROADCAST)
+                                            Estimates: {row: 65744, cpu: ?, memory: ?, network: ?, cost: 1.47415302E7}
+                                        - HASH/INNER JOIN [221:d_week_seq = 249:d_week_seq] => [219:d_date]
+                                                Estimates: {row: 65744, cpu: ?, memory: ?, network: ?, cost: 4222474.2}
+                                            - HIVE-SCAN [date_dim] => [219:d_date, 221:d_week_seq]
+                                                    Estimates: {row: 65744, cpu: ?, memory: ?, network: ?, cost: 2103811.2}
+                                                    predicate: 219:d_date IS NOT NULL
+                                            - EXCHANGE(BROADCAST)
+                                                    Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 1461140.0}
+                                                - PREDICATE [249: d_week_seq IS NOT NULL]
+                                                    - ASSERT LE 1
+                                                            Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 1460980.0}
+                                                        - EXCHANGE(GATHER)
+                                                                Estimates: {row: 36524, cpu: ?, memory: ?, network: ?, cost: 1460980.0}
+                                                            - HIVE-SCAN [date_dim] => [249:d_week_seq]
+                                                                    Estimates: {row: 36524, cpu: ?, memory: ?, network: ?, cost: 1168784.0}
+                                                                    predicate: 247:d_date = 1998-02-21
+                - AGGREGATE(GLOBAL) [311:i_item_id]
+                        Estimates: {row: 1619991747, cpu: ?, memory: ?, network: ?, cost: 1.5262165607283389E12}
+                        418:sum := sum(418:sum)
+                    - EXCHANGE(SHUFFLE) [311]
+                            Estimates: {row: 3239983495, cpu: ?, memory: ?, network: ?, cost: 1.3706973529299387E12}
+                        - AGGREGATE(LOCAL) [311:i_item_id]
+                                Estimates: {row: 3239983495, cpu: ?, memory: ?, network: ?, cost: 1.3499614585568186E12}
+                                418:sum := sum(299:ws_ext_sales_price)
+                            - HASH/LEFT SEMI JOIN [334:d_date = 362:d_date] => [311:i_item_id, 299:ws_ext_sales_price]
+                                    Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 1.3188576169971387E12}
+                                - HASH/INNER JOIN [276:ws_sold_date_sk = 332:d_date_sk] => [311:i_item_id, 299:ws_ext_sales_price, 334:d_date]
+                                        Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 1.1244384747027388E12}
+                                    - HASH/INNER JOIN [279:ws_item_sk = 310:i_item_sk] => [276:ws_sold_date_sk, 311:i_item_id, 299:ws_ext_sales_price]
+                                            Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 8.781488430885386E11}
+                                        - HIVE-SCAN [web_sales] => [276:ws_sold_date_sk, 279:ws_item_sk, 299:ws_ext_sales_price]
+                                                Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 6.220768311936001E11}
+                                                predicate: 279:ws_item_sk IS NOT NULL
+                                        - EXCHANGE(BROADCAST)
+                                                Estimates: {row: 361800, cpu: ?, memory: ?, network: ?, cost: 3.820608E8}
+                                            - HIVE-SCAN [item] => [310:i_item_sk, 311:i_item_id]
+                                                    Estimates: {row: 361800, cpu: ?, memory: ?, network: ?, cost: 3.47328E7}
+                                                    predicate: 311:i_item_id IS NOT NULL
+                                    - EXCHANGE(BROADCAST)
+                                            Estimates: {row: 65744, cpu: ?, memory: ?, network: ?, cost: 3.4712884800000004E7}
+                                        - HIVE-SCAN [date_dim] => [332:d_date_sk, 334:d_date]
+                                                Estimates: {row: 65744, cpu: ?, memory: ?, network: ?, cost: 3155716.8000000003}
+                                                predicate: 332:d_date_sk IS NOT NULL
+                                - EXCHANGE(BROADCAST)
+                                        Estimates: {row: 65744, cpu: ?, memory: ?, network: ?, cost: 1.47415302E7}
+                                    - HASH/INNER JOIN [364:d_week_seq = 392:d_week_seq] => [362:d_date]
+                                            Estimates: {row: 65744, cpu: ?, memory: ?, network: ?, cost: 4222474.2}
+                                        - HIVE-SCAN [date_dim] => [362:d_date, 364:d_week_seq]
+                                                Estimates: {row: 65744, cpu: ?, memory: ?, network: ?, cost: 2103811.2}
+                                                predicate: 362:d_date IS NOT NULL
+                                        - EXCHANGE(BROADCAST)
+                                                Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 1461140.0}
+                                            - PREDICATE [392: d_week_seq IS NOT NULL]
+                                                - ASSERT LE 1
+                                                        Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 1460980.0}
+                                                    - EXCHANGE(GATHER)
+                                                            Estimates: {row: 36524, cpu: ?, memory: ?, network: ?, cost: 1460980.0}
+                                                        - HIVE-SCAN [date_dim] => [392:d_week_seq]
+                                                                Estimates: {row: 36524, cpu: ?, memory: ?, network: ?, cost: 1168784.0}
+                                                                predicate: 390:d_date = 1998-02-21

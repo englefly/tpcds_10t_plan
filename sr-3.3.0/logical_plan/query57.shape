@@ -1,0 +1,92 @@
+Explain String
+- Output => [131:i_category, 127:i_brand, 181:d_year, 183:d_moy, 235:avg(234: sum), 234:sum, 352:sum, 470:sum]
+    - CTEAnchor[1]
+            Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 6.227184807557348E12}
+        - CTEProduce[1]
+            - PREDICATE [13: i_category IS NOT NULL AND 9: i_brand IS NOT NULL AND 91: cc_name IS NOT NULL AND subtract(118: rank(), 1) IS NOT NULL OR 13: i_category IS NOT NULL AND 9: i_brand IS NOT NULL AND 91: cc_name IS NOT NULL AND add(118: rank(), 1) IS NOT NULL OR 63: d_year = 1999 AND 117: avg(116: sum) > 0.00000000 AND if(117: avg(116: sum) > 0.00000000, divide(abs(subtract(116: sum, 117: avg(116: sum))), 117: avg(116: sum)), null) > 0.100000000000]
+                - ANALYTIC [ partition by (13:i_category, 9:i_brand, 91:cc_name, 63:d_year), order by)]
+                        Estimates: {row: 1196735976, cpu: ?, memory: ?, network: ?, cost: 4.305539827484067E12}
+                        117:avg(116: sum) := avg(116:sum) RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+                    - ANALYTIC [ partition by (13:i_category, 9:i_brand, 91:cc_name), order by (63: d_year ASC NULLS FIRST, 65: d_moy ASC NULLS FIRST)]
+                            Estimates: {row: 1196735976, cpu: ?, memory: ?, network: ?, cost: 4.248096500605935E12}
+                            118:rank() := rank() RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+                        - SORT(GLOBAL)[13: i_category ASC NULLS FIRST, 9: i_brand ASC NULLS FIRST, 91: cc_name ASC NULLS FIRST, 63: d_year ASC NULLS FIRST, 65: d_moy ASC NULLS FIRST]
+                                Estimates: {row: 1196735976, cpu: ?, memory: ?, network: ?, cost: 4.200227061540825E12}
+                            - EXCHANGE(SHUFFLE) [13, 9, 91]
+                                    Estimates: {row: 1196735976, cpu: ?, memory: ?, network: ?, cost: 4.200227061540825E12}
+                                - AGGREGATE(GLOBAL) [13:i_category, 9:i_brand, 91:cc_name, 63:d_year, 65:d_moy]
+                                        Estimates: {row: 1196735976, cpu: ?, memory: ?, network: ?, cost: 4.02789708090643E12}
+                                        116:sum := sum(116:sum)
+                                    - EXCHANGE(SHUFFLE) [13, 9, 91, 63, 65]
+                                            Estimates: {row: 1969115299, cpu: ?, memory: ?, network: ?, cost: 3.784678949497658E12}
+                                        - AGGREGATE(LOCAL) [13:i_category, 9:i_brand, 91:cc_name, 63:d_year, 65:d_moy]
+                                                Estimates: {row: 1969115299, cpu: ?, memory: ?, network: ?, cost: 3.756323689187907E12}
+                                                116:sum := sum(44:cs_sales_price)
+                                            - HASH/INNER JOIN [34:cs_call_center_sk = 85:cc_call_center_sk] => [65:d_moy, 9:i_brand, 91:cc_name, 44:cs_sales_price, 13:i_category, 63:d_year]
+                                                    Estimates: {row: 3239992059, cpu: ?, memory: ?, network: ?, cost: 3.7150084606391562E12}
+                                                - HASH/INNER JOIN [23:cs_sold_date_sk = 57:d_date_sk] => [65:d_moy, 34:cs_call_center_sk, 9:i_brand, 44:cs_sales_price, 13:i_category, 63:d_year]
+                                                        Estimates: {row: 12959968239, cpu: ?, memory: ?, network: ?, cost: 3.222529592324356E12}
+                                                    - HASH/INNER JOIN [38:cs_item_sk = 1:i_item_sk] => [34:cs_call_center_sk, 23:cs_sold_date_sk, 9:i_brand, 44:cs_sales_price, 13:i_category]
+                                                            Estimates: {row: 12959968239, cpu: ?, memory: ?, network: ?, cost: 2.393016240524356E12}
+                                                        - HIVE-SCAN [catalog_sales] => [34:cs_call_center_sk, 38:cs_item_sk, 23:cs_sold_date_sk, 44:cs_sales_price]
+                                                                Estimates: {row: 12959968239, cpu: ?, memory: ?, network: ?, cost: 1.658875934592E12}
+                                                                predicate: 38:cs_item_sk IS NOT NULL
+                                                        - EXCHANGE(BROADCAST)
+                                                                Estimates: {row: 361800, cpu: ?, memory: ?, network: ?, cost: 6.36768E8}
+                                                            - HIVE-SCAN [item] => [1:i_item_sk, 9:i_brand, 13:i_category]
+                                                                    Estimates: {row: 361800, cpu: ?, memory: ?, network: ?, cost: 5.7888E7}
+                                                                    predicate: 1:i_item_sk IS NOT NULL
+                                                    - EXCHANGE(BROADCAST)
+                                                            Estimates: {row: 73047, cpu: ?, memory: ?, network: ?, cost: 5.1425088E7}
+                                                        - HIVE-SCAN [date_dim] => [65:d_moy, 57:d_date_sk, 63:d_year]
+                                                                Estimates: {row: 73047, cpu: ?, memory: ?, network: ?, cost: 4675008.0}
+                                                                predicate: (63:d_year = 1999 OR 63:d_year = 1998 AND 65:d_moy = 12 OR 63:d_year = 2000 AND 65:d_moy = 1) AND 63:d_year IN (1999, 1998, 2000)
+                                                - EXCHANGE(BROADCAST)
+                                                        Estimates: {row: 48, cpu: ?, memory: ?, network: ?, cost: 51321.6}
+                                                    - HIVE-SCAN [call_center] => [85:cc_call_center_sk, 91:cc_name]
+                                                            Estimates: {row: 48, cpu: ?, memory: ?, network: ?, cost: 4665.6}
+                                                            predicate: 85:cc_call_center_sk IS NOT NULL
+        - TOP-100(FINAL)[473: expr ASC NULLS FIRST, 235: avg(234: sum) ASC NULLS FIRST] => [131:i_category, 181:d_year, 470:sum, 183:d_moy, 234:sum, 235:avg(234: sum), 127:i_brand, 352:sum]
+                Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 1.4015063665556147E12}
+            - TOP-100(PARTIAL)[473: expr ASC NULLS FIRST, 235: avg(234: sum) ASC NULLS FIRST]
+                    Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 1.4015062865556147E12}
+                - HASH/INNER JOIN [131:i_category = 367:i_category AND 127:i_brand = 363:i_brand AND 209:cc_name = 445:cc_name AND 236:rank() = 474:subtract] => [131:i_category, 181:d_year, 470:sum, 183:d_moy, 473:expr, 234:sum, 235:avg(234: sum), 127:i_brand, 352:sum]
+                        Estimates: {row: 1077062378, cpu: ?, memory: ?, network: ?, cost: 9.706812949696268E11}
+                        473:expr := 234:sum - 235:avg(234: sum)
+                    - HASH/INNER JOIN [249:i_category = 131:i_category AND 245:i_brand = 127:i_brand AND 327:cc_name = 209:cc_name AND 475:add = 236:rank()] => [209:cc_name, 131:i_category, 181:d_year, 183:d_moy, 234:sum, 235:avg(234: sum), 236:rank(), 127:i_brand, 352:sum]
+                            Estimates: {row: 1077062378, cpu: ?, memory: ?, network: ?, cost: 3.702190186966561E11}
+                        - EXCHANGE(SHUFFLE) [249, 245, 327, 475]
+                                Estimates: {row: 1077062378, cpu: ?, memory: ?, network: ?, cost: 1.5509698257095566E11}
+                            - CTEConsume[1]
+                                    354:rank() := 118:rank()
+                                    245:i_brand := 9:i_brand
+                                    327:cc_name := 91:cc_name
+                                    249:i_category := 13:i_category
+                                    352:sum := 116:sum
+                                    Estimates: {row: 1077062378, cpu: ?, memory: ?, network: ?, cost: 0.0}
+                                    475:add := 354:rank() + 1
+                                    predicate: 249:i_category IS NOT NULL AND 245:i_brand IS NOT NULL AND 327:cc_name IS NOT NULL AND 354:rank() + 1 IS NOT NULL
+                        - EXCHANGE(SHUFFLE) [131, 127, 209, 236]
+                                Estimates: {row: 149591997, cpu: ?, memory: ?, network: ?, cost: 2.872166343906586E10}
+                            - CTEConsume[1]
+                                    209:cc_name := 91:cc_name
+                                    131:i_category := 13:i_category
+                                    181:d_year := 63:d_year
+                                    183:d_moy := 65:d_moy
+                                    234:sum := 116:sum
+                                    235:avg(234: sum) := 117:avg(116: sum)
+                                    236:rank() := 118:rank()
+                                    127:i_brand := 9:i_brand
+                                    Estimates: {row: 149591997, cpu: ?, memory: ?, network: ?, cost: 0.0}
+                                    predicate: 181:d_year = 1999 AND 235:avg(234: sum) > 0 AND if(235:avg(234: sum) > 0, abs(234:sum - 235:avg(234: sum)) / 235:avg(234: sum), null) > 0.1
+                    - EXCHANGE(SHUFFLE) [367, 363, 445, 474]
+                            Estimates: {row: 1077062378, cpu: ?, memory: ?, network: ?, cost: 1.5509698257095566E11}
+                        - CTEConsume[1]
+                                470:sum := 116:sum
+                                472:rank() := 118:rank()
+                                363:i_brand := 9:i_brand
+                                445:cc_name := 91:cc_name
+                                367:i_category := 13:i_category
+                                Estimates: {row: 1077062378, cpu: ?, memory: ?, network: ?, cost: 0.0}
+                                474:subtract := 472:rank() - 1
+                                predicate: 367:i_category IS NOT NULL AND 363:i_brand IS NOT NULL AND 445:cc_name IS NOT NULL AND 472:rank() - 1 IS NOT NULL

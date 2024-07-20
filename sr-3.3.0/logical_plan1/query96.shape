@@ -1,0 +1,39 @@
+Explain String
+- Output => [68:count]
+    - TOP-100(FINAL)[68: count ASC NULLS FIRST]
+            Estimates: {row: 1, cpu: 8.00, memory: 8.00, network: 8.00, cost: 3119162844015.98}
+        - TOP-100(PARTIAL)[68: count ASC NULLS FIRST]
+                Estimates: {row: 1, cpu: 8.00, memory: 8.00, network: 8.00, cost: 3119162843983.98}
+            - AGGREGATE(GLOBAL) []
+                    Estimates: {row: 1, cpu: 8.00, memory: 8.00, network: 0.00, cost: 3119162843951.98}
+                    68:count := count(68:count)
+                - EXCHANGE(GATHER)
+                        Estimates: {row: 1, cpu: 8.00, memory: 0.00, network: 8.00, cost: 3119162843931.98}
+                    - AGGREGATE(LOCAL) []
+                            Estimates: {row: 1, cpu: 11016000783.74, memory: 0.80, network: 0.00, cost: 3119162843915.98}
+                            68:count := count()
+                        - HASH/INNER JOIN [2:ss_sold_time_sk = 29:t_time_sk] => [70:auto_fill_col]
+                                Estimates: {row: 6480000461, cpu: 162000184325.63, memory: 172800.00, network: 0.00, cost: 3113654843522.51}
+                                70:auto_fill_col := 1
+                            - HASH/INNER JOIN [6:ss_hdemo_sk = 24:hd_demo_sk] => [2:ss_sold_time_sk]
+                                    Estimates: {row: 6480000461, cpu: ?, memory: ?, network: ?, cost: 3.0326430009597E12}
+                                - HASH/INNER JOIN [8:ss_store_sk = 39:s_store_sk] => [2:ss_sold_time_sk, 6:ss_hdemo_sk]
+                                        Estimates: {row: 6480000461, cpu: ?, memory: ?, network: ?, cost: 2.9030410765392E12}
+                                    - HIVE-SCAN [store_sales] => [2:ss_sold_time_sk, 6:ss_hdemo_sk, 8:ss_store_sk]
+                                            Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 2.4883201770336E12}
+                                            predicate: 6:ss_hdemo_sk IS NOT NULL
+                                    - EXCHANGE(BROADCAST)
+                                            Estimates: {row: 1500, cpu: ?, memory: ?, network: ?, cost: 624000.0}
+                                        - HIVE-SCAN [store] => [39:s_store_sk]
+                                                Estimates: {row: 1500, cpu: ?, memory: ?, network: ?, cost: 144000.0}
+                                                predicate: 44:s_store_name = 'ese'
+                                - EXCHANGE(BROADCAST)
+                                        Estimates: {row: 3600, cpu: ?, memory: ?, network: ?, cost: 1324800.0}
+                                    - HIVE-SCAN [household_demographics] => [24:hd_demo_sk]
+                                            Estimates: {row: 3600, cpu: ?, memory: ?, network: ?, cost: 172800.0}
+                                            predicate: 27:hd_dep_count = 6
+                            - EXCHANGE(BROADCAST)
+                                    Estimates: {row: 21600, cpu: ?, memory: ?, network: ?, cost: 8294400.0}
+                                - HIVE-SCAN [time_dim] => [29:t_time_sk]
+                                        Estimates: {row: 21600, cpu: ?, memory: ?, network: ?, cost: 1382400.0}
+                                        predicate: 32:t_hour = 16 AND 33:t_minute >= 30

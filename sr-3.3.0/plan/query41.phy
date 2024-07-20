@@ -1,0 +1,125 @@
+Explain String
+RESOURCE GROUP: default_wg
+
+PLAN FRAGMENT 0(F05)
+  Fragment Cost: 6400.0
+  Output Exprs:22: i_product_name
+  Input Partition: UNPARTITIONED
+  RESULT SINK
+
+  14:MERGING-EXCHANGE
+     distribution type: GATHER
+     limit: 100
+     cardinality: 100
+
+PLAN FRAGMENT 1(F04)
+  Fragment Cost: 2174000.0
+
+  Input Partition: HASH_PARTITIONED: 22: i_product_name
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 14
+
+  13:TOP-N
+  |  order by: [22, VARCHAR, true] ASC
+  |  offset: 0
+  |  limit: 100
+  |  cardinality: 100
+  |  
+  12:AGGREGATE (merge finalize)
+  |  group by: [22: i_product_name, VARCHAR, true]
+  |  cardinality: 25125
+  |  
+  11:EXCHANGE
+     distribution type: SHUFFLE
+     partition exprs: [22: i_product_name, VARCHAR, true]
+     cardinality: 50250
+
+PLAN FRAGMENT 2(F00)
+  Fragment Cost: 1.93380456E7
+
+  Input Partition: RANDOM
+  OutPut Partition: HASH_PARTITIONED: 22: i_product_name
+  OutPut Exchange Id: 11
+
+  10:AGGREGATE (update serialize)
+  |  STREAMING
+  |  group by: [22: i_product_name, VARCHAR, true]
+  |  cardinality: 50250
+  |  
+  9:Project
+  |  output columns:
+  |  22 <-> [22: i_product_name, VARCHAR, true]
+  |  cardinality: 100500
+  |  
+  8:HASH JOIN
+  |  join op: INNER JOIN (BROADCAST)
+  |  equal join conjunct: [15: i_manufact, VARCHAR, true] = [37: i_manufact, VARCHAR, true]
+  |  build runtime filters:
+  |  - filter_id = 0, build_expr = (37: i_manufact), remote = false
+  |  output columns: 22
+  |  can local shuffle: true
+  |  cardinality: 100500
+  |  
+  |----7:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 1
+  |    
+  1:Project
+  |  output columns:
+  |  15 <-> [15: i_manufact, VARCHAR, true]
+  |  22 <-> [22: i_product_name, VARCHAR, true]
+  |  cardinality: 100500
+  |  
+  0:HdfsScanNode
+     TABLE: item
+     NON-PARTITION PREDICATES: 14: i_manufact_id >= 970, 14: i_manufact_id <= 1010
+     MIN/MAX PREDICATES: 14: i_manufact_id >= 970, 14: i_manufact_id <= 1010
+     partitions=1/1
+     avgRowSize=3.0
+     cardinality: 100500
+     probe runtime filters:
+     - filter_id = 0, probe_expr = (15: i_manufact)
+
+PLAN FRAGMENT 3(F02)
+  Fragment Cost: 64.80000000000001
+
+  Input Partition: HASH_PARTITIONED: 37: i_manufact
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 07
+
+  6:AGGREGATE (merge finalize)
+  |  aggregate: count[([45: count, BIGINT, false]); args: ; result: BIGINT; args nullable: true; result nullable: false]
+  |  group by: [37: i_manufact, VARCHAR, true]
+  |  having: ifnull[([45: count, BIGINT, false], 0); args: BIGINT,BIGINT; result: BIGINT; args nullable: false; result nullable: true] > 0
+  |  cardinality: 1
+  |  
+  5:EXCHANGE
+     distribution type: SHUFFLE
+     partition exprs: [37: i_manufact, VARCHAR, true]
+     cardinality: 1
+
+PLAN FRAGMENT 4(F01)
+  Fragment Cost: 328.8
+
+  Input Partition: RANDOM
+  OutPut Partition: HASH_PARTITIONED: 37: i_manufact
+  OutPut Exchange Id: 05
+
+  4:AGGREGATE (update serialize)
+  |  STREAMING
+  |  aggregate: count[(*); args: ; result: BIGINT; args nullable: false; result nullable: false]
+  |  group by: [37: i_manufact, VARCHAR, true]
+  |  cardinality: 1
+  |  
+  3:Project
+  |  output columns:
+  |  37 <-> [37: i_manufact, VARCHAR, true]
+  |  cardinality: 1
+  |  
+  2:HdfsScanNode
+     TABLE: item
+     NON-PARTITION PREDICATES: ((((35: i_category = 'Women') AND (((((40: i_color = 'frosted') OR (40: i_color = 'rose')) AND ((41: i_units = 'Lb') OR (41: i_units = 'Gross'))) AND ((38: i_size = 'medium') OR (38: i_size = 'large'))) OR ((((40: i_color = 'chocolate') OR (40: i_color = 'black')) AND ((41: i_units = 'Box') OR (41: i_units = 'Dram'))) AND ((38: i_size = 'economy') OR (38: i_size = 'petite'))))) OR ((((35: i_category = 'Men') AND ((40: i_color = 'slate') OR (40: i_color = 'magenta'))) AND ((41: i_units = 'Carton') OR (41: i_units = 'Bundle'))) AND ((38: i_size = 'N/A') OR (38: i_size = 'small')))) OR ((((35: i_category = 'Men') AND ((40: i_color = 'cornflower') OR (40: i_color = 'firebrick'))) AND ((41: i_units = 'Pound') OR (41: i_units = 'Oz'))) AND ((38: i_size = 'medium') OR (38: i_size = 'large')))) OR ((((35: i_category = 'Women') AND (((((40: i_color = 'almond') OR (40: i_color = 'steel')) AND ((41: i_units = 'Tsp') OR (41: i_units = 'Case'))) AND ((38: i_size = 'medium') OR (38: i_size = 'large'))) OR ((((40: i_color = 'purple') OR (40: i_color = 'aquamarine')) AND ((41: i_units = 'Bunch') OR (41: i_units = 'Gram'))) AND ((38: i_size = 'economy') OR (38: i_size = 'petite'))))) OR ((((35: i_category = 'Men') AND ((40: i_color = 'lavender') OR (40: i_color = 'papaya'))) AND ((41: i_units = 'Pallet') OR (41: i_units = 'Cup'))) AND ((38: i_size = 'N/A') OR (38: i_size = 'small')))) OR ((((35: i_category = 'Men') AND ((40: i_color = 'maroon') OR (40: i_color = 'cyan'))) AND ((41: i_units = 'Each') OR (41: i_units = 'N/A'))) AND ((38: i_size = 'medium') OR (38: i_size = 'large')))), 41: i_units IN ('Lb', 'Gross', 'Box', 'Dram', 'Carton', 'Bundle', 'Pound', 'Oz', 'Tsp', 'Case', 'Bunch', 'Gram', 'Pallet', 'Cup', 'Each', 'N/A'), 35: i_category IN ('Women', 'Men'), 38: i_size IN ('medium', 'large', 'economy', 'petite', 'N/A', 'small'), 40: i_color IN ('frosted', 'rose', 'chocolate', 'black', 'slate', 'magenta', 'cornflower', 'firebrick', 'almond', 'steel', 'purple', 'aquamarine', 'lavender', 'papaya', 'maroon', 'cyan')
+     MIN/MAX PREDICATES: 41: i_units >= 'Box', 41: i_units <= 'Tsp', 35: i_category >= 'Men', 35: i_category <= 'Women', 38: i_size >= 'N/A', 38: i_size <= 'small', 40: i_color >= 'almond', 40: i_color <= 'steel'
+     partitions=1/1
+     avgRowSize=5.0
+     cardinality: 1

@@ -1,0 +1,335 @@
+nohup: ignoring input
+Running tpcds sf 10000 queries
+mysql  Ver 8.0.37-0ubuntu0.22.04.3 for Linux on x86_64 ((Ubuntu))
+FE_HOST: 127.0.0.1
+FE_QUERY_PORT: 9030
+USER: root
+DB: dlf.tpcds10000_oss
+Time Unit: ms
+============================================
+Optimize session variables
+source /root/tpc/tpcds-tools/bin/../conf/opt/opt_sf10000.sql;
+============================================
+show variables;
+Variable_name	Value
+SQL_AUTO_IS_NULL	false
+activate_all_roles_on_login	false
+allow_hive_without_partition_filter	true
+analyze_mv	sample
+array_low_cardinality_optimize	true
+audit_execute_stmt	false
+auto_increment_increment	1
+autocommit	true
+big_query_log_cpu_second_threshold	480
+big_query_log_scan_bytes_threshold	10737418240
+big_query_log_scan_rows_threshold	1000000000
+big_query_profile_threshold	0s
+broadcast_row_limit	15000000
+catalog	dlf
+cbo_cte_reuse	true
+cbo_derive_join_is_null_predicate	true
+cbo_derive_range_join_predicate	false
+cbo_enable_low_cardinality_optimize	true
+cbo_eq_base_type	decimal
+cbo_max_reorder_node_use_dp	10
+cbo_max_reorder_node_use_exhaustive	4
+cbo_prepare_metadata_thread_pool_size	16
+cbo_prune_json_subfield	false
+cbo_push_down_distinct_below_window	true
+cbo_push_down_topn_limit	1000
+cbo_reorder_threshold_use_exhaustive	6
+character_set_client	utf8
+character_set_connection	utf8
+character_set_database	utf8
+character_set_results	utf8
+character_set_server	utf8
+choose_execute_instances_mode	LOCALITY
+collation_connection	utf8_general_ci
+collation_database	utf8_general_ci
+collation_server	utf8_general_ci
+computation_fragment_scheduling_policy	COMPUTE_NODES_ONLY
+connector_huge_file_size	536870912
+connector_io_tasks_per_scan_operator	16
+connector_max_split_size	67108864
+connector_scan_use_query_mem_ratio	0.3
+connector_sink_compression_codec	uncompressed
+connector_sink_target_max_file_size	1073741824
+count_distinct_column_buckets	1024
+default_rowset_type	alpha
+default_table_compression	lz4_frame
+disable_colocate_join	false
+disable_join_reorder	false
+disable_spill_to_local_disk	false
+div_precision_increment	4
+enable_adaptive_sink_dop	true
+enable_array_distinct_after_agg_opt	true
+enable_big_query_log	true
+enable_cbo_table_prune	false
+enable_cbo_view_based_mv_rewrite	false
+enable_collect_table_level_scan_stats	true
+enable_connector_adaptive_io_tasks	true
+enable_connector_sink_writer_scaling	true
+enable_connector_split_io_tasks	true
+enable_constant_execute_in_fe	true
+enable_datacache_async_populate_mode	true
+enable_datacache_io_adaptor	true
+enable_distinct_column_bucketization	false
+enable_dynamic_prune_scan_range	true
+enable_file_metacache	true
+enable_filter_unused_columns_in_scan_stage	true
+enable_fine_grained_range_predicate	false
+enable_force_rule_based_mv_rewrite	true
+enable_gin_filter	true
+enable_global_runtime_filter	true
+enable_group_execution	true
+enable_group_level_query_queue	false
+enable_groupby_use_output_alias	false
+enable_hive_column_stats	true
+enable_hive_metadata_cache_with_insert	false
+enable_hyperscan_vec	true
+enable_iceberg_column_statistics	false
+enable_iceberg_identity_column_optimize	true
+enable_incremental_mv	false
+enable_insert_strict	true
+enable_lake_tablet_internal_parallel	false
+enable_load_profile	false
+enable_local_shuffle_agg	true
+enable_materialized_view_agg_pushdown_rewrite	false
+enable_materialized_view_for_insert	false
+enable_materialized_view_rewrite	true
+enable_materialized_view_rewrite_greedy_mode	false
+enable_materialized_view_text_match_rewrite	true
+enable_materialized_view_transparent_union_rewrite	true
+enable_materialized_view_union_rewrite	true
+enable_materialized_view_view_delta_rewrite	true
+enable_metadata_profile	false
+enable_multicolumn_global_runtime_filter	false
+enable_mv_planner	false
+enable_outer_join_reorder	true
+enable_parallel_merge	true
+enable_parallel_prepare_metadata	false
+enable_per_bucket_optimize	true
+enable_pipeline_engine	true
+enable_pipeline_level_multi_partitioned_rf	false
+enable_plan_serialize_concurrently	true
+enable_populate_datacache	true
+enable_predicate_reorder	false
+enable_prepare_stmt	true
+enable_profile	false
+enable_prune_complex_types	true
+enable_prune_complex_types_in_unnest	true
+enable_prune_iceberg_manifest	true
+enable_query_cache	false
+enable_query_dump	false
+enable_query_queue_load	false
+enable_query_queue_select	false
+enable_query_queue_statistic	false
+enable_query_tablet_affinity	false
+enable_rbo_table_prune	false
+enable_read_iceberg_puffin_ndv	true
+enable_result_sink_accumulate	true
+enable_rewrite_bitmap_union_to_bitamp_agg	true
+enable_rewrite_groupingsets_to_union_all	false
+enable_rewrite_simple_agg_to_hdfs_scan	false
+enable_rewrite_simple_agg_to_meta_scan	false
+enable_rewrite_sum_by_associative_rule	true
+enable_runtime_adaptive_dop	false
+enable_scan_datacache	true
+enable_shared_scan	false
+enable_short_circuit	false
+enable_sort_aggregate	false
+enable_spill	false
+enable_spill_to_remote_storage	false
+enable_stats_to_optimize_skew_join	true
+enable_strict_order_by	true
+enable_subfield_no_copy	true
+enable_sync_materialized_view_rewrite	true
+enable_table_prune_on_update	false
+enable_tablet_internal_parallel	true
+enable_topn_runtime_filter	true
+enable_ukfk_join_reorder	false
+enable_ukfk_opt	false
+enable_view_based_mv_rewrite	true
+enable_wait_dependent_event	false
+enable_write_hive_external_table	false
+event_scheduler	OFF
+force_schedule_local	false
+forward_to_leader	false
+full_sort_late_materialization	true
+group_concat_max_len	1024
+group_execution_group_scale	64
+group_execution_max_groups	128
+group_execution_min_scan_rows	5000000
+hash_join_push_down_right_table	true
+hive_partition_stats_sample_size	3000
+hive_temp_staging_dir	/tmp/starrocks
+hudi_mor_force_jni_reader	false
+init_connect	
+innodb_read_only	true
+interactive_timeout	3600
+interleaving_group_size	10
+io_tasks_per_scan_operator	4
+jit_level	1
+join_implementation_mode_v2	auto
+join_late_materialization	false
+language	/starrocks/share/english/
+large_decimal_underlying_type	panic
+license	Apache License 2.0
+like_predicate_consolidate_min	2
+load_mem_limit	0
+load_transmission_compression_type	NO_COMPRESSION
+log_rejected_record_num	0
+low_cardinality_optimize_v2	true
+lower_case_table_names	0
+materialized_view_rewrite_mode	DEFAULT
+materialized_view_subuqery_text_match_max_count	4
+materialized_view_union_rewrite_mode	0
+max_allowed_packet	33554432
+max_parallel_scan_instance_num	-1
+max_pipeline_dop	64
+max_pushdown_conditions_per_column	-1
+max_scan_key_num	-1
+metadata_collect_query_timeout	60
+nested_mv_rewrite_max_level	3
+net_buffer_length	16384
+net_read_timeout	60
+net_write_timeout	60
+new_planner_agg_stage	0
+new_planner_optimize_timeout	3000
+optimizer_materialized_view_timelimit	1000
+orc_use_column_names	false
+paimon_force_jni_reader	false
+parallel_exchange_instance_num	-1
+parallel_fragment_exec_instance_num	1
+parse_tokens_limit	3500000
+partial_update_mode	auto
+performance_schema	false
+pipeline_dop	0
+pipeline_profile_level	1
+pipeline_sink_dop	0
+plan_mode	auto
+prefer_compute_node	false
+query_cache_agg_cardinality_limit	5000000
+query_cache_entry_max_bytes	4194304
+query_cache_entry_max_rows	409600
+query_cache_force_populate	false
+query_cache_hot_partition_num	3
+query_cache_size	1048576
+query_cache_type	0
+query_delivery_timeout	300
+query_mem_limit	0
+query_queue_concurrency_limit	0
+query_queue_cpu_used_permille_limit	0
+query_queue_driver_high_water	-1
+query_queue_driver_low_water	-1
+query_queue_fresh_resource_usage_interval_ms	5000
+query_queue_max_queued_queries	1024
+query_queue_mem_used_pct_limit	0.0
+query_queue_pending_timeout_second	300
+query_timeout	300
+range_pruner_max_predicate	100
+resource_group	
+runtime_filter_on_exchange_node	false
+runtime_join_filter_push_down_limit	1024000
+runtime_profile_report_interval	10
+scan_hive_partition_num_limit	0
+scan_use_query_mem_ratio	0.3
+spill_enable_direct_io	false
+spill_encode_level	7
+spill_mode	auto
+spill_revocable_max_bytes	0
+spill_storage_volume	
+sql_dialect	StarRocks
+sql_mode	ONLY_FULL_GROUP_BY
+sql_quote_show_create	true
+sql_safe_updates	0
+sql_select_limit	9223372036854775807
+storage_engine	olap
+streaming_preaggregation_mode	auto
+system_time_zone	Asia/Shanghai
+thrift_plan_protocol	binary
+time_zone	Asia/Shanghai
+transaction_isolation	REPEATABLE-READ
+transaction_read_only	OFF
+transmission_compression_type	NO_COMPRESSION
+transmission_encode_level	7
+tx_isolation	REPEATABLE-READ
+tx_visible_wait_timeout	10
+use_compute_nodes	-1
+use_page_cache	true
+version	5.1.0
+version_comment	3.3.0-19a3f66
+wait_timeout	28800
+warehouse	default_warehouse
+============================================
+show table status;
+============================================
+query4	90607	86754	86747	86747
+query5	19307	17913	17137	17137
+query6	4857	4501	5490	4501
+query7	24257	20975	18738	18738
+query8	6305	6010	5963	5963
+query9	40584	40241	40261	40241
+query10	4179	3752	3714	3714
+query11	47707	47893	49064	47893
+query12	2991	1974	2554	1974
+query13	18700	18154	17644	17644
+query14	60703	58511	57166	57166
+query15	6937	2209	1580	1580
+query16	17891	10428	10190	10190
+query17	15956	14866	14586	14586
+query18	7942	7630	7107	7107
+query19	7991	10130	8436	8436
+query20	1293	1347	1604	1347
+query21	4382	2207	1855	1855
+query22	12236	11830	12282	11830
+query23	117034	118117	113636	113636
+query24	20189	19462	18989	18989
+query25	15805	15303	15292	15292
+query26	7115	4943	4581	4581
+query27	14152	13686	13521	13521
+query28	50092	48782	48315	48315
+query29	23772	24200	22989	22989
+query30	4016	3172	2936	2936
+query31	11434	10580	13220	10580
+query32	8372	3086	2263	2263
+query33	8748	8741	8703	8703
+query34	6728	6635	6589	6589
+query35	6071	6111	6872	6111
+query36	12653	12188	12168	12168
+query37	5994	5724	5769	5724
+query38	15886	15927	15462	15462
+query39	2321	1217	2574	1217
+query40	2932	2712	2328	2328
+query41	93	90	97	90
+query42	5319	5127	5502	5127
+query43	5858	5880	5906	5880
+query44	6560	6157	6180	6157
+query45	2613	4291	4239	4239
+query46	12049	11951	11803	11803
+query47	27031	27448	27796	27448
+query48	12979	12350	11204	11204
+query49	19476	19047	18654	18654
+query50	42364	42175	42130	42130
+query51	15339	14901	14954	14901
+query52	5428	5422	5252	5252
+query53	6833	6815	7189	6815
+query54	7987	8023	7886	7886
+query55	5607	5318	5102	5102
+query56	8783	8767	8588	8588
+query57	12827	13212	13115	13115
+query58	6234	6396	6068	6068
+query59	17011	16852	16917	16852
+query60	9240	9032	9004	9004
+query61	19202	19041	18950	18950
+query62	4325	3958	3648	3648
+query63	6874	6806	6795	6795
+query64	29372	28421	28271	28271
+query65	30360	30226	30901	30226
+query66	9376	7463	6989	6989
+query67	283763	296241	291043	291043
+query68	16515	15400	12598	12598
+query69	579	490	711	490
+query70	71110	69937	70073	69937
+query71	12076	11074	9893	9893
+query72	

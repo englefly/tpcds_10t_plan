@@ -1,0 +1,60 @@
+Explain String
+- Output => [114:substr, 51:sm_type, 61:cc_name, 120:sum, 121:sum, 122:sum, 123:sum, 124:sum]
+    - TOP-100(FINAL)[114: substr ASC NULLS FIRST, 51: sm_type ASC NULLS FIRST, 61: cc_name ASC NULLS FIRST]
+            Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 2.6215226255763984E12}
+        - TOP-100(PARTIAL)[114: substr ASC NULLS FIRST, 51: sm_type ASC NULLS FIRST, 61: cc_name ASC NULLS FIRST]
+                Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 2.6215225903763984E12}
+            - AGGREGATE(GLOBAL) [114:substr, 51:sm_type, 61:cc_name]
+                    Estimates: {row: 61534853, cpu: ?, memory: ?, network: ?, cost: 2.610692438630313E12}
+                    120:sum := sum(120:sum)
+                    121:sum := sum(121:sum)
+                    122:sum := sum(122:sum)
+                    123:sum := sum(123:sum)
+                    124:sum := sum(124:sum)
+                - EXCHANGE(SHUFFLE) [114, 51, 61]
+                        Estimates: {row: 111627851, cpu: ?, memory: ?, network: ?, cost: 2.5949506790211504E12}
+                    - AGGREGATE(LOCAL) [114:substr, 51:sm_type, 61:cc_name]
+                            Estimates: {row: 111627851, cpu: ?, memory: ?, network: ?, cost: 2.5929860288359194E12}
+                            120:sum := sum(115:case)
+                            121:sum := sum(116:case)
+                            122:sum := sum(117:case)
+                            123:sum := sum(118:case)
+                            124:sum := sum(119:case)
+                        - HASH/INNER JOIN [3:cs_ship_date_sk = 86:d_date_sk] => [51:sm_type, 61:cc_name, 114:substr, 115:case, 116:case, 117:case, 118:case, 119:case]
+                                Estimates: {row: 202499503, cpu: ?, memory: ?, network: ?, cost: 2.5900797559583237E12}
+                                114:substr := substr(37:w_warehouse_name, 1, 20)
+                                115:case := if(125:subtract <= 30, 1, 0)
+                                116:case := if(125:subtract > 30 AND 125:subtract <= 60, 1, 0)
+                                117:case := if(125:subtract > 60 AND 125:subtract <= 90, 1, 0)
+                                118:case := if(125:subtract > 90 AND 125:subtract <= 120, 1, 0)
+                                119:case := if(125:subtract > 120, 1, 0)
+                                125:subtract := 3:cs_ship_date_sk - 1:cs_sold_date_sk, 
+                            - HASH/INNER JOIN [12:cs_call_center_sk = 55:cc_call_center_sk] => [1:cs_sold_date_sk, 3:cs_ship_date_sk, 51:sm_type, 37:w_warehouse_name, 61:cc_name]
+                                    Estimates: {row: 202499503, cpu: ?, memory: ?, network: ?, cost: 2.5741738293981753E12}
+                                - HASH/INNER JOIN [14:cs_ship_mode_sk = 49:sm_ship_mode_sk] => [1:cs_sold_date_sk, 3:cs_ship_date_sk, 51:sm_type, 37:w_warehouse_name, 12:cs_call_center_sk]
+                                        Estimates: {row: 809998014, cpu: ?, memory: ?, network: ?, cost: 2.54339382959775E12}
+                                    - HASH/INNER JOIN [15:cs_warehouse_sk = 35:w_warehouse_sk] => [1:cs_sold_date_sk, 3:cs_ship_date_sk, 37:w_warehouse_name, 12:cs_call_center_sk, 14:cs_ship_mode_sk]
+                                            Estimates: {row: 3239992059, cpu: ?, memory: ?, network: ?, cost: 2.436474063762E12}
+                                        - HIVE-SCAN [catalog_sales] => [1:cs_sold_date_sk, 3:cs_ship_date_sk, 12:cs_call_center_sk, 14:cs_ship_mode_sk, 15:cs_warehouse_sk]
+                                                Estimates: {row: 12959968239, cpu: ?, memory: ?, network: ?, cost: 2.07359491824E12}
+                                                predicate: 15:cs_warehouse_sk IS NOT NULL
+                                        - EXCHANGE(BROADCAST)
+                                                Estimates: {row: 22, cpu: ?, memory: ?, network: ?, cost: 23760.0}
+                                            - HIVE-SCAN [warehouse] => [35:w_warehouse_sk, 37:w_warehouse_name]
+                                                    Estimates: {row: 22, cpu: ?, memory: ?, network: ?, cost: 2160.0}
+                                                    predicate: 35:w_warehouse_sk IS NOT NULL
+                                    - EXCHANGE(BROADCAST)
+                                            Estimates: {row: 18, cpu: ?, memory: ?, network: ?, cost: 19008.0}
+                                        - HIVE-SCAN [ship_mode] => [49:sm_ship_mode_sk, 51:sm_type]
+                                                Estimates: {row: 18, cpu: ?, memory: ?, network: ?, cost: 1728.0}
+                                                predicate: 49:sm_ship_mode_sk IS NOT NULL
+                                - EXCHANGE(BROADCAST)
+                                        Estimates: {row: 48, cpu: ?, memory: ?, network: ?, cost: 51321.6}
+                                    - HIVE-SCAN [call_center] => [55:cc_call_center_sk, 61:cc_name]
+                                            Estimates: {row: 48, cpu: ?, memory: ?, network: ?, cost: 4665.6}
+                                            predicate: 55:cc_call_center_sk IS NOT NULL
+                            - EXCHANGE(BROADCAST)
+                                    Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 6720508.0}
+                                - HIVE-SCAN [date_dim] => [86:d_date_sk]
+                                        Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 876588.0}
+                                        predicate: 89:d_month_seq >= 1178 AND 89:d_month_seq <= 1189

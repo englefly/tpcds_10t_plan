@@ -1,0 +1,33 @@
+Explain String
+- Output => [54:i_product_name, 41:i_brand, 43:i_class, 45:i_category, 55:avg]
+    - TOP-100(FINAL)[55: avg ASC NULLS FIRST, 54: i_product_name ASC NULLS FIRST, 41: i_brand ASC NULLS FIRST, 43: i_class ASC NULLS FIRST, 45: i_category ASC NULLS FIRST]
+            Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 1.1613927585946943E12}
+        - TOP-100(PARTIAL)[55: avg ASC NULLS FIRST, 54: i_product_name ASC NULLS FIRST, 41: i_brand ASC NULLS FIRST, 43: i_class ASC NULLS FIRST, 45: i_category ASC NULLS FIRST]
+                Estimates: {row: 100, cpu: 174394777582.39, memory: 8000.00, network: 174394777582.39, cost: 1161392728194.69}
+            - AGGREGATE(GLOBAL) [54:i_product_name, 41:i_brand, 43:i_class, 45:i_category, 56:GROUPING_ID] => [54:i_product_name, 55:avg, 41:i_brand, 43:i_class, 45:i_category]
+                    Estimates: {row: 2179934719, cpu: 286950030215.63, memory: 174394777582.39, network: 0.00, cost: 812603157029.91}
+                    55:avg := avg(55:avg)
+                - EXCHANGE(SHUFFLE) [54, 41, 43, 45, 56]
+                        Estimates: {row: 3586875377, cpu: 28695003021.56, memory: 0.00, network: 28695003021.56, cost: 320338586757.32}
+                    - AGGREGATE(LOCAL) [54:i_product_name, 41:i_brand, 43:i_class, 45:i_category, 56:GROUPING_ID]
+                            Estimates: {row: 3586875377, cpu: 44854155000.00, memory: 28695003021.56, network: 0.00, cost: 262948580714.19}
+                            55:avg := avg(4:inv_quantity_on_hand)
+                        - REPEAT [[], [54:i_product_name], [54:i_product_name, 41:i_brand], [54:i_product_name, 41:i_brand, 43:i_class], [54:i_product_name, 41:i_brand, 43:i_class, 45:i_category]] => [54:i_product_name, 56:GROUPING_ID, 41:i_brand, 43:i_class, 45:i_category]
+                                Estimates: {row: 5901862500, cpu: 0.00, memory: 0.00, network: 0.00, cost: 183131497171.07}
+                            - HASH/INNER JOIN [2:inv_item_sk = 33:i_item_sk] => [4:inv_quantity_on_hand, 54:i_product_name, 41:i_brand, 43:i_class, 45:i_category]
+                                    Estimates: {row: 1180372500, cpu: ?, memory: ?, network: ?, cost: 1.8313149717106946E11}
+                                - HASH/INNER JOIN [1:inv_date_sk = 5:d_date_sk] => [2:inv_item_sk, 4:inv_quantity_on_hand]
+                                        Estimates: {row: 1180372500, cpu: ?, memory: ?, network: ?, cost: 1.22768455517E11}
+                                    - HIVE-SCAN [inventory] => [1:inv_date_sk, 2:inv_item_sk, 4:inv_quantity_on_hand]
+                                            Estimates: {row: 1180372500, cpu: ?, memory: ?, network: ?, cost: 9.44298E10}
+                                            predicate: 1:inv_date_sk IS NOT NULL
+                                    - EXCHANGE(BROADCAST)
+                                            Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 6720508.0}
+                                        - HIVE-SCAN [date_dim] => [5:d_date_sk]
+                                                Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 876588.0}
+                                                predicate: 8:d_month_seq >= 1186 AND 8:d_month_seq <= 1197
+                                - EXCHANGE(BROADCAST)
+                                        Estimates: {row: 361800, cpu: ?, memory: ?, network: ?, cost: 1.1461824E9}
+                                    - HIVE-SCAN [item] => [33:i_item_sk, 54:i_product_name, 41:i_brand, 43:i_class, 45:i_category]
+                                            Estimates: {row: 361800, cpu: ?, memory: ?, network: ?, cost: 1.041984E8}
+                                            predicate: 33:i_item_sk IS NOT NULL

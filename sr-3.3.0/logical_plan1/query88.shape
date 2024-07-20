@@ -1,0 +1,294 @@
+Explain String
+- Output => [68:count, 136:count, 204:count, 272:count, 340:count, 408:count, 476:count, 544:count]
+    - NESTLOOP/CROSS JOIN
+            Estimates: {row: 1, cpu: 896000000.00, memory: 1600.00, network: 0.00, cost: 31175899621951.87}
+        - NESTLOOP/CROSS JOIN
+                Estimates: {row: 1, cpu: 768000000.00, memory: 1600.00, network: 0.00, cost: 27278688168767.89}
+            - NESTLOOP/CROSS JOIN
+                    Estimates: {row: 1, cpu: 640000000.00, memory: 1600.00, network: 0.00, cost: 23381540715583.90}
+                - NESTLOOP/CROSS JOIN
+                        Estimates: {row: 1, cpu: 512000000.00, memory: 1600.00, network: 0.00, cost: 19484457262399.92}
+                    - NESTLOOP/CROSS JOIN
+                            Estimates: {row: 1, cpu: 384000000.00, memory: 1600.00, network: 0.00, cost: 15587437809215.94}
+                        - NESTLOOP/CROSS JOIN
+                                Estimates: {row: 1, cpu: 256000000.00, memory: 1600.00, network: 0.00, cost: 11690482356031.95}
+                            - NESTLOOP/CROSS JOIN
+                                    Estimates: {row: 1, cpu: 128000000.00, memory: 1600.00, network: 0.00, cost: 7793590902847.97}
+                                - AGGREGATE(GLOBAL) []
+                                        Estimates: {row: 1, cpu: 8.00, memory: 8.00, network: 0.00, cost: 3896763449663.98}
+                                        68:count := count(68:count)
+                                    - EXCHANGE(GATHER)
+                                            Estimates: {row: 1, cpu: 8.00, memory: 0.00, network: 8.00, cost: 3896763449643.98}
+                                        - AGGREGATE(LOCAL) []
+                                                Estimates: {row: 1, cpu: 11016000783.74, memory: 0.80, network: 0.00, cost: 3896763449627.98}
+                                                68:count := count()
+                                            - HASH/INNER JOIN [8:ss_store_sk = 39:s_store_sk] => [560:auto_fill_col]
+                                                    Estimates: {row: 6480000461, cpu: 317520034590.23, memory: 12000.00, network: 0.00, cost: 3891255449234.51}
+                                                    560:auto_fill_col := 1
+                                                - HASH/INNER JOIN [2:ss_sold_time_sk = 29:t_time_sk] => [8:ss_store_sk]
+                                                        Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 3.7324945679394004E12}
+                                                    - HASH/INNER JOIN [6:ss_hdemo_sk = 24:hd_demo_sk] => [2:ss_sold_time_sk, 8:ss_store_sk]
+                                                            Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 3.2140826942574004E12}
+                                                        - HIVE-SCAN [store_sales] => [2:ss_sold_time_sk, 6:ss_hdemo_sk, 8:ss_store_sk]
+                                                                Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 2.4883201770336E12}
+                                                                predicate: 6:ss_hdemo_sk IS NOT NULL
+                                                        - EXCHANGE(BROADCAST)
+                                                                Estimates: {row: 4499, cpu: ?, memory: ?, network: ?, cost: 1727712.0}
+                                                            - HIVE-SCAN [household_demographics] => [24:hd_demo_sk]
+                                                                    Estimates: {row: 4499, cpu: ?, memory: ?, network: ?, cost: 287952.0}
+                                                                    predicate: (27:hd_dep_count = 2 AND 28:hd_vehicle_count <= 4 OR 27:hd_dep_count = 4 AND 28:hd_vehicle_count <= 6 OR 27:hd_dep_count = 3 AND 28:hd_vehicle_count <= 5) AND 27:hd_dep_count IN (2, 4, 3) AND 28:hd_vehicle_count <= 6
+                                                    - EXCHANGE(BROADCAST)
+                                                            Estimates: {row: 21600, cpu: ?, memory: ?, network: ?, cost: 8294400.0}
+                                                        - HIVE-SCAN [time_dim] => [29:t_time_sk]
+                                                                Estimates: {row: 21600, cpu: ?, memory: ?, network: ?, cost: 1382400.0}
+                                                                predicate: 32:t_hour = 8 AND 33:t_minute >= 30
+                                                - EXCHANGE(BROADCAST)
+                                                        Estimates: {row: 1500, cpu: ?, memory: ?, network: ?, cost: 624000.0}
+                                                    - HIVE-SCAN [store] => [39:s_store_sk]
+                                                            Estimates: {row: 1500, cpu: ?, memory: ?, network: ?, cost: 144000.0}
+                                                            predicate: 44:s_store_name = 'ese'
+                                - EXCHANGE(BROADCAST)
+                                        Estimates: {row: 1, cpu: 80.00, memory: 80.00, network: 80.00, cost: 3896763449983.98}
+                                    - AGGREGATE(GLOBAL) []
+                                            Estimates: {row: 1, cpu: 8.00, memory: 8.00, network: 0.00, cost: 3896763449663.98}
+                                            136:count := count(136:count)
+                                        - EXCHANGE(GATHER)
+                                                Estimates: {row: 1, cpu: 8.00, memory: 0.00, network: 8.00, cost: 3896763449643.98}
+                                            - AGGREGATE(LOCAL) []
+                                                    Estimates: {row: 1, cpu: 11016000783.74, memory: 0.80, network: 0.00, cost: 3896763449627.98}
+                                                    136:count := count()
+                                                - HASH/INNER JOIN [76:ss_store_sk = 107:s_store_sk] => [559:auto_fill_col]
+                                                        Estimates: {row: 6480000461, cpu: 317520034590.23, memory: 12000.00, network: 0.00, cost: 3891255449234.51}
+                                                        559:auto_fill_col := 1
+                                                    - HASH/INNER JOIN [70:ss_sold_time_sk = 97:t_time_sk] => [76:ss_store_sk]
+                                                            Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 3.7324945679394004E12}
+                                                        - HASH/INNER JOIN [74:ss_hdemo_sk = 92:hd_demo_sk] => [70:ss_sold_time_sk, 76:ss_store_sk]
+                                                                Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 3.2140826942574004E12}
+                                                            - HIVE-SCAN [store_sales] => [70:ss_sold_time_sk, 74:ss_hdemo_sk, 76:ss_store_sk]
+                                                                    Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 2.4883201770336E12}
+                                                                    predicate: 74:ss_hdemo_sk IS NOT NULL
+                                                            - EXCHANGE(BROADCAST)
+                                                                    Estimates: {row: 4499, cpu: ?, memory: ?, network: ?, cost: 1727712.0}
+                                                                - HIVE-SCAN [household_demographics] => [92:hd_demo_sk]
+                                                                        Estimates: {row: 4499, cpu: ?, memory: ?, network: ?, cost: 287952.0}
+                                                                        predicate: (95:hd_dep_count = 2 AND 96:hd_vehicle_count <= 4 OR 95:hd_dep_count = 4 AND 96:hd_vehicle_count <= 6 OR 95:hd_dep_count = 3 AND 96:hd_vehicle_count <= 5) AND 95:hd_dep_count IN (2, 4, 3) AND 96:hd_vehicle_count <= 6
+                                                        - EXCHANGE(BROADCAST)
+                                                                Estimates: {row: 21600, cpu: ?, memory: ?, network: ?, cost: 8294400.0}
+                                                            - HIVE-SCAN [time_dim] => [97:t_time_sk]
+                                                                    Estimates: {row: 21600, cpu: ?, memory: ?, network: ?, cost: 1382400.0}
+                                                                    predicate: 100:t_hour = 9 AND 101:t_minute < 30
+                                                    - EXCHANGE(BROADCAST)
+                                                            Estimates: {row: 1500, cpu: ?, memory: ?, network: ?, cost: 624000.0}
+                                                        - HIVE-SCAN [store] => [107:s_store_sk]
+                                                                Estimates: {row: 1500, cpu: ?, memory: ?, network: ?, cost: 144000.0}
+                                                                predicate: 112:s_store_name = 'ese'
+                            - EXCHANGE(BROADCAST)
+                                    Estimates: {row: 1, cpu: 80.00, memory: 80.00, network: 80.00, cost: 3896763449983.98}
+                                - AGGREGATE(GLOBAL) []
+                                        Estimates: {row: 1, cpu: 8.00, memory: 8.00, network: 0.00, cost: 3896763449663.98}
+                                        204:count := count(204:count)
+                                    - EXCHANGE(GATHER)
+                                            Estimates: {row: 1, cpu: 8.00, memory: 0.00, network: 8.00, cost: 3896763449643.98}
+                                        - AGGREGATE(LOCAL) []
+                                                Estimates: {row: 1, cpu: 11016000783.74, memory: 0.80, network: 0.00, cost: 3896763449627.98}
+                                                204:count := count()
+                                            - HASH/INNER JOIN [144:ss_store_sk = 175:s_store_sk] => [558:auto_fill_col]
+                                                    Estimates: {row: 6480000461, cpu: 317520034590.23, memory: 12000.00, network: 0.00, cost: 3891255449234.51}
+                                                    558:auto_fill_col := 1
+                                                - HASH/INNER JOIN [138:ss_sold_time_sk = 165:t_time_sk] => [144:ss_store_sk]
+                                                        Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 3.7324945679394004E12}
+                                                    - HASH/INNER JOIN [142:ss_hdemo_sk = 160:hd_demo_sk] => [138:ss_sold_time_sk, 144:ss_store_sk]
+                                                            Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 3.2140826942574004E12}
+                                                        - HIVE-SCAN [store_sales] => [138:ss_sold_time_sk, 142:ss_hdemo_sk, 144:ss_store_sk]
+                                                                Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 2.4883201770336E12}
+                                                                predicate: 142:ss_hdemo_sk IS NOT NULL
+                                                        - EXCHANGE(BROADCAST)
+                                                                Estimates: {row: 4499, cpu: ?, memory: ?, network: ?, cost: 1727712.0}
+                                                            - HIVE-SCAN [household_demographics] => [160:hd_demo_sk]
+                                                                    Estimates: {row: 4499, cpu: ?, memory: ?, network: ?, cost: 287952.0}
+                                                                    predicate: (163:hd_dep_count = 2 AND 164:hd_vehicle_count <= 4 OR 163:hd_dep_count = 4 AND 164:hd_vehicle_count <= 6 OR 163:hd_dep_count = 3 AND 164:hd_vehicle_count <= 5) AND 163:hd_dep_count IN (2, 4, 3) AND 164:hd_vehicle_count <= 6
+                                                    - EXCHANGE(BROADCAST)
+                                                            Estimates: {row: 21600, cpu: ?, memory: ?, network: ?, cost: 8294400.0}
+                                                        - HIVE-SCAN [time_dim] => [165:t_time_sk]
+                                                                Estimates: {row: 21600, cpu: ?, memory: ?, network: ?, cost: 1382400.0}
+                                                                predicate: 168:t_hour = 9 AND 169:t_minute >= 30
+                                                - EXCHANGE(BROADCAST)
+                                                        Estimates: {row: 1500, cpu: ?, memory: ?, network: ?, cost: 624000.0}
+                                                    - HIVE-SCAN [store] => [175:s_store_sk]
+                                                            Estimates: {row: 1500, cpu: ?, memory: ?, network: ?, cost: 144000.0}
+                                                            predicate: 180:s_store_name = 'ese'
+                        - EXCHANGE(BROADCAST)
+                                Estimates: {row: 1, cpu: 80.00, memory: 80.00, network: 80.00, cost: 3896763449983.98}
+                            - AGGREGATE(GLOBAL) []
+                                    Estimates: {row: 1, cpu: 8.00, memory: 8.00, network: 0.00, cost: 3896763449663.98}
+                                    272:count := count(272:count)
+                                - EXCHANGE(GATHER)
+                                        Estimates: {row: 1, cpu: 8.00, memory: 0.00, network: 8.00, cost: 3896763449643.98}
+                                    - AGGREGATE(LOCAL) []
+                                            Estimates: {row: 1, cpu: 11016000783.74, memory: 0.80, network: 0.00, cost: 3896763449627.98}
+                                            272:count := count()
+                                        - HASH/INNER JOIN [212:ss_store_sk = 243:s_store_sk] => [557:auto_fill_col]
+                                                Estimates: {row: 6480000461, cpu: 317520034590.23, memory: 12000.00, network: 0.00, cost: 3891255449234.51}
+                                                557:auto_fill_col := 1
+                                            - HASH/INNER JOIN [206:ss_sold_time_sk = 233:t_time_sk] => [212:ss_store_sk]
+                                                    Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 3.7324945679394004E12}
+                                                - HASH/INNER JOIN [210:ss_hdemo_sk = 228:hd_demo_sk] => [212:ss_store_sk, 206:ss_sold_time_sk]
+                                                        Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 3.2140826942574004E12}
+                                                    - HIVE-SCAN [store_sales] => [210:ss_hdemo_sk, 212:ss_store_sk, 206:ss_sold_time_sk]
+                                                            Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 2.4883201770336E12}
+                                                            predicate: 210:ss_hdemo_sk IS NOT NULL
+                                                    - EXCHANGE(BROADCAST)
+                                                            Estimates: {row: 4499, cpu: ?, memory: ?, network: ?, cost: 1727712.0}
+                                                        - HIVE-SCAN [household_demographics] => [228:hd_demo_sk]
+                                                                Estimates: {row: 4499, cpu: ?, memory: ?, network: ?, cost: 287952.0}
+                                                                predicate: (231:hd_dep_count = 2 AND 232:hd_vehicle_count <= 4 OR 231:hd_dep_count = 4 AND 232:hd_vehicle_count <= 6 OR 231:hd_dep_count = 3 AND 232:hd_vehicle_count <= 5) AND 231:hd_dep_count IN (2, 4, 3) AND 232:hd_vehicle_count <= 6
+                                                - EXCHANGE(BROADCAST)
+                                                        Estimates: {row: 21600, cpu: ?, memory: ?, network: ?, cost: 8294400.0}
+                                                    - HIVE-SCAN [time_dim] => [233:t_time_sk]
+                                                            Estimates: {row: 21600, cpu: ?, memory: ?, network: ?, cost: 1382400.0}
+                                                            predicate: 236:t_hour = 10 AND 237:t_minute < 30
+                                            - EXCHANGE(BROADCAST)
+                                                    Estimates: {row: 1500, cpu: ?, memory: ?, network: ?, cost: 624000.0}
+                                                - HIVE-SCAN [store] => [243:s_store_sk]
+                                                        Estimates: {row: 1500, cpu: ?, memory: ?, network: ?, cost: 144000.0}
+                                                        predicate: 248:s_store_name = 'ese'
+                    - EXCHANGE(BROADCAST)
+                            Estimates: {row: 1, cpu: 80.00, memory: 80.00, network: 80.00, cost: 3896763449983.98}
+                        - AGGREGATE(GLOBAL) []
+                                Estimates: {row: 1, cpu: 8.00, memory: 8.00, network: 0.00, cost: 3896763449663.98}
+                                340:count := count(340:count)
+                            - EXCHANGE(GATHER)
+                                    Estimates: {row: 1, cpu: 8.00, memory: 0.00, network: 8.00, cost: 3896763449643.98}
+                                - AGGREGATE(LOCAL) []
+                                        Estimates: {row: 1, cpu: 11016000783.74, memory: 0.80, network: 0.00, cost: 3896763449627.98}
+                                        340:count := count()
+                                    - HASH/INNER JOIN [280:ss_store_sk = 311:s_store_sk] => [556:auto_fill_col]
+                                            Estimates: {row: 6480000461, cpu: 317520034590.23, memory: 12000.00, network: 0.00, cost: 3891255449234.51}
+                                            556:auto_fill_col := 1
+                                        - HASH/INNER JOIN [274:ss_sold_time_sk = 301:t_time_sk] => [280:ss_store_sk]
+                                                Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 3.7324945679394004E12}
+                                            - HASH/INNER JOIN [278:ss_hdemo_sk = 296:hd_demo_sk] => [274:ss_sold_time_sk, 280:ss_store_sk]
+                                                    Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 3.2140826942574004E12}
+                                                - HIVE-SCAN [store_sales] => [274:ss_sold_time_sk, 278:ss_hdemo_sk, 280:ss_store_sk]
+                                                        Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 2.4883201770336E12}
+                                                        predicate: 278:ss_hdemo_sk IS NOT NULL
+                                                - EXCHANGE(BROADCAST)
+                                                        Estimates: {row: 4499, cpu: ?, memory: ?, network: ?, cost: 1727712.0}
+                                                    - HIVE-SCAN [household_demographics] => [296:hd_demo_sk]
+                                                            Estimates: {row: 4499, cpu: ?, memory: ?, network: ?, cost: 287952.0}
+                                                            predicate: (299:hd_dep_count = 2 AND 300:hd_vehicle_count <= 4 OR 299:hd_dep_count = 4 AND 300:hd_vehicle_count <= 6 OR 299:hd_dep_count = 3 AND 300:hd_vehicle_count <= 5) AND 299:hd_dep_count IN (2, 4, 3) AND 300:hd_vehicle_count <= 6
+                                            - EXCHANGE(BROADCAST)
+                                                    Estimates: {row: 21600, cpu: ?, memory: ?, network: ?, cost: 8294400.0}
+                                                - HIVE-SCAN [time_dim] => [301:t_time_sk]
+                                                        Estimates: {row: 21600, cpu: ?, memory: ?, network: ?, cost: 1382400.0}
+                                                        predicate: 304:t_hour = 10 AND 305:t_minute >= 30
+                                        - EXCHANGE(BROADCAST)
+                                                Estimates: {row: 1500, cpu: ?, memory: ?, network: ?, cost: 624000.0}
+                                            - HIVE-SCAN [store] => [311:s_store_sk]
+                                                    Estimates: {row: 1500, cpu: ?, memory: ?, network: ?, cost: 144000.0}
+                                                    predicate: 316:s_store_name = 'ese'
+                - EXCHANGE(BROADCAST)
+                        Estimates: {row: 1, cpu: 80.00, memory: 80.00, network: 80.00, cost: 3896763449983.98}
+                    - AGGREGATE(GLOBAL) []
+                            Estimates: {row: 1, cpu: 8.00, memory: 8.00, network: 0.00, cost: 3896763449663.98}
+                            408:count := count(408:count)
+                        - EXCHANGE(GATHER)
+                                Estimates: {row: 1, cpu: 8.00, memory: 0.00, network: 8.00, cost: 3896763449643.98}
+                            - AGGREGATE(LOCAL) []
+                                    Estimates: {row: 1, cpu: 11016000783.74, memory: 0.80, network: 0.00, cost: 3896763449627.98}
+                                    408:count := count()
+                                - HASH/INNER JOIN [348:ss_store_sk = 379:s_store_sk] => [555:auto_fill_col]
+                                        Estimates: {row: 6480000461, cpu: 317520034590.23, memory: 12000.00, network: 0.00, cost: 3891255449234.51}
+                                        555:auto_fill_col := 1
+                                    - HASH/INNER JOIN [342:ss_sold_time_sk = 369:t_time_sk] => [348:ss_store_sk]
+                                            Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 3.7324945679394004E12}
+                                        - HASH/INNER JOIN [346:ss_hdemo_sk = 364:hd_demo_sk] => [342:ss_sold_time_sk, 348:ss_store_sk]
+                                                Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 3.2140826942574004E12}
+                                            - HIVE-SCAN [store_sales] => [342:ss_sold_time_sk, 346:ss_hdemo_sk, 348:ss_store_sk]
+                                                    Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 2.4883201770336E12}
+                                                    predicate: 346:ss_hdemo_sk IS NOT NULL
+                                            - EXCHANGE(BROADCAST)
+                                                    Estimates: {row: 4499, cpu: ?, memory: ?, network: ?, cost: 1727712.0}
+                                                - HIVE-SCAN [household_demographics] => [364:hd_demo_sk]
+                                                        Estimates: {row: 4499, cpu: ?, memory: ?, network: ?, cost: 287952.0}
+                                                        predicate: (367:hd_dep_count = 2 AND 368:hd_vehicle_count <= 4 OR 367:hd_dep_count = 4 AND 368:hd_vehicle_count <= 6 OR 367:hd_dep_count = 3 AND 368:hd_vehicle_count <= 5) AND 367:hd_dep_count IN (2, 4, 3) AND 368:hd_vehicle_count <= 6
+                                        - EXCHANGE(BROADCAST)
+                                                Estimates: {row: 21600, cpu: ?, memory: ?, network: ?, cost: 8294400.0}
+                                            - HIVE-SCAN [time_dim] => [369:t_time_sk]
+                                                    Estimates: {row: 21600, cpu: ?, memory: ?, network: ?, cost: 1382400.0}
+                                                    predicate: 372:t_hour = 11 AND 373:t_minute < 30
+                                    - EXCHANGE(BROADCAST)
+                                            Estimates: {row: 1500, cpu: ?, memory: ?, network: ?, cost: 624000.0}
+                                        - HIVE-SCAN [store] => [379:s_store_sk]
+                                                Estimates: {row: 1500, cpu: ?, memory: ?, network: ?, cost: 144000.0}
+                                                predicate: 384:s_store_name = 'ese'
+            - EXCHANGE(BROADCAST)
+                    Estimates: {row: 1, cpu: 80.00, memory: 80.00, network: 80.00, cost: 3896763449983.98}
+                - AGGREGATE(GLOBAL) []
+                        Estimates: {row: 1, cpu: 8.00, memory: 8.00, network: 0.00, cost: 3896763449663.98}
+                        476:count := count(476:count)
+                    - EXCHANGE(GATHER)
+                            Estimates: {row: 1, cpu: 8.00, memory: 0.00, network: 8.00, cost: 3896763449643.98}
+                        - AGGREGATE(LOCAL) []
+                                Estimates: {row: 1, cpu: 11016000783.74, memory: 0.80, network: 0.00, cost: 3896763449627.98}
+                                476:count := count()
+                            - HASH/INNER JOIN [416:ss_store_sk = 447:s_store_sk] => [554:auto_fill_col]
+                                    Estimates: {row: 6480000461, cpu: 317520034590.23, memory: 12000.00, network: 0.00, cost: 3891255449234.51}
+                                    554:auto_fill_col := 1
+                                - HASH/INNER JOIN [410:ss_sold_time_sk = 437:t_time_sk] => [416:ss_store_sk]
+                                        Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 3.7324945679394004E12}
+                                    - HASH/INNER JOIN [414:ss_hdemo_sk = 432:hd_demo_sk] => [410:ss_sold_time_sk, 416:ss_store_sk]
+                                            Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 3.2140826942574004E12}
+                                        - HIVE-SCAN [store_sales] => [410:ss_sold_time_sk, 414:ss_hdemo_sk, 416:ss_store_sk]
+                                                Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 2.4883201770336E12}
+                                                predicate: 414:ss_hdemo_sk IS NOT NULL
+                                        - EXCHANGE(BROADCAST)
+                                                Estimates: {row: 4499, cpu: ?, memory: ?, network: ?, cost: 1727712.0}
+                                            - HIVE-SCAN [household_demographics] => [432:hd_demo_sk]
+                                                    Estimates: {row: 4499, cpu: ?, memory: ?, network: ?, cost: 287952.0}
+                                                    predicate: (435:hd_dep_count = 2 AND 436:hd_vehicle_count <= 4 OR 435:hd_dep_count = 4 AND 436:hd_vehicle_count <= 6 OR 435:hd_dep_count = 3 AND 436:hd_vehicle_count <= 5) AND 435:hd_dep_count IN (2, 4, 3) AND 436:hd_vehicle_count <= 6
+                                    - EXCHANGE(BROADCAST)
+                                            Estimates: {row: 21600, cpu: ?, memory: ?, network: ?, cost: 8294400.0}
+                                        - HIVE-SCAN [time_dim] => [437:t_time_sk]
+                                                Estimates: {row: 21600, cpu: ?, memory: ?, network: ?, cost: 1382400.0}
+                                                predicate: 440:t_hour = 11 AND 441:t_minute >= 30
+                                - EXCHANGE(BROADCAST)
+                                        Estimates: {row: 1500, cpu: ?, memory: ?, network: ?, cost: 624000.0}
+                                    - HIVE-SCAN [store] => [447:s_store_sk]
+                                            Estimates: {row: 1500, cpu: ?, memory: ?, network: ?, cost: 144000.0}
+                                            predicate: 452:s_store_name = 'ese'
+        - EXCHANGE(BROADCAST)
+                Estimates: {row: 1, cpu: 80.00, memory: 80.00, network: 80.00, cost: 3896763449983.98}
+            - AGGREGATE(GLOBAL) []
+                    Estimates: {row: 1, cpu: 8.00, memory: 8.00, network: 0.00, cost: 3896763449663.98}
+                    544:count := count(544:count)
+                - EXCHANGE(GATHER)
+                        Estimates: {row: 1, cpu: 8.00, memory: 0.00, network: 8.00, cost: 3896763449643.98}
+                    - AGGREGATE(LOCAL) []
+                            Estimates: {row: 1, cpu: 11016000783.74, memory: 0.80, network: 0.00, cost: 3896763449627.98}
+                            544:count := count()
+                        - HASH/INNER JOIN [484:ss_store_sk = 515:s_store_sk] => [553:auto_fill_col]
+                                Estimates: {row: 6480000461, cpu: 317520034590.23, memory: 12000.00, network: 0.00, cost: 3891255449234.51}
+                                553:auto_fill_col := 1
+                            - HASH/INNER JOIN [478:ss_sold_time_sk = 505:t_time_sk] => [484:ss_store_sk]
+                                    Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 3.7324945679394004E12}
+                                - HASH/INNER JOIN [482:ss_hdemo_sk = 500:hd_demo_sk] => [484:ss_store_sk, 478:ss_sold_time_sk]
+                                        Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 3.2140826942574004E12}
+                                    - HIVE-SCAN [store_sales] => [482:ss_hdemo_sk, 484:ss_store_sk, 478:ss_sold_time_sk]
+                                            Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 2.4883201770336E12}
+                                            predicate: 482:ss_hdemo_sk IS NOT NULL
+                                    - EXCHANGE(BROADCAST)
+                                            Estimates: {row: 4499, cpu: ?, memory: ?, network: ?, cost: 1727712.0}
+                                        - HIVE-SCAN [household_demographics] => [500:hd_demo_sk]
+                                                Estimates: {row: 4499, cpu: ?, memory: ?, network: ?, cost: 287952.0}
+                                                predicate: (503:hd_dep_count = 2 AND 504:hd_vehicle_count <= 4 OR 503:hd_dep_count = 4 AND 504:hd_vehicle_count <= 6 OR 503:hd_dep_count = 3 AND 504:hd_vehicle_count <= 5) AND 503:hd_dep_count IN (2, 4, 3) AND 504:hd_vehicle_count <= 6
+                                - EXCHANGE(BROADCAST)
+                                        Estimates: {row: 21600, cpu: ?, memory: ?, network: ?, cost: 8294400.0}
+                                    - HIVE-SCAN [time_dim] => [505:t_time_sk]
+                                            Estimates: {row: 21600, cpu: ?, memory: ?, network: ?, cost: 1382400.0}
+                                            predicate: 508:t_hour = 12 AND 509:t_minute < 30
+                            - EXCHANGE(BROADCAST)
+                                    Estimates: {row: 1500, cpu: ?, memory: ?, network: ?, cost: 624000.0}
+                                - HIVE-SCAN [store] => [515:s_store_sk]
+                                        Estimates: {row: 1500, cpu: ?, memory: ?, network: ?, cost: 144000.0}
+                                        predicate: 520:s_store_name = 'ese'

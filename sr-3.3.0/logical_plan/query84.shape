@@ -1,0 +1,49 @@
+Explain String
+- Output => [2:c_customer_id, 69:concat]
+    - TOP-100(FINAL)[2: c_customer_id ASC NULLS FIRST]
+            Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 3.476194481370015E11}
+        - TOP-100(PARTIAL)[2: c_customer_id ASC NULLS FIRST]
+                Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 3.476194257370015E11}
+            - HASH/INNER JOIN [32:cd_demo_sk = 53:sr_cdemo_sk] => [2:c_customer_id, 69:concat]
+                    Estimates: {row: 647998130, cpu: ?, memory: ?, network: ?, cost: 2.4393970878900153E11}
+                    69:concat := concat(concat(coalesce(10:c_last_name, ''), ','), coalesce(9:c_first_name, ''))
+                - EXCHANGE(SHUFFLE) [32]
+                        Estimates: {row: 14625000, cpu: ?, memory: ?, network: ?, cost: 5.0471763281251495E10}
+                    - HASH/INNER JOIN [42:hd_income_band_sk = 46:ib_income_band_sk] => [2:c_customer_id, 9:c_first_name, 10:c_last_name, 32:cd_demo_sk]
+                            Estimates: {row: 14625000, cpu: ?, memory: ?, network: ?, cost: 4.8833763281251495E10}
+                        - HASH/INNER JOIN [4:c_current_hdemo_sk = 41:hd_demo_sk] => [2:c_customer_id, 9:c_first_name, 42:hd_income_band_sk, 10:c_last_name, 32:cd_demo_sk]
+                                Estimates: {row: 58500000, cpu: ?, memory: ?, network: ?, cost: 4.6435260541251495E10}
+                            - HASH/INNER JOIN [3:c_current_cdemo_sk = 32:cd_demo_sk] => [2:c_customer_id, 4:c_current_hdemo_sk, 9:c_first_name, 10:c_last_name, 32:cd_demo_sk]
+                                    Estimates: {row: 58500000, cpu: ?, memory: ?, network: ?, cost: 4.2216573181251495E10}
+                                - HASH/INNER JOIN [5:c_current_addr_sk = 19:ca_address_sk] => [2:c_customer_id, 3:c_current_cdemo_sk, 4:c_current_hdemo_sk, 9:c_first_name, 10:c_last_name]
+                                        Estimates: {row: 58500000, cpu: ?, memory: ?, network: ?, cost: 3.3883416666666668E10}
+                                    - EXCHANGE(SHUFFLE) [5]
+                                            Estimates: {row: 58500000, cpu: ?, memory: ?, network: ?, cost: 2.5272E10}
+                                        - HIVE-SCAN [customer] => [2:c_customer_id, 3:c_current_cdemo_sk, 4:c_current_hdemo_sk, 5:c_current_addr_sk, 9:c_first_name, 10:c_last_name]
+                                                Estimates: {row: 58500000, cpu: ?, memory: ?, network: ?, cost: 1.6848E10}
+                                                predicate: 5:c_current_addr_sk IS NOT NULL
+                                    - EXCHANGE(SHUFFLE) [19]
+                                            Estimates: {row: 32500000, cpu: ?, memory: ?, network: ?, cost: 3.64E9}
+                                        - HIVE-SCAN [customer_address] => [19:ca_address_sk]
+                                                Estimates: {row: 32500000, cpu: ?, memory: ?, network: ?, cost: 3.12E9}
+                                                predicate: 25:ca_city = 'Hopewell'
+                                - EXCHANGE(BROADCAST)
+                                        Estimates: {row: 1728720, cpu: ?, memory: ?, network: ?, cost: 6.0850944E8}
+                                    - HIVE-SCAN [customer_demographics] => [32:cd_demo_sk]
+                                            Estimates: {row: 1728720, cpu: ?, memory: ?, network: ?, cost: 5.531904E7}
+                                            predicate: 32:cd_demo_sk IS NOT NULL
+                            - EXCHANGE(BROADCAST)
+                                    Estimates: {row: 6480, cpu: ?, memory: ?, network: ?, cost: 4561920.0}
+                                - HIVE-SCAN [household_demographics] => [41:hd_demo_sk, 42:hd_income_band_sk]
+                                        Estimates: {row: 6480, cpu: ?, memory: ?, network: ?, cost: 414720.0}
+                                        predicate: 41:hd_demo_sk IS NOT NULL
+                        - EXCHANGE(BROADCAST)
+                                Estimates: {row: 5, cpu: ?, memory: ?, network: ?, cost: 1920.0}
+                            - HIVE-SCAN [income_band] => [46:ib_income_band_sk]
+                                    Estimates: {row: 5, cpu: ?, memory: ?, network: ?, cost: 320.0}
+                                    predicate: 47:ib_lower_bound >= 37855 AND 48:ib_upper_bound <= 87855
+                - EXCHANGE(SHUFFLE) [53]
+                        Estimates: {row: 2591992523, cpu: ?, memory: ?, network: ?, cost: 1.244156411376E11}
+                    - HIVE-SCAN [store_returns] => [53:sr_cdemo_sk]
+                            Estimates: {row: 2591992523, cpu: ?, memory: ?, network: ?, cost: 8.294376075840001E10}
+                            predicate: 53:sr_cdemo_sk IS NOT NULL

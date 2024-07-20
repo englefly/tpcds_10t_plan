@@ -1,0 +1,298 @@
+Explain String
+RESOURCE GROUP: default_wg
+
+PLAN FRAGMENT 0(F17)
+  Fragment Cost: 160.0
+  Output Exprs:170: count | 171: sum | 172: sum
+  Input Partition: UNPARTITIONED
+  RESULT SINK
+
+  33:MERGING-EXCHANGE
+     distribution type: GATHER
+     limit: 100
+     cardinality: 1
+
+PLAN FRAGMENT 1(F16)
+  Fragment Cost: 340.0
+
+  Input Partition: UNPARTITIONED
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 33
+
+  32:TOP-N
+  |  order by: [170, BIGINT, false] ASC
+  |  offset: 0
+  |  limit: 100
+  |  cardinality: 1
+  |  
+  31:AGGREGATE (merge finalize)
+  |  aggregate: count[([170: count, BIGINT, false]); args: BIGINT; result: BIGINT; args nullable: true; result nullable: false], sum[([171: sum, DECIMAL128(38,2), true]); args: DECIMAL64; result: DECIMAL128(38,2); args nullable: true; result nullable: true], sum[([172: sum, DECIMAL128(38,2), true]); args: DECIMAL64; result: DECIMAL128(38,2); args nullable: true; result nullable: true]
+  |  cardinality: 1
+  |  
+  30:EXCHANGE
+     distribution type: GATHER
+     cardinality: 1
+
+PLAN FRAGMENT 2(F15)
+  Fragment Cost: 4.4926460976200195E10
+
+  Input Partition: HASH_PARTITIONED: 18: cs_order_number
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 30
+
+  29:AGGREGATE (update serialize)
+  |  aggregate: count[([18: cs_order_number, BIGINT, true]); args: BIGINT; result: BIGINT; args nullable: true; result nullable: false], sum[([171: sum, DECIMAL128(38,2), true]); args: DECIMAL64; result: DECIMAL128(38,2); args nullable: true; result nullable: true], sum[([172: sum, DECIMAL128(38,2), true]); args: DECIMAL64; result: DECIMAL128(38,2); args nullable: true; result nullable: true]
+  |  cardinality: 1
+  |  
+  28:AGGREGATE (merge serialize)
+  |  aggregate: sum[([171: sum, DECIMAL128(38,2), true]); args: DECIMAL64; result: DECIMAL128(38,2); args nullable: true; result nullable: true], sum[([172: sum, DECIMAL128(38,2), true]); args: DECIMAL64; result: DECIMAL128(38,2); args nullable: true; result nullable: true]
+  |  group by: [18: cs_order_number, BIGINT, true]
+  |  cardinality: 287990134
+  |  
+  27:EXCHANGE
+     distribution type: SHUFFLE
+     partition exprs: [18: cs_order_number, BIGINT, true]
+     cardinality: 575980268
+
+PLAN FRAGMENT 3(F14)
+  Fragment Cost: 1.1808460710394727E11
+
+  Input Partition: HASH_PARTITIONED: 11: cs_ship_addr_sk
+  OutPut Partition: HASH_PARTITIONED: 18: cs_order_number
+  OutPut Exchange Id: 27
+
+  26:AGGREGATE (update serialize)
+  |  STREAMING
+  |  aggregate: sum[([29: cs_ext_ship_cost, DECIMAL64(7,2), true]); args: DECIMAL64; result: DECIMAL128(38,2); args nullable: true; result nullable: true], sum[([34: cs_net_profit, DECIMAL64(7,2), true]); args: DECIMAL64; result: DECIMAL128(38,2); args nullable: true; result nullable: true]
+  |  group by: [18: cs_order_number, BIGINT, true]
+  |  cardinality: 575980268
+  |  
+  25:Project
+  |  output columns:
+  |  18 <-> [18: cs_order_number, BIGINT, true]
+  |  29 <-> [29: cs_ext_ship_cost, DECIMAL64(7,2), true]
+  |  34 <-> [34: cs_net_profit, DECIMAL64(7,2), true]
+  |  cardinality: 1151960536
+  |  
+  24:HASH JOIN
+  |  join op: INNER JOIN (PARTITIONED)
+  |  equal join conjunct: [11: cs_ship_addr_sk, BIGINT, true] = [63: ca_address_sk, BIGINT, true]
+  |  build runtime filters:
+  |  - filter_id = 2, build_expr = (63: ca_address_sk), remote = true
+  |  output columns: 18, 29, 34
+  |  can local shuffle: true
+  |  cardinality: 1151960536
+  |  
+  |----23:EXCHANGE
+  |       distribution type: SHUFFLE
+  |       partition exprs: [63: ca_address_sk, BIGINT, true]
+  |       cardinality: 32500000
+  |    
+  20:EXCHANGE
+     distribution type: SHUFFLE
+     partition exprs: [11: cs_ship_addr_sk, BIGINT, true]
+     cardinality: 1151960536
+
+PLAN FRAGMENT 4(F12)
+  Fragment Cost: 3.12E9
+
+  Input Partition: RANDOM
+  OutPut Partition: HASH_PARTITIONED: 63: ca_address_sk
+  OutPut Exchange Id: 23
+
+  22:Project
+  |  output columns:
+  |  63 <-> [63: ca_address_sk, BIGINT, true]
+  |  cardinality: 32500000
+  |  
+  21:HdfsScanNode
+     TABLE: customer_address
+     NON-PARTITION PREDICATES: 71: ca_state = 'IL'
+     MIN/MAX PREDICATES: 71: ca_state <= 'IL', 71: ca_state >= 'IL'
+     partitions=1/1
+     avgRowSize=2.0
+     cardinality: 32500000
+
+PLAN FRAGMENT 5(F10)
+  Fragment Cost: 1.437413081923458E12
+
+  Input Partition: HASH_PARTITIONED: 18: cs_order_number
+  OutPut Partition: HASH_PARTITIONED: 11: cs_ship_addr_sk
+  OutPut Exchange Id: 20
+
+  19:Project
+  |  output columns:
+  |  11 <-> [11: cs_ship_addr_sk, BIGINT, true]
+  |  18 <-> [18: cs_order_number, BIGINT, true]
+  |  29 <-> [29: cs_ext_ship_cost, DECIMAL64(7,2), true]
+  |  34 <-> [34: cs_net_profit, DECIMAL64(7,2), true]
+  |  cardinality: 1151960536
+  |  
+  18:HASH JOIN
+  |  join op: RIGHT SEMI JOIN (BUCKET_SHUFFLE(S))
+  |  equal join conjunct: [124: cs_order_number, BIGINT, true] = [18: cs_order_number, BIGINT, true]
+  |  other join predicates: [15: cs_warehouse_sk, BIGINT, true] != [121: cs_warehouse_sk, BIGINT, true]
+  |  output columns: 11, 18, 29, 34
+  |  can local shuffle: false
+  |  cardinality: 1151960536
+  |  
+  |----17:Project
+  |    |  output columns:
+  |    |  11 <-> [11: cs_ship_addr_sk, BIGINT, true]
+  |    |  15 <-> [15: cs_warehouse_sk, BIGINT, true]
+  |    |  18 <-> [18: cs_order_number, BIGINT, true]
+  |    |  29 <-> [29: cs_ext_ship_cost, DECIMAL64(7,2), true]
+  |    |  34 <-> [34: cs_net_profit, DECIMAL64(7,2), true]
+  |    |  cardinality: 1799958948
+  |    |  
+  |    16:HASH JOIN
+  |    |  join op: LEFT ANTI JOIN (PARTITIONED)
+  |    |  equal join conjunct: [18: cs_order_number, BIGINT, true] = [158: cr_order_number, BIGINT, true]
+  |    |  output columns: 11, 15, 18, 29, 34
+  |    |  can local shuffle: false
+  |    |  cardinality: 1799958948
+  |    |  
+  |    |----15:EXCHANGE
+  |    |       distribution type: SHUFFLE
+  |    |       partition exprs: [158: cr_order_number, BIGINT, true]
+  |    |       cardinality: 1440033112
+  |    |    
+  |    13:EXCHANGE
+  |       distribution type: SHUFFLE
+  |       partition exprs: [18: cs_order_number, BIGINT, true]
+  |       cardinality: 3239992060
+  |    
+  1:EXCHANGE
+     distribution type: SHUFFLE
+     partition exprs: [124: cs_order_number, BIGINT, true]
+     cardinality: 12959968239
+
+PLAN FRAGMENT 6(F08)
+  Fragment Cost: 4.6081059584E10
+
+  Input Partition: RANDOM
+  OutPut Partition: HASH_PARTITIONED: 158: cr_order_number
+  OutPut Exchange Id: 15
+
+  14:HdfsScanNode
+     TABLE: catalog_returns
+     partitions=1/1
+     avgRowSize=1.0
+     cardinality: 1440033112
+
+PLAN FRAGMENT 7(F02)
+  Fragment Cost: 3.538081060424E12
+
+  Input Partition: RANDOM
+  OutPut Partition: HASH_PARTITIONED: 18: cs_order_number
+  OutPut Exchange Id: 13
+
+  12:Project
+  |  output columns:
+  |  11 <-> [11: cs_ship_addr_sk, BIGINT, true]
+  |  15 <-> [15: cs_warehouse_sk, BIGINT, true]
+  |  18 <-> [18: cs_order_number, BIGINT, true]
+  |  29 <-> [29: cs_ext_ship_cost, DECIMAL64(7,2), true]
+  |  34 <-> [34: cs_net_profit, DECIMAL64(7,2), true]
+  |  cardinality: 3239992060
+  |  
+  11:HASH JOIN
+  |  join op: INNER JOIN (BROADCAST)
+  |  equal join conjunct: [3: cs_ship_date_sk, BIGINT, true] = [35: d_date_sk, BIGINT, true]
+  |  build runtime filters:
+  |  - filter_id = 1, build_expr = (35: d_date_sk), remote = false
+  |  output columns: 11, 15, 18, 29, 34
+  |  can local shuffle: false
+  |  cardinality: 3239992060
+  |  
+  |----10:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 18262
+  |    
+  7:Project
+  |  output columns:
+  |  3 <-> [3: cs_ship_date_sk, BIGINT, true]
+  |  11 <-> [11: cs_ship_addr_sk, BIGINT, true]
+  |  15 <-> [15: cs_warehouse_sk, BIGINT, true]
+  |  18 <-> [18: cs_order_number, BIGINT, true]
+  |  29 <-> [29: cs_ext_ship_cost, DECIMAL64(7,2), true]
+  |  34 <-> [34: cs_net_profit, DECIMAL64(7,2), true]
+  |  cardinality: 3239992060
+  |  
+  6:HASH JOIN
+  |  join op: INNER JOIN (BROADCAST)
+  |  equal join conjunct: [12: cs_call_center_sk, BIGINT, true] = [76: cc_call_center_sk, BIGINT, true]
+  |  build runtime filters:
+  |  - filter_id = 0, build_expr = (76: cc_call_center_sk), remote = false
+  |  output columns: 3, 11, 15, 18, 29, 34
+  |  can local shuffle: false
+  |  cardinality: 3239992060
+  |  
+  |----5:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 27
+  |    
+  2:HdfsScanNode
+     TABLE: catalog_sales
+     NON-PARTITION PREDICATES: 3: cs_ship_date_sk IS NOT NULL
+     partitions=1/1
+     avgRowSize=7.0
+     cardinality: 12959968239
+     probe runtime filters:
+     - filter_id = 0, probe_expr = (12: cs_call_center_sk)
+     - filter_id = 1, probe_expr = (3: cs_ship_date_sk)
+     - filter_id = 2, probe_expr = (11: cs_ship_addr_sk)
+
+PLAN FRAGMENT 8(F05)
+  Fragment Cost: 876588.0
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 10
+
+  9:Project
+  |  output columns:
+  |  35 <-> [35: d_date_sk, BIGINT, true]
+  |  cardinality: 18262
+  |  
+  8:HdfsScanNode
+     TABLE: date_dim
+     NON-PARTITION PREDICATES: 37: d_date >= '1999-04-01', 37: d_date <= '1999-05-31'
+     MIN/MAX PREDICATES: 37: d_date >= '1999-04-01', 37: d_date <= '1999-05-31'
+     partitions=1/1
+     avgRowSize=2.0
+     cardinality: 18262
+
+PLAN FRAGMENT 9(F03)
+  Fragment Cost: 2592.0
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 05
+
+  4:Project
+  |  output columns:
+  |  76 <-> [76: cc_call_center_sk, BIGINT, true]
+  |  cardinality: 27
+  |  
+  3:HdfsScanNode
+     TABLE: call_center
+     NON-PARTITION PREDICATES: 101: cc_county IN ('Richland County', 'Bronx County', 'Maverick County', 'Mesa County', 'Raleigh County')
+     MIN/MAX PREDICATES: 101: cc_county >= 'Bronx County', 101: cc_county <= 'Richland County'
+     partitions=1/1
+     avgRowSize=2.0
+     cardinality: 27
+
+PLAN FRAGMENT 10(F00)
+  Fragment Cost: 8.29437967296E11
+
+  Input Partition: RANDOM
+  OutPut Partition: HASH_PARTITIONED: 124: cs_order_number
+  OutPut Exchange Id: 01
+
+  0:HdfsScanNode
+     TABLE: catalog_sales
+     NON-PARTITION PREDICATES: 124: cs_order_number IS NOT NULL
+     partitions=1/1
+     avgRowSize=2.0
+     cardinality: 12959968239

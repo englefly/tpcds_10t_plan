@@ -1,0 +1,39 @@
+Explain String
+- Output => [36:i_item_id, 39:i_item_desc, 47:i_category, 45:i_class, 40:i_current_price, 85:sum, 87:expr]
+    - TOP-100(FINAL)[47: i_category ASC NULLS FIRST, 45: i_class ASC NULLS FIRST, 36: i_item_id ASC NULLS FIRST, 39: i_item_desc ASC NULLS FIRST, 87: expr ASC NULLS FIRST]
+            Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 3.070991472028782E12}
+        - TOP-100(PARTIAL)[47: i_category ASC NULLS FIRST, 45: i_class ASC NULLS FIRST, 36: i_item_id ASC NULLS FIRST, 39: i_item_desc ASC NULLS FIRST, 87: expr ASC NULLS FIRST]
+                Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 3.070991427228782E12}
+            - ANALYTIC [ partition by (45:i_class), order by)]
+                    Estimates: {row: 2393465626, cpu: ?, memory: ?, network: ?, cost: 2.4965596527900107E12}
+                    86:sum(85: sum) := sum(85:sum) RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+                    87:expr := 85:sum * 100 / 86:sum(85: sum)
+                - SORT(GLOBAL)[45: i_class ASC NULLS FIRST]
+                        Estimates: {row: 2393465626, cpu: ?, memory: ?, network: ?, cost: 2.352951715180318E12}
+                    - EXCHANGE(SHUFFLE) [45]
+                            Estimates: {row: 2393465626, cpu: ?, memory: ?, network: ?, cost: 2.352951715180318E12}
+                        - AGGREGATE(GLOBAL) [36:i_item_id, 39:i_item_desc, 47:i_category, 45:i_class, 40:i_current_price]
+                                Estimates: {row: 2393465626, cpu: ?, memory: ?, network: ?, cost: 1.9317017648585522E12}
+                                85:sum := sum(85:sum)
+                            - EXCHANGE(SHUFFLE) [36, 39, 47, 45, 40]
+                                    Estimates: {row: 3938220189, cpu: ?, memory: ?, network: ?, cost: 1.3371701262189497E12}
+                                - AGGREGATE(LOCAL) [36:i_item_id, 39:i_item_desc, 47:i_category, 45:i_class, 40:i_current_price]
+                                        Estimates: {row: 3938220189, cpu: ?, memory: ?, network: ?, cost: 1.267857450891815E12}
+                                        85:sum := sum(24:ws_ext_sales_price)
+                                    - HASH/INNER JOIN [4:ws_item_sk = 35:i_item_sk] => [36:i_item_id, 39:i_item_desc, 40:i_current_price, 24:ws_ext_sales_price, 45:i_class, 47:i_category]
+                                            Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 1.1674409340050002E12}
+                                        - HASH/INNER JOIN [1:ws_sold_date_sk = 57:d_date_sk] => [4:ws_item_sk, 24:ws_ext_sales_price]
+                                                Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 8.035256224754001E11}
+                                            - HIVE-SCAN [web_sales] => [1:ws_sold_date_sk, 4:ws_item_sk, 24:ws_ext_sales_price]
+                                                    Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 6.220768311936001E11}
+                                                    predicate: 4:ws_item_sk IS NOT NULL
+                                            - EXCHANGE(BROADCAST)
+                                                    Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 6720508.0}
+                                                - HIVE-SCAN [date_dim] => [57:d_date_sk]
+                                                        Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 876588.0}
+                                                        predicate: 59:d_date >= 1998-01-06 AND 59:d_date <= 1998-02-05
+                                        - EXCHANGE(BROADCAST)
+                                                Estimates: {row: 201000, cpu: ?, memory: ?, network: ?, cost: 7.0752E8}
+                                            - HIVE-SCAN [item] => [35:i_item_sk, 36:i_item_id, 39:i_item_desc, 40:i_current_price, 45:i_class, 47:i_category]
+                                                    Estimates: {row: 201000, cpu: ?, memory: ?, network: ?, cost: 6.432E7}
+                                                    predicate: 47:i_category IN ('Electronics', 'Books', 'Women')

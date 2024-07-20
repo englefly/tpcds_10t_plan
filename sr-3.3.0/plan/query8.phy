@@ -1,0 +1,303 @@
+Explain String
+RESOURCE GROUP: default_wg
+
+PLAN FRAGMENT 0(F15)
+  Fragment Cost: 12800.0
+  Output Exprs:57: s_store_name | 129: sum
+  Input Partition: UNPARTITIONED
+  RESULT SINK
+
+  35:MERGING-EXCHANGE
+     distribution type: GATHER
+     limit: 100
+     cardinality: 100
+
+PLAN FRAGMENT 1(F14)
+  Fragment Cost: 6.998401137906982E10
+
+  Input Partition: HASH_PARTITIONED: 57: s_store_name
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 35
+
+  34:TOP-N
+  |  order by: [57, VARCHAR, true] ASC
+  |  offset: 0
+  |  limit: 100
+  |  cardinality: 100
+  |  
+  33:AGGREGATE (merge finalize)
+  |  aggregate: sum[([129: sum, DECIMAL128(38,2), true]); args: DECIMAL64; result: DECIMAL128(38,2); args nullable: true; result nullable: true]
+  |  group by: [57: s_store_name, VARCHAR, true]
+  |  cardinality: 405000029
+  |  
+  32:EXCHANGE
+     distribution type: SHUFFLE
+     partition exprs: [57: s_store_name, VARCHAR, true]
+     cardinality: 810000058
+
+PLAN FRAGMENT 2(F00)
+  Fragment Cost: 2.9477220995359414E12
+
+  Input Partition: RANDOM
+  OutPut Partition: HASH_PARTITIONED: 57: s_store_name
+  OutPut Exchange Id: 32
+
+  31:AGGREGATE (update serialize)
+  |  STREAMING
+  |  aggregate: sum[([23: ss_net_profit, DECIMAL64(7,2), true]); args: DECIMAL64; result: DECIMAL128(38,2); args nullable: true; result nullable: true]
+  |  group by: [57: s_store_name, VARCHAR, true]
+  |  cardinality: 810000058
+  |  
+  30:Project
+  |  output columns:
+  |  23 <-> [23: ss_net_profit, DECIMAL64(7,2), true]
+  |  57 <-> [57: s_store_name, VARCHAR, true]
+  |  cardinality: 1620000115
+  |  
+  29:HASH JOIN
+  |  join op: INNER JOIN (BROADCAST)
+  |  equal join conjunct: [1: ss_sold_date_sk, BIGINT, true] = [24: d_date_sk, BIGINT, true]
+  |  build runtime filters:
+  |  - filter_id = 3, build_expr = (24: d_date_sk), remote = false
+  |  output columns: 23, 57
+  |  can local shuffle: true
+  |  cardinality: 1620000115
+  |  
+  |----28:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 18262
+  |    
+  25:Project
+  |  output columns:
+  |  1 <-> [1: ss_sold_date_sk, BIGINT, true]
+  |  23 <-> [23: ss_net_profit, DECIMAL64(7,2), true]
+  |  57 <-> [57: s_store_name, VARCHAR, true]
+  |  cardinality: 1620000115
+  |  
+  24:HASH JOIN
+  |  join op: INNER JOIN (BROADCAST)
+  |  equal join conjunct: [8: ss_store_sk, BIGINT, true] = [52: s_store_sk, BIGINT, true]
+  |  build runtime filters:
+  |  - filter_id = 2, build_expr = (52: s_store_sk), remote = false
+  |  output columns: 1, 23, 57
+  |  can local shuffle: false
+  |  cardinality: 1620000115
+  |  
+  |----23:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 1350
+  |    
+  0:HdfsScanNode
+     TABLE: store_sales
+     NON-PARTITION PREDICATES: 1: ss_sold_date_sk IS NOT NULL
+     partitions=1/1
+     avgRowSize=3.0
+     cardinality: 25920001844
+     probe runtime filters:
+     - filter_id = 2, probe_expr = (8: ss_store_sk)
+     - filter_id = 3, probe_expr = (1: ss_sold_date_sk)
+
+PLAN FRAGMENT 3(F12)
+  Fragment Cost: 1168784.0
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 28
+
+  27:Project
+  |  output columns:
+  |  24 <-> [24: d_date_sk, BIGINT, true]
+  |  cardinality: 18262
+  |  
+  26:HdfsScanNode
+     TABLE: date_dim
+     NON-PARTITION PREDICATES: 34: d_qoy = 2, 30: d_year = 1998
+     MIN/MAX PREDICATES: 34: d_qoy <= 2, 34: d_qoy >= 2, 30: d_year <= 1998, 30: d_year >= 1998
+     partitions=1/1
+     avgRowSize=3.0
+     cardinality: 18262
+
+PLAN FRAGMENT 4(F01)
+  Fragment Cost: 1.6805923101333332E10
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 23
+
+  22:Project
+  |  output columns:
+  |  52 <-> [52: s_store_sk, BIGINT, true]
+  |  57 <-> [57: s_store_name, VARCHAR, true]
+  |  cardinality: 1350
+  |  
+  21:HASH JOIN
+  |  join op: INNER JOIN (BROADCAST)
+  |  equal join conjunct: [130: substr, VARCHAR, true] = [131: substr, VARCHAR, true]
+  |  build runtime filters:
+  |  - filter_id = 1, build_expr = (131: substr), remote = false
+  |  output columns: 52, 57
+  |  can local shuffle: false
+  |  cardinality: 1350
+  |  
+  |----20:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 1
+  |    
+  2:Project
+  |  output columns:
+  |  52 <-> [52: s_store_sk, BIGINT, true]
+  |  57 <-> [57: s_store_name, VARCHAR, true]
+  |  77 <-> [77: s_zip, VARCHAR, true]
+  |  130 <-> substr[([77: s_zip, VARCHAR, true], 1, 2); args: VARCHAR,INT,INT; result: VARCHAR; args nullable: true; result nullable: true]
+  |  cardinality: 1350
+  |  
+  1:HdfsScanNode
+     TABLE: store
+     NON-PARTITION PREDICATES: 52: s_store_sk IS NOT NULL
+     partitions=1/1
+     avgRowSize=4.0
+     cardinality: 1350
+     probe runtime filters:
+     - filter_id = 1, probe_expr = (substr(77: s_zip, 1, 2))
+
+PLAN FRAGMENT 5(F02)
+  Fragment Cost: 0.0
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 20
+
+  19:Project
+  |  output columns:
+  |  131 <-> substr[([128: substr, VARCHAR, true], 1, 2); args: VARCHAR,INT,INT; result: VARCHAR; args nullable: true; result nullable: true]
+  |  cardinality: 1
+  |  
+  3:INTERSECT
+  |  output exprs:
+  |      [128, VARCHAR, true]
+  |  child exprs:
+  |      [94: substr, VARCHAR, true]
+  |      [127: substr, VARCHAR, true]
+  |  cardinality: 1
+  |  
+  |----18:EXCHANGE
+  |       partition exprs: [104: ca_zip, VARCHAR, true]
+  |       cardinality: 8125000
+  |    
+  6:EXCHANGE
+     cardinality: 14625000
+
+PLAN FRAGMENT 6(F09)
+  Fragment Cost: 1.196E9
+
+  Input Partition: HASH_PARTITIONED: 104: ca_zip
+  OutPut Partition: HASH_PARTITIONED: 127: substr
+  OutPut Exchange Id: 18
+
+  17:Project
+  |  output columns:
+  |  127 <-> substr[([104: ca_zip, VARCHAR, true], 1, 5); args: VARCHAR,INT,INT; result: VARCHAR; args nullable: true; result nullable: true]
+  |  cardinality: 8125000
+  |  
+  16:AGGREGATE (merge finalize)
+  |  aggregate: count[([126: count, BIGINT, false]); args: ; result: BIGINT; args nullable: true; result nullable: false]
+  |  group by: [104: ca_zip, VARCHAR, true]
+  |  having: [126: count, BIGINT, false] > 10
+  |  cardinality: 8125000
+  |  
+  15:EXCHANGE
+     distribution type: SHUFFLE
+     partition exprs: [104: ca_zip, VARCHAR, true]
+     cardinality: 32500000
+
+PLAN FRAGMENT 7(F08)
+  Fragment Cost: 4.970333333333332E9
+
+  Input Partition: HASH_PARTITIONED: 95: ca_address_sk
+  OutPut Partition: HASH_PARTITIONED: 104: ca_zip
+  OutPut Exchange Id: 15
+
+  14:AGGREGATE (update serialize)
+  |  STREAMING
+  |  aggregate: count[(*); args: ; result: BIGINT; args nullable: false; result nullable: false]
+  |  group by: [104: ca_zip, VARCHAR, true]
+  |  cardinality: 32500000
+  |  
+  13:Project
+  |  output columns:
+  |  104 <-> [104: ca_zip, VARCHAR, true]
+  |  cardinality: 65000000
+  |  
+  12:HASH JOIN
+  |  join op: INNER JOIN (PARTITIONED)
+  |  equal join conjunct: [95: ca_address_sk, BIGINT, true] = [112: c_current_addr_sk, BIGINT, true]
+  |  build runtime filters:
+  |  - filter_id = 0, build_expr = (112: c_current_addr_sk), remote = false
+  |  output columns: 104
+  |  can local shuffle: true
+  |  cardinality: 65000000
+  |  
+  |----11:EXCHANGE
+  |       distribution type: SHUFFLE
+  |       partition exprs: [112: c_current_addr_sk, BIGINT, true]
+  |       cardinality: 65000000
+  |    
+  8:EXCHANGE
+     distribution type: SHUFFLE
+     partition exprs: [95: ca_address_sk, BIGINT, true]
+     cardinality: 26325000
+     probe runtime filters:
+     - filter_id = 0, probe_expr = (95: ca_address_sk)
+
+PLAN FRAGMENT 8(F06)
+  Fragment Cost: 6.24E9
+
+  Input Partition: RANDOM
+  OutPut Partition: HASH_PARTITIONED: 112: c_current_addr_sk
+  OutPut Exchange Id: 11
+
+  10:Project
+  |  output columns:
+  |  112 <-> [112: c_current_addr_sk, BIGINT, true]
+  |  cardinality: 65000000
+  |  
+  9:HdfsScanNode
+     TABLE: customer
+     NON-PARTITION PREDICATES: 118: c_preferred_cust_flag = 'Y'
+     MIN/MAX PREDICATES: 118: c_preferred_cust_flag <= 'Y', 118: c_preferred_cust_flag >= 'Y'
+     partitions=1/1
+     avgRowSize=2.0
+     cardinality: 65000000
+
+PLAN FRAGMENT 9(F04)
+  Fragment Cost: 2.5272E9
+
+  Input Partition: RANDOM
+  OutPut Partition: HASH_PARTITIONED: 95: ca_address_sk
+  OutPut Exchange Id: 08
+
+  7:HdfsScanNode
+     TABLE: customer_address
+     NON-PARTITION PREDICATES: substr(substr(104: ca_zip, 1, 5), 1, 2) IS NOT NULL, 95: ca_address_sk IS NOT NULL
+     partitions=1/1
+     avgRowSize=2.0
+     cardinality: 26325000
+
+PLAN FRAGMENT 10(F03)
+  Fragment Cost: 1.872E9
+
+  Input Partition: RANDOM
+  OutPut Partition: HASH_PARTITIONED: 94: substr
+  OutPut Exchange Id: 06
+
+  5:Project
+  |  output columns:
+  |  94 <-> substr[([90: ca_zip, VARCHAR, true], 1, 5); args: VARCHAR,INT,INT; result: VARCHAR; args nullable: true; result nullable: true]
+  |  cardinality: 14625000
+  |  
+  4:HdfsScanNode
+     TABLE: customer_address
+     NON-PARTITION PREDICATES: substr(substr(90: ca_zip, 1, 5), 1, 2) IS NOT NULL, substr(90: ca_zip, 1, 5) IN ('47602', '16704', '35863', '28577', '83910', '36201', '58412', '48162', '28055', '41419', '80332', '38607', '77817', '24891', '16226', '18410', '21231', '59345', '13918', '51089', '20317', '17167', '54585', '67881', '78366', '47770', '18360', '51717', '73108', '14440', '21800', '89338', '45859', '65501', '34948', '25973', '73219', '25333', '17291', '10374', '18829', '60736', '82620', '41351', '52094', '19326', '25214', '54207', '40936', '21814', '79077', '25178', '75742', '77454', '30621', '89193', '27369', '41232', '48567', '83041', '71948', '37119', '68341', '14073', '16891', '62878', '49130', '19833', '24286', '27700', '40979', '50412', '81504', '94835', '84844', '71954', '39503', '57649', '18434', '24987', '12350', '86379', '27413', '44529', '98569', '16515', '27287', '24255', '21094', '16005', '56436', '91110', '68293', '56455', '54558', '10298', '83647', '32754', '27052', '51766', '19444', '13869', '45645', '94791', '57631', '20712', '37788', '41807', '46507', '21727', '71836', '81070', '50632', '88086', '63991', '20244', '31655', '51782', '29818', '63792', '68605', '94898', '36430', '57025', '20601', '82080', '33869', '22728', '35834', '29086', '92645', '98584', '98072', '11652', '78093', '57553', '43830', '71144', '53565', '18700', '90209', '71256', '38353', '54364', '28571', '96560', '57839', '56355', '50679', '45266', '84680', '34306', '34972', '48530', '30106', '15371', '92380', '84247', '92292', '68852', '13338', '34594', '82602', '70073', '98069', '85066', '47289', '11686', '98862', '26217', '47529', '63294', '51793', '35926', '24227', '14196', '24594', '32489', '99060', '49472', '43432', '49211', '14312', '88137', '47369', '56877', '20534', '81755', '15794', '12318', '21060', '73134', '41255', '63073', '81003', '73873', '66057', '51184', '51195', '45676', '92696', '70450', '90669', '98338', '25264', '38919', '59226', '58581', '60298', '17895', '19489', '52301', '80846', '95464', '68770', '51634', '19988', '18367', '18421', '11618', '67975', '25494', '41352', '95430', '15734', '62585', '97173', '33773', '10425', '75675', '53535', '17879', '41967', '12197', '67998', '79658', '59130', '72592', '14851', '43933', '68101', '50636', '25717', '71286', '24660', '58058', '72991', '95042', '15543', '33122', '69280', '11912', '59386', '27642', '65177', '17672', '33467', '64592', '36335', '54010', '18767', '63193', '42361', '49254', '33113', '33159', '36479', '59080', '11855', '81963', '31016', '49140', '29392', '41836', '32958', '53163', '13844', '73146', '23952', '65148', '93498', '14530', '46131', '58454', '13376', '13378', '83986', '12320', '17193', '59852', '46081', '98533', '52389', '13086', '68843', '31013', '13261', '60560', '13443', '45533', '83583', '11489', '58218', '19753', '22911', '25115', '86709', '27156', '32669', '13123', '51933', '39214', '41331', '66943', '14155', '69998', '49101', '70070', '35076', '14242', '73021', '59494', '15782', '29752', '37914', '74686', '83086', '34473', '15751', '81084', '49230', '91894', '60624', '17819', '28810', '63180', '56224', '39459', '55233', '75752', '43639', '55349', '86057', '62361', '50788', '31830', '58062', '18218', '85761', '60083', '45484', '21204', '90229', '70041', '41162', '35390', '16364', '39500', '68908', '26689', '52868', '81335', '40146', '11340', '61527', '61794', '71997', '30415', '59004', '29450', '58117', '69952', '33562', '83833', '27385', '61860', '96435', '48333', '23065', '32961', '84919', '61997', '99132', '22815', '56600', '68730', '48017', '95694', '32919', '88217', '27116', '28239', '58032', '18884', '16791', '21343', '97462', '18569', '75660', '15475')
+     partitions=1/1
+     avgRowSize=2.0
+     cardinality: 14625000

@@ -1,0 +1,48 @@
+Explain String
+- Output => [96:c_last_name, 95:c_first_name, 94:c_salutation, 97:c_preferred_cust_flag, 10:ss_ticket_number, 86:count]
+    - SORT(FINAL)[86: count DESC NULLS LAST, 96: c_last_name ASC NULLS FIRST]
+            Estimates: {row: 446512531, cpu: ?, memory: ?, network: ?, cost: 5.766058897483539E12}
+        - SORT(PARTIAL)[86: count DESC NULLS LAST, 96: c_last_name ASC NULLS FIRST]
+                Estimates: {row: 446512531, cpu: ?, memory: ?, network: ?, cost: 5.594598085284817E12}
+            - HASH/INNER JOIN [4:ss_customer_sk = 87:c_customer_sk] => [97:c_preferred_cust_flag, 86:count, 10:ss_ticket_number, 94:c_salutation, 95:c_first_name, 96:c_last_name]
+                    Estimates: {row: 446512531, cpu: ?, memory: ?, network: ?, cost: 5.423137273086096E12}
+                - EXCHANGE(SHUFFLE) [4]
+                        Estimates: {row: 446512531, cpu: ?, memory: ?, network: ?, cost: 5.362562771180046E12}
+                    - AGGREGATE(GLOBAL) [10:ss_ticket_number, 4:ss_customer_sk]
+                            Estimates: {row: 446512531, cpu: ?, memory: ?, network: ?, cost: 5.341130169655206E12}
+                            86:count := count(86:count)
+                            predicate: 86:count >= 1 AND 86:count <= 5
+                        - EXCHANGE(SHUFFLE) [10, 4]
+                                Estimates: {row: 3402000242, cpu: ?, memory: ?, network: ?, cost: 5.278873565225908E12}
+                            - AGGREGATE(LOCAL) [10:ss_ticket_number, 4:ss_customer_sk]
+                                    Estimates: {row: 3402000242, cpu: ?, memory: ?, network: ?, cost: 5.262543964064125E12}
+                                    86:count := count()
+                                - HASH/INNER JOIN [6:ss_hdemo_sk = 81:hd_demo_sk] => [4:ss_customer_sk, 10:ss_ticket_number]
+                                        Estimates: {row: 6480000461, cpu: ?, memory: ?, network: ?, cost: 5.235846362164702E12}
+                                    - HASH/INNER JOIN [1:ss_sold_date_sk = 24:d_date_sk] => [4:ss_customer_sk, 6:ss_hdemo_sk, 10:ss_ticket_number]
+                                            Estimates: {row: 6480000461, cpu: ?, memory: ?, network: ?, cost: 5.054405798456002E12}
+                                        - HASH/INNER JOIN [8:ss_store_sk = 52:s_store_sk] => [1:ss_sold_date_sk, 4:ss_customer_sk, 6:ss_hdemo_sk, 10:ss_ticket_number]
+                                                Estimates: {row: 6480000461, cpu: ?, memory: ?, network: ?, cost: 4.821120778002602E12}
+                                            - HIVE-SCAN [store_sales] => [1:ss_sold_date_sk, 4:ss_customer_sk, 6:ss_hdemo_sk, 8:ss_store_sk, 10:ss_ticket_number]
+                                                    Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 4.147200295056001E12}
+                                                    predicate: 1:ss_sold_date_sk IS NOT NULL
+                                            - EXCHANGE(BROADCAST)
+                                                    Estimates: {row: 750, cpu: ?, memory: ?, network: ?, cost: 312000.0}
+                                                - HIVE-SCAN [store] => [52:s_store_sk]
+                                                        Estimates: {row: 750, cpu: ?, memory: ?, network: ?, cost: 72000.0}
+                                                        predicate: 75:s_county IN ('Lea County', 'Furnas County', 'Pennington County', 'Bronx County')
+                                        - EXCHANGE(BROADCAST)
+                                                Estimates: {row: 9131, cpu: ?, memory: ?, network: ?, cost: 3506352.0}
+                                            - HIVE-SCAN [date_dim] => [24:d_date_sk]
+                                                    Estimates: {row: 9131, cpu: ?, memory: ?, network: ?, cost: 584392.0}
+                                                    predicate: 33:d_dom >= 1 AND 33:d_dom <= 2 AND 30:d_year IN (2000, 2001, 2002)
+                                    - EXCHANGE(BROADCAST)
+                                            Estimates: {row: 900, cpu: ?, memory: ?, network: ?, cost: 403200.0}
+                                        - HIVE-SCAN [household_demographics] => [81:hd_demo_sk]
+                                                Estimates: {row: 900, cpu: ?, memory: ?, network: ?, cost: 115200.0}
+                                                predicate: 83:hd_buy_potential IN ('>10000', '5001-10000') AND 85:hd_vehicle_count > 0 AND if(85:hd_vehicle_count > 0, cast(84:hd_dep_count as double) / cast(85:hd_vehicle_count as double), null) > 1.0
+                - EXCHANGE(SHUFFLE) [87]
+                        Estimates: {row: 58500000, cpu: ?, memory: ?, network: ?, cost: 2.5272E10}
+                    - HIVE-SCAN [customer] => [97:c_preferred_cust_flag, 87:c_customer_sk, 94:c_salutation, 95:c_first_name, 96:c_last_name]
+                            Estimates: {row: 58500000, cpu: ?, memory: ?, network: ?, cost: 1.6848E10}
+                            predicate: 87:c_customer_sk IS NOT NULL

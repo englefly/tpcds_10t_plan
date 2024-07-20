@@ -1,0 +1,34 @@
+Explain String
+- Output => [4:ss_customer_sk, 48:sum]
+    - TOP-100(FINAL)[48: sum ASC NULLS FIRST, 4: ss_customer_sk ASC NULLS FIRST]
+            Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 7.071504604373286E12}
+        - TOP-100(PARTIAL)[48: sum ASC NULLS FIRST, 4: ss_customer_sk ASC NULLS FIRST]
+                Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 7.071504594773286E12}
+            - AGGREGATE(GLOBAL) [4:ss_customer_sk]
+                    Estimates: {row: 1458000103, cpu: ?, memory: ?, network: ?, cost: 7.001520584994216E12}
+                    48:sum := sum(48:sum)
+                - EXCHANGE(SHUFFLE) [4]
+                        Estimates: {row: 2916000207, cpu: ?, memory: ?, network: ?, cost: 6.89654457752561E12}
+                    - AGGREGATE(LOCAL) [4:ss_customer_sk]
+                            Estimates: {row: 2916000207, cpu: ?, memory: ?, network: ?, cost: 6.882547776529796E12}
+                            48:sum := sum(47:case)
+                        - HASH/INNER JOIN [3:ss_item_sk = 26:sr_item_sk AND 10:ss_ticket_number = 33:sr_ticket_number] => [4:ss_customer_sk, 47:case]
+                                Estimates: {row: 5832000414, cpu: ?, memory: ?, network: ?, cost: 6.852221374372199E12}
+                                47:case := if(34:sr_return_quantity IS NOT NULL, cast(cast(11:ss_quantity as bigint(20)) - cast(34:sr_return_quantity as bigint(20)) as decimal(18, 0)) * cast(14:ss_sales_price as decimal(7, 2)), cast(cast(11:ss_quantity as decimal(9, 0)) * 14:ss_sales_price as decimal(25, 2)))
+                            - EXCHANGE(SHUFFLE) [3, 10]
+                                    Estimates: {row: 23328001659, cpu: ?, memory: ?, network: ?, cost: 5.038848358493041E12}
+                                - HIVE-SCAN [store_sales] => [3:ss_item_sk, 4:ss_customer_sk, 10:ss_ticket_number, 11:ss_quantity, 14:ss_sales_price]
+                                        Estimates: {row: 23328001659, cpu: ?, memory: ?, network: ?, cost: 3.3592322389953604E12}
+                                        predicate: 3:ss_item_sk IS NOT NULL AND 10:ss_ticket_number IS NOT NULL
+                            - EXCHANGE(SHUFFLE) [26, 33]
+                                    Estimates: {row: 647998130, cpu: ?, memory: ?, network: ?, cost: 3.6417499017985004E11}
+                                - HASH/INNER JOIN [32:sr_reason_sk = 44:r_reason_sk] => [33:sr_ticket_number, 34:sr_return_quantity, 26:sr_item_sk]
+                                        Estimates: {row: 647998130, cpu: ?, memory: ?, network: ?, cost: 3.3825506494285004E11}
+                                    - HIVE-SCAN [store_returns] => [33:sr_ticket_number, 34:sr_return_quantity, 26:sr_item_sk, 32:sr_reason_sk]
+                                            Estimates: {row: 2591992523, cpu: ?, memory: ?, network: ?, cost: 2.903031626544E11}
+                                            predicate: 32:sr_reason_sk IS NOT NULL
+                                    - EXCHANGE(BROADCAST)
+                                            Estimates: {row: 70, cpu: ?, memory: ?, network: ?, cost: 29120.0}
+                                        - HIVE-SCAN [reason] => [44:r_reason_sk]
+                                                Estimates: {row: 70, cpu: ?, memory: ?, network: ?, cost: 6720.0}
+                                                predicate: 46:r_reason_desc = 'reason 66'

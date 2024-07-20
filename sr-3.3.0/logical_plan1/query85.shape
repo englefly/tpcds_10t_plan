@@ -1,0 +1,75 @@
+Explain String
+- Output => [138:substr, 135:avg, 136:avg, 137:avg]
+    - TOP-100(FINAL)[138: substr ASC NULLS FIRST, 135: avg ASC NULLS FIRST, 136: avg ASC NULLS FIRST, 137: avg ASC NULLS FIRST]
+            Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 5.654306120793565E12}
+        - TOP-100(PARTIAL)[138: substr ASC NULLS FIRST, 135: avg ASC NULLS FIRST, 136: avg ASC NULLS FIRST, 137: avg ASC NULLS FIRST]
+                Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 5.654306095193565E12}
+            - AGGREGATE(GLOBAL) [134:r_reason_desc] => [135:avg, 136:avg, 137:avg, 138:substr]
+                    Estimates: {row: 51525616, cpu: ?, memory: ?, network: ?, cost: 5.646886392026328E12}
+                    135:avg := avg(135:avg)
+                    136:avg := avg(136:avg)
+                    137:avg := avg(137:avg)
+                    138:substr := substr(134:r_reason_desc, 1, 20)
+                - EXCHANGE(SHUFFLE) [134]
+                        Estimates: {row: 103051232, cpu: ?, memory: ?, network: ?, cost: 5.636581268738498E12}
+                    - AGGREGATE(LOCAL) [134:r_reason_desc]
+                            Estimates: {row: 103051232, cpu: ?, memory: ?, network: ?, cost: 5.635427094930261E12}
+                            135:avg := avg(19:ws_quantity)
+                            136:avg := avg(55:wr_refunded_cash)
+                            137:avg := avg(53:wr_fee)
+                        - HASH/INNER JOIN [47:wr_reason_sk = 132:r_reason_sk] => [19:ws_quantity, 53:wr_fee, 134:r_reason_desc, 55:wr_refunded_cash]
+                                Estimates: {row: 206102465, cpu: ?, memory: ?, network: ?, cost: 5.633737054711057E12}
+                            - HASH/INNER JOIN [13:ws_web_page_sk = 59:wp_web_page_sk] => [19:ws_quantity, 53:wr_fee, 55:wr_refunded_cash, 47:wr_reason_sk]
+                                    Estimates: {row: 824409863, cpu: ?, memory: ?, network: ?, cost: 5.616836554995016E12}
+                                - HASH/INNER JOIN [1:ws_sold_date_sk = 104:d_date_sk] => [19:ws_quantity, 53:wr_fee, 55:wr_refunded_cash, 13:ws_web_page_sk, 47:wr_reason_sk]
+                                        Estimates: {row: 824409863, cpu: ?, memory: ?, network: ?, cost: 5.583858301945161E12}
+                                    - HASH/INNER JOIN [43:wr_returning_cdemo_sk = 82:cd_demo_sk AND 75:cd_marital_status = 84:cd_marital_status AND 76:cd_education_status = 85:cd_education_status] => [1:ws_sold_date_sk, 19:ws_quantity, 53:wr_fee, 55:wr_refunded_cash, 13:ws_web_page_sk, 47:wr_reason_sk]
+                                            Estimates: {row: 824409863, cpu: ?, memory: ?, network: ?, cost: 5.5442671974858955E12}
+                                        - HASH/INNER JOIN [39:wr_refunded_cdemo_sk = 73:cd_demo_sk AND (75:cd_marital_status = 'M' AND 76:cd_education_status = '4 yr Degree' AND 22:ws_sales_price >= 100.00 AND 22:ws_sales_price <= 150.00 OR 75:cd_marital_status = 'S' AND 76:cd_education_status = 'College' AND 22:ws_sales_price >= 50.00 AND 22:ws_sales_price <= 100.00 OR 75:cd_marital_status = 'D' AND 76:cd_education_status = 'Secondary' AND 22:ws_sales_price >= 150.00 AND 22:ws_sales_price <= 200.00)] => [1:ws_sold_date_sk, 19:ws_quantity, 53:wr_fee, 55:wr_refunded_cash, 43:wr_returning_cdemo_sk, 75:cd_marital_status, 76:cd_education_status, 13:ws_web_page_sk, 47:wr_reason_sk]
+                                                Estimates: {row: 824409863, cpu: ?, memory: ?, network: ?, cost: 5.385869296317961E12}
+                                            - HASH/INNER JOIN [41:wr_refunded_addr_sk = 91:ca_address_sk AND (99:ca_state IN ('TX', 'VA', 'CA') AND 34:ws_net_profit >= 100 AND 34:ws_net_profit <= 200 OR 99:ca_state IN ('AR', 'NE', 'MO') AND 34:ws_net_profit >= 150 AND 34:ws_net_profit <= 300 OR 99:ca_state IN ('IA', 'MS', 'WA') AND 34:ws_net_profit >= 50 AND 34:ws_net_profit <= 250)] => [1:ws_sold_date_sk, 19:ws_quantity, 53:wr_fee, 22:ws_sales_price, 39:wr_refunded_cdemo_sk, 55:wr_refunded_cash, 43:wr_returning_cdemo_sk, 13:ws_web_page_sk, 47:wr_reason_sk]
+                                                    Estimates: {row: 1884365401, cpu: ?, memory: ?, network: ?, cost: 5.147052366519969E12}
+                                                - EXCHANGE(SHUFFLE) [41]
+                                                        Estimates: {row: 7199963324, cpu: ?, memory: ?, network: ?, cost: 4.734561925247E12}
+                                                    - HASH/INNER JOIN [4:ws_item_sk = 37:wr_item_sk AND 18:ws_order_number = 48:wr_order_number] => [1:ws_sold_date_sk, 34:ws_net_profit, 19:ws_quantity, 53:wr_fee, 22:ws_sales_price, 39:wr_refunded_cdemo_sk, 55:wr_refunded_cash, 41:wr_refunded_addr_sk, 43:wr_returning_cdemo_sk, 13:ws_web_page_sk, 47:wr_reason_sk]
+                                                            Estimates: {row: 7199963324, cpu: ?, memory: ?, network: ?, cost: 3.524968086815E12}
+                                                        - EXCHANGE(SHUFFLE) [4, 18]
+                                                                Estimates: {row: 7199963324, cpu: ?, memory: ?, network: ?, cost: 2.246388557088E12}
+                                                            - HIVE-SCAN [web_sales] => [1:ws_sold_date_sk, 18:ws_order_number, 34:ws_net_profit, 19:ws_quantity, 4:ws_item_sk, 22:ws_sales_price, 13:ws_web_page_sk]
+                                                                    Estimates: {row: 7199963324, cpu: ?, memory: ?, network: ?, cost: 1.497592371392E12}
+                                                                    predicate: 22:ws_sales_price >= 50.00 AND 22:ws_sales_price <= 200.00 AND 34:ws_net_profit >= 50 AND 34:ws_net_profit <= 300
+                                                        - EXCHANGE(SHUFFLE) [37, 48]
+                                                                Estimates: {row: 583216592, cpu: ?, memory: ?, network: ?, cost: 2.2395517165440002E11}
+                                                            - HIVE-SCAN [web_returns] => [37:wr_item_sk, 53:wr_fee, 39:wr_refunded_cdemo_sk, 55:wr_refunded_cash, 41:wr_refunded_addr_sk, 43:wr_returning_cdemo_sk, 47:wr_reason_sk, 48:wr_order_number]
+                                                                    Estimates: {row: 583216592, cpu: ?, memory: ?, network: ?, cost: 1.493034477696E11}
+                                                                    predicate: 37:wr_item_sk IS NOT NULL AND 48:wr_order_number IS NOT NULL
+                                                - EXCHANGE(SHUFFLE) [91]
+                                                        Estimates: {row: 32500000, cpu: ?, memory: ?, network: ?, cost: 6.76E9}
+                                                    - HIVE-SCAN [customer_address] => [99:ca_state, 91:ca_address_sk]
+                                                            Estimates: {row: 32500000, cpu: ?, memory: ?, network: ?, cost: 5.2E9}
+                                                            predicate: 99:ca_state IN ('TX', 'VA', 'CA', 'AR', 'NE', 'MO', 'IA', 'MS', 'WA') AND 101:ca_country = 'United States'
+                                            - EXCHANGE(BROADCAST)
+                                                    Estimates: {row: 1920800, cpu: ?, memory: ?, network: ?, cost: 3.380608E9}
+                                                - HIVE-SCAN [customer_demographics] => [73:cd_demo_sk, 75:cd_marital_status, 76:cd_education_status]
+                                                        Estimates: {row: 1920800, cpu: ?, memory: ?, network: ?, cost: 3.07328E8}
+                                                        predicate: 75:cd_marital_status IN ('M', 'S', 'D') AND 76:cd_education_status IN ('4 yr Degree', 'College', 'Secondary')
+                                        - EXCHANGE(BROADCAST)
+                                                Estimates: {row: 1920800, cpu: ?, memory: ?, network: ?, cost: 3.380608E9}
+                                            - HIVE-SCAN [customer_demographics] => [82:cd_demo_sk, 84:cd_marital_status, 85:cd_education_status]
+                                                    Estimates: {row: 1920800, cpu: ?, memory: ?, network: ?, cost: 3.07328E8}
+                                                    predicate: 84:cd_marital_status IN ('M', 'S', 'D') AND 85:cd_education_status IN ('4 yr Degree', 'College', 'Secondary')
+                                    - EXCHANGE(BROADCAST)
+                                            Estimates: {row: 36524, cpu: ?, memory: ?, network: ?, cost: 1.3441016E7}
+                                        - HIVE-SCAN [date_dim] => [104:d_date_sk]
+                                                Estimates: {row: 36524, cpu: ?, memory: ?, network: ?, cost: 1753176.0}
+                                                predicate: 110:d_year = 2001
+                                - EXCHANGE(BROADCAST)
+                                        Estimates: {row: 3601, cpu: ?, memory: ?, network: ?, cost: 1267833.6}
+                                    - HIVE-SCAN [web_page] => [59:wp_web_page_sk]
+                                            Estimates: {row: 3601, cpu: ?, memory: ?, network: ?, cost: 115257.6}
+                                            predicate: 59:wp_web_page_sk IS NOT NULL
+                            - EXCHANGE(BROADCAST)
+                                    Estimates: {row: 63, cpu: ?, memory: ?, network: ?, cost: 66528.0}
+                                - HIVE-SCAN [reason] => [132:r_reason_sk, 134:r_reason_desc]
+                                        Estimates: {row: 63, cpu: ?, memory: ?, network: ?, cost: 6048.0}
+                                        predicate: 132:r_reason_sk IS NOT NULL

@@ -1,0 +1,46 @@
+Explain String
+- Output => [21:i_manager_id, 103:sum, 104:avg(103: sum)]
+    - TOP-100(FINAL)[21: i_manager_id ASC NULLS FIRST, 104: avg(103: sum) ASC NULLS FIRST, 103: sum ASC NULLS FIRST]
+            Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 4.587555915844387E12}
+        - TOP-100(PARTIAL)[21: i_manager_id ASC NULLS FIRST, 104: avg(103: sum) ASC NULLS FIRST, 103: sum ASC NULLS FIRST]
+                Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 4.587555900644387E12}
+            - PREDICATE [if(104: avg(103: sum) > 0.00000000, divide(abs(subtract(103: sum, 104: avg(103: sum))), 104: avg(103: sum)), null) > 0.100000000000]
+                - ANALYTIC [ partition by (21:i_manager_id), order by)]
+                        Estimates: {row: 1786050127, cpu: ?, memory: ?, network: ?, cost: 4.516113887561586E12}
+                        104:avg(103: sum) := avg(103:sum) RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+                    - SORT(GLOBAL)[21: i_manager_id ASC NULLS FIRST]
+                            Estimates: {row: 1786050127, cpu: ?, memory: ?, network: ?, cost: 4.480392885020186E12}
+                        - EXCHANGE(SHUFFLE) [21]
+                                Estimates: {row: 1786050127, cpu: ?, memory: ?, network: ?, cost: 4.480392885020186E12}
+                            - AGGREGATE(GLOBAL) [21:i_manager_id, 54:d_moy]
+                                    Estimates: {row: 1786050127, cpu: ?, memory: ?, network: ?, cost: 4.3946624789208247E12}
+                                    103:sum := sum(103:sum)
+                                - EXCHANGE(SHUFFLE) [21, 54]
+                                        Estimates: {row: 3402000242, cpu: ?, memory: ?, network: ?, cost: 4.2681080699170063E12}
+                                    - AGGREGATE(LOCAL) [21:i_manager_id, 54:d_moy]
+                                            Estimates: {row: 3402000242, cpu: ?, memory: ?, network: ?, cost: 4.251778468755223E12}
+                                            103:sum := sum(36:ss_sales_price)
+                                        - HASH/INNER JOIN [23:ss_sold_date_sk = 46:d_date_sk] => [36:ss_sales_price, 21:i_manager_id, 54:d_moy]
+                                                Estimates: {row: 6480000461, cpu: ?, memory: ?, network: ?, cost: 4.2250808668558003E12}
+                                            - HASH/INNER JOIN [25:ss_item_sk = 1:i_item_sk] => [36:ss_sales_price, 21:i_manager_id, 23:ss_sold_date_sk]
+                                                    Estimates: {row: 6480000461, cpu: ?, memory: ?, network: ?, cost: 4.0565720005141504E12}
+                                                - HASH/INNER JOIN [30:ss_store_sk = 74:s_store_sk] => [36:ss_sales_price, 23:ss_sold_date_sk, 25:ss_item_sk]
+                                                        Estimates: {row: 6480000461, cpu: ?, memory: ?, network: ?, cost: 3.8620809713709004E12}
+                                                    - HIVE-SCAN [store_sales] => [36:ss_sales_price, 23:ss_sold_date_sk, 25:ss_item_sk, 30:ss_store_sk]
+                                                            Estimates: {row: 25920001844, cpu: ?, memory: ?, network: ?, cost: 3.3177602360448003E12}
+                                                            predicate: 25:ss_item_sk IS NOT NULL
+                                                    - EXCHANGE(BROADCAST)
+                                                            Estimates: {row: 1350, cpu: ?, memory: ?, network: ?, cost: 475200.0}
+                                                        - HIVE-SCAN [store] => [74:s_store_sk]
+                                                                Estimates: {row: 1350, cpu: ?, memory: ?, network: ?, cost: 43200.0}
+                                                                predicate: 74:s_store_sk IS NOT NULL
+                                                - EXCHANGE(BROADCAST)
+                                                        Estimates: {row: 94218, cpu: ?, memory: ?, network: ?, cost: 6.78375E7}
+                                                    - HIVE-SCAN [item] => [1:i_item_sk, 21:i_manager_id]
+                                                            Estimates: {row: 94218, cpu: ?, memory: ?, network: ?, cost: 2.26125E7}
+                                                            predicate: (13:i_category IN ('Books', 'Children', 'Electronics') AND 11:i_class IN ('personal', 'portable', 'reference', 'self-help') AND 9:i_brand IN ('scholaramalgamalg #14', 'scholaramalgamalg #7', 'exportiunivamalg #9', 'scholaramalgamalg #9') OR 13:i_category IN ('Women', 'Music', 'Men') AND 11:i_class IN ('accessories', 'classical', 'fragrances', 'pants') AND 9:i_brand IN ('amalgimporto #1', 'edu packscholar #1', 'exportiimporto #1', 'importoamalg #1')) AND 9:i_brand IN ('scholaramalgamalg #14', 'scholaramalgamalg #7', 'exportiunivamalg #9', 'scholaramalgamalg #9', 'amalgimporto #1', 'edu packscholar #1', 'exportiimporto #1', 'importoamalg #1') AND 11:i_class IN ('personal', 'portable', 'reference', 'self-help', 'accessories', 'classical', 'fragrances', 'pants') AND 13:i_category IN ('Books', 'Children', 'Electronics', 'Women', 'Music', 'Men')
+                                            - EXCHANGE(BROADCAST)
+                                                    Estimates: {row: 36524, cpu: ?, memory: ?, network: ?, cost: 1.9869328E7}
+                                                - HIVE-SCAN [date_dim] => [54:d_moy, 46:d_date_sk]
+                                                        Estimates: {row: 36524, cpu: ?, memory: ?, network: ?, cost: 2337568.0}
+                                                        predicate: 49:d_month_seq IN (1211, 1212, 1213, 1214, 1215, 1216, 1217, 1218, 1219, 1220, 1221, 1222)

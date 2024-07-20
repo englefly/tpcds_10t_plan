@@ -1,0 +1,434 @@
+Explain String
+RESOURCE GROUP: default_wg
+
+PLAN FRAGMENT 0(F02)
+  Fragment Cost: 1.5360070544E10
+  Output Exprs:24: avg | 25: count | 26: count | 50: avg | 51: count | 52: count | 76: avg | 77: count | 78: count | 102: avg | 103: count | 104: count | 128: avg | 129: count | 130: count | 154: avg | 155: count | 156: count
+  Input Partition: UNPARTITIONED
+  RESULT SINK
+
+  57:NESTLOOP JOIN
+  |  join op: CROSS JOIN
+  |  can local shuffle: false
+  |  limit: 100
+  |  cardinality: 1
+  |  
+  |----56:EXCHANGE
+  |       distribution type: BROADCAST
+  |       limit: 100
+  |       cardinality: 1
+  |    
+  47:NESTLOOP JOIN
+  |  join op: CROSS JOIN
+  |  can local shuffle: false
+  |  limit: 100
+  |  cardinality: 1
+  |  
+  |----46:EXCHANGE
+  |       distribution type: BROADCAST
+  |       limit: 100
+  |       cardinality: 1
+  |    
+  37:NESTLOOP JOIN
+  |  join op: CROSS JOIN
+  |  can local shuffle: false
+  |  limit: 100
+  |  cardinality: 1
+  |  
+  |----36:EXCHANGE
+  |       distribution type: BROADCAST
+  |       limit: 100
+  |       cardinality: 1
+  |    
+  27:NESTLOOP JOIN
+  |  join op: CROSS JOIN
+  |  can local shuffle: false
+  |  limit: 100
+  |  cardinality: 1
+  |  
+  |----26:EXCHANGE
+  |       distribution type: BROADCAST
+  |       limit: 100
+  |       cardinality: 1
+  |    
+  17:NESTLOOP JOIN
+  |  join op: CROSS JOIN
+  |  can local shuffle: false
+  |  limit: 100
+  |  cardinality: 1
+  |  
+  |----16:EXCHANGE
+  |       distribution type: BROADCAST
+  |       limit: 100
+  |       cardinality: 1
+  |    
+  7:AGGREGATE (merge finalize)
+  |  aggregate: avg[([24: avg, VARBINARY, true]); args: DECIMAL64; result: DECIMAL128(38,8); args nullable: true; result nullable: true], count[([25: count, BIGINT, false]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false], count[([26: count, BIGINT, false]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false]
+  |  limit: 100
+  |  cardinality: 1
+  |  
+  6:EXCHANGE
+     distribution type: GATHER
+     cardinality: 1
+
+PLAN FRAGMENT 1(F21)
+  Fragment Cost: 144.0
+
+  Input Partition: UNPARTITIONED
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 56
+
+  55:AGGREGATE (merge finalize)
+  |  aggregate: avg[([154: avg, VARBINARY, true]); args: DECIMAL64; result: DECIMAL128(38,8); args nullable: true; result nullable: true], count[([155: count, BIGINT, false]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false], count[([156: count, BIGINT, false]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false]
+  |  limit: 100
+  |  cardinality: 1
+  |  
+  54:EXCHANGE
+     distribution type: GATHER
+     cardinality: 1
+
+PLAN FRAGMENT 2(F20)
+  Fragment Cost: 1.2987000930370929E11
+
+  Input Partition: HASH_PARTITIONED: 143: ss_list_price
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 54
+
+  53:AGGREGATE (update serialize)
+  |  aggregate: avg[([154: avg, DECIMAL128(38,8), true]); args: DECIMAL64; result: VARBINARY; args nullable: true; result nullable: true], count[([155: count, BIGINT, false]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false], count[([143: ss_list_price, DECIMAL64(7,2), true]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false]
+  |  cardinality: 1
+  |  
+  52:AGGREGATE (merge serialize)
+  |  aggregate: avg[([154: avg, VARBINARY, true]); args: DECIMAL64; result: DECIMAL128(38,8); args nullable: true; result nullable: true], count[([155: count, BIGINT, false]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false]
+  |  group by: [143: ss_list_price, DECIMAL64(7,2), true]
+  |  cardinality: 1040625074
+  |  
+  51:EXCHANGE
+     distribution type: SHUFFLE
+     partition exprs: [143: ss_list_price, DECIMAL64(7,2), true]
+     cardinality: 2081250148
+
+PLAN FRAGMENT 3(F19)
+  Fragment Cost: 4.8534753453045233E11
+
+  Input Partition: RANDOM
+  OutPut Partition: HASH_PARTITIONED: 143: ss_list_price
+  OutPut Exchange Id: 51
+
+  50:AGGREGATE (update serialize)
+  |  STREAMING
+  |  aggregate: avg[([143: ss_list_price, DECIMAL64(7,2), true]); args: DECIMAL64; result: VARBINARY; args nullable: true; result nullable: true], count[([143: ss_list_price, DECIMAL64(7,2), true]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false]
+  |  group by: [143: ss_list_price, DECIMAL64(7,2), true]
+  |  cardinality: 2081250148
+  |  
+  49:Project
+  |  output columns:
+  |  143 <-> [143: ss_list_price, DECIMAL64(7,2), true]
+  |  cardinality: 4162500296
+  |  
+  48:HdfsScanNode
+     TABLE: store_sales
+     NON-PARTITION PREDICATES: 141: ss_quantity >= 26, 141: ss_quantity <= 30, (((143: ss_list_price >= 180) AND (143: ss_list_price <= 190)) OR ((150: ss_coupon_amt >= 12592) AND (150: ss_coupon_amt <= 13592))) OR ((142: ss_wholesale_cost >= 22) AND (142: ss_wholesale_cost <= 42))
+     MIN/MAX PREDICATES: 141: ss_quantity >= 26, 141: ss_quantity <= 30
+     partitions=1/1
+     avgRowSize=4.0
+     cardinality: 4162500296
+
+PLAN FRAGMENT 4(F17)
+  Fragment Cost: 144.0
+
+  Input Partition: UNPARTITIONED
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 46
+
+  45:AGGREGATE (merge finalize)
+  |  aggregate: count[([129: count, BIGINT, false]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false], count[([130: count, BIGINT, false]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false], avg[([128: avg, VARBINARY, true]); args: DECIMAL64; result: DECIMAL128(38,8); args nullable: true; result nullable: true]
+  |  limit: 100
+  |  cardinality: 1
+  |  
+  44:EXCHANGE
+     distribution type: GATHER
+     cardinality: 1
+
+PLAN FRAGMENT 5(F16)
+  Fragment Cost: 1.2987000930370929E11
+
+  Input Partition: HASH_PARTITIONED: 117: ss_list_price
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 44
+
+  43:AGGREGATE (update serialize)
+  |  aggregate: count[([129: count, BIGINT, false]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false], count[([117: ss_list_price, DECIMAL64(7,2), true]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false], avg[([128: avg, DECIMAL128(38,8), true]); args: DECIMAL64; result: VARBINARY; args nullable: true; result nullable: true]
+  |  cardinality: 1
+  |  
+  42:AGGREGATE (merge serialize)
+  |  aggregate: count[([129: count, BIGINT, false]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false], avg[([128: avg, VARBINARY, true]); args: DECIMAL64; result: DECIMAL128(38,8); args nullable: true; result nullable: true]
+  |  group by: [117: ss_list_price, DECIMAL64(7,2), true]
+  |  cardinality: 1040625074
+  |  
+  41:EXCHANGE
+     distribution type: SHUFFLE
+     partition exprs: [117: ss_list_price, DECIMAL64(7,2), true]
+     cardinality: 2081250148
+
+PLAN FRAGMENT 6(F15)
+  Fragment Cost: 4.8534753453045233E11
+
+  Input Partition: RANDOM
+  OutPut Partition: HASH_PARTITIONED: 117: ss_list_price
+  OutPut Exchange Id: 41
+
+  40:AGGREGATE (update serialize)
+  |  STREAMING
+  |  aggregate: count[([117: ss_list_price, DECIMAL64(7,2), true]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false], avg[([117: ss_list_price, DECIMAL64(7,2), true]); args: DECIMAL64; result: VARBINARY; args nullable: true; result nullable: true]
+  |  group by: [117: ss_list_price, DECIMAL64(7,2), true]
+  |  cardinality: 2081250148
+  |  
+  39:Project
+  |  output columns:
+  |  117 <-> [117: ss_list_price, DECIMAL64(7,2), true]
+  |  cardinality: 4162500296
+  |  
+  38:HdfsScanNode
+     TABLE: store_sales
+     NON-PARTITION PREDICATES: 115: ss_quantity >= 21, 115: ss_quantity <= 25, (((117: ss_list_price >= 85) AND (117: ss_list_price <= 95)) OR ((124: ss_coupon_amt >= 3310) AND (124: ss_coupon_amt <= 4310))) OR ((116: ss_wholesale_cost >= 37) AND (116: ss_wholesale_cost <= 57))
+     MIN/MAX PREDICATES: 115: ss_quantity >= 21, 115: ss_quantity <= 25
+     partitions=1/1
+     avgRowSize=4.0
+     cardinality: 4162500296
+
+PLAN FRAGMENT 7(F13)
+  Fragment Cost: 144.0
+
+  Input Partition: UNPARTITIONED
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 36
+
+  35:AGGREGATE (merge finalize)
+  |  aggregate: avg[([102: avg, VARBINARY, true]); args: DECIMAL64; result: DECIMAL128(38,8); args nullable: true; result nullable: true], count[([103: count, BIGINT, false]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false], count[([104: count, BIGINT, false]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false]
+  |  limit: 100
+  |  cardinality: 1
+  |  
+  34:EXCHANGE
+     distribution type: GATHER
+     cardinality: 1
+
+PLAN FRAGMENT 8(F12)
+  Fragment Cost: 1.2987000930370929E11
+
+  Input Partition: HASH_PARTITIONED: 91: ss_list_price
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 34
+
+  33:AGGREGATE (update serialize)
+  |  aggregate: avg[([102: avg, DECIMAL128(38,8), true]); args: DECIMAL64; result: VARBINARY; args nullable: true; result nullable: true], count[([103: count, BIGINT, false]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false], count[([91: ss_list_price, DECIMAL64(7,2), true]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false]
+  |  cardinality: 1
+  |  
+  32:AGGREGATE (merge serialize)
+  |  aggregate: avg[([102: avg, VARBINARY, true]); args: DECIMAL64; result: DECIMAL128(38,8); args nullable: true; result nullable: true], count[([103: count, BIGINT, false]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false]
+  |  group by: [91: ss_list_price, DECIMAL64(7,2), true]
+  |  cardinality: 1040625074
+  |  
+  31:EXCHANGE
+     distribution type: SHUFFLE
+     partition exprs: [91: ss_list_price, DECIMAL64(7,2), true]
+     cardinality: 2081250148
+
+PLAN FRAGMENT 9(F11)
+  Fragment Cost: 4.8534753453045233E11
+
+  Input Partition: RANDOM
+  OutPut Partition: HASH_PARTITIONED: 91: ss_list_price
+  OutPut Exchange Id: 31
+
+  30:AGGREGATE (update serialize)
+  |  STREAMING
+  |  aggregate: avg[([91: ss_list_price, DECIMAL64(7,2), true]); args: DECIMAL64; result: VARBINARY; args nullable: true; result nullable: true], count[([91: ss_list_price, DECIMAL64(7,2), true]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false]
+  |  group by: [91: ss_list_price, DECIMAL64(7,2), true]
+  |  cardinality: 2081250148
+  |  
+  29:Project
+  |  output columns:
+  |  91 <-> [91: ss_list_price, DECIMAL64(7,2), true]
+  |  cardinality: 4162500296
+  |  
+  28:HdfsScanNode
+     TABLE: store_sales
+     NON-PARTITION PREDICATES: 89: ss_quantity >= 16, 89: ss_quantity <= 20, (((91: ss_list_price >= 182) AND (91: ss_list_price <= 192)) OR ((98: ss_coupon_amt >= 3262) AND (98: ss_coupon_amt <= 4262))) OR ((90: ss_wholesale_cost >= 20) AND (90: ss_wholesale_cost <= 40))
+     MIN/MAX PREDICATES: 89: ss_quantity >= 16, 89: ss_quantity <= 20
+     partitions=1/1
+     avgRowSize=4.0
+     cardinality: 4162500296
+
+PLAN FRAGMENT 10(F09)
+  Fragment Cost: 144.0
+
+  Input Partition: UNPARTITIONED
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 26
+
+  25:AGGREGATE (merge finalize)
+  |  aggregate: avg[([76: avg, VARBINARY, true]); args: DECIMAL64; result: DECIMAL128(38,8); args nullable: true; result nullable: true], count[([77: count, BIGINT, false]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false], count[([78: count, BIGINT, false]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false]
+  |  limit: 100
+  |  cardinality: 1
+  |  
+  24:EXCHANGE
+     distribution type: GATHER
+     cardinality: 1
+
+PLAN FRAGMENT 11(F08)
+  Fragment Cost: 1.2987000930370929E11
+
+  Input Partition: HASH_PARTITIONED: 65: ss_list_price
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 24
+
+  23:AGGREGATE (update serialize)
+  |  aggregate: avg[([76: avg, DECIMAL128(38,8), true]); args: DECIMAL64; result: VARBINARY; args nullable: true; result nullable: true], count[([77: count, BIGINT, false]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false], count[([65: ss_list_price, DECIMAL64(7,2), true]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false]
+  |  cardinality: 1
+  |  
+  22:AGGREGATE (merge serialize)
+  |  aggregate: avg[([76: avg, VARBINARY, true]); args: DECIMAL64; result: DECIMAL128(38,8); args nullable: true; result nullable: true], count[([77: count, BIGINT, false]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false]
+  |  group by: [65: ss_list_price, DECIMAL64(7,2), true]
+  |  cardinality: 1040625074
+  |  
+  21:EXCHANGE
+     distribution type: SHUFFLE
+     partition exprs: [65: ss_list_price, DECIMAL64(7,2), true]
+     cardinality: 2081250148
+
+PLAN FRAGMENT 12(F07)
+  Fragment Cost: 4.8534753453045233E11
+
+  Input Partition: RANDOM
+  OutPut Partition: HASH_PARTITIONED: 65: ss_list_price
+  OutPut Exchange Id: 21
+
+  20:AGGREGATE (update serialize)
+  |  STREAMING
+  |  aggregate: avg[([65: ss_list_price, DECIMAL64(7,2), true]); args: DECIMAL64; result: VARBINARY; args nullable: true; result nullable: true], count[([65: ss_list_price, DECIMAL64(7,2), true]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false]
+  |  group by: [65: ss_list_price, DECIMAL64(7,2), true]
+  |  cardinality: 2081250148
+  |  
+  19:Project
+  |  output columns:
+  |  65 <-> [65: ss_list_price, DECIMAL64(7,2), true]
+  |  cardinality: 4162500296
+  |  
+  18:HdfsScanNode
+     TABLE: store_sales
+     NON-PARTITION PREDICATES: 63: ss_quantity >= 11, 63: ss_quantity <= 15, (((65: ss_list_price >= 53) AND (65: ss_list_price <= 63)) OR ((72: ss_coupon_amt >= 3430) AND (72: ss_coupon_amt <= 4430))) OR ((64: ss_wholesale_cost >= 13) AND (64: ss_wholesale_cost <= 33))
+     MIN/MAX PREDICATES: 63: ss_quantity >= 11, 63: ss_quantity <= 15
+     partitions=1/1
+     avgRowSize=4.0
+     cardinality: 4162500296
+
+PLAN FRAGMENT 13(F05)
+  Fragment Cost: 144.0
+
+  Input Partition: UNPARTITIONED
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 16
+
+  15:AGGREGATE (merge finalize)
+  |  aggregate: avg[([50: avg, VARBINARY, true]); args: DECIMAL64; result: DECIMAL128(38,8); args nullable: true; result nullable: true], count[([51: count, BIGINT, false]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false], count[([52: count, BIGINT, false]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false]
+  |  limit: 100
+  |  cardinality: 1
+  |  
+  14:EXCHANGE
+     distribution type: GATHER
+     cardinality: 1
+
+PLAN FRAGMENT 14(F04)
+  Fragment Cost: 1.2987000930370929E11
+
+  Input Partition: HASH_PARTITIONED: 39: ss_list_price
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 14
+
+  13:AGGREGATE (update serialize)
+  |  aggregate: avg[([50: avg, DECIMAL128(38,8), true]); args: DECIMAL64; result: VARBINARY; args nullable: true; result nullable: true], count[([51: count, BIGINT, false]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false], count[([39: ss_list_price, DECIMAL64(7,2), true]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false]
+  |  cardinality: 1
+  |  
+  12:AGGREGATE (merge serialize)
+  |  aggregate: avg[([50: avg, VARBINARY, true]); args: DECIMAL64; result: DECIMAL128(38,8); args nullable: true; result nullable: true], count[([51: count, BIGINT, false]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false]
+  |  group by: [39: ss_list_price, DECIMAL64(7,2), true]
+  |  cardinality: 1040625074
+  |  
+  11:EXCHANGE
+     distribution type: SHUFFLE
+     partition exprs: [39: ss_list_price, DECIMAL64(7,2), true]
+     cardinality: 2081250148
+
+PLAN FRAGMENT 15(F03)
+  Fragment Cost: 4.8534753453045233E11
+
+  Input Partition: RANDOM
+  OutPut Partition: HASH_PARTITIONED: 39: ss_list_price
+  OutPut Exchange Id: 11
+
+  10:AGGREGATE (update serialize)
+  |  STREAMING
+  |  aggregate: avg[([39: ss_list_price, DECIMAL64(7,2), true]); args: DECIMAL64; result: VARBINARY; args nullable: true; result nullable: true], count[([39: ss_list_price, DECIMAL64(7,2), true]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false]
+  |  group by: [39: ss_list_price, DECIMAL64(7,2), true]
+  |  cardinality: 2081250148
+  |  
+  9:Project
+  |  output columns:
+  |  39 <-> [39: ss_list_price, DECIMAL64(7,2), true]
+  |  cardinality: 4162500296
+  |  
+  8:HdfsScanNode
+     TABLE: store_sales
+     NON-PARTITION PREDICATES: 37: ss_quantity >= 6, 37: ss_quantity <= 10, (((39: ss_list_price >= 152) AND (39: ss_list_price <= 162)) OR ((46: ss_coupon_amt >= 2196) AND (46: ss_coupon_amt <= 3196))) OR ((38: ss_wholesale_cost >= 56) AND (38: ss_wholesale_cost <= 76))
+     MIN/MAX PREDICATES: 37: ss_quantity >= 6, 37: ss_quantity <= 10
+     partitions=1/1
+     avgRowSize=4.0
+     cardinality: 4162500296
+
+PLAN FRAGMENT 16(F01)
+  Fragment Cost: 1.2987000930370929E11
+
+  Input Partition: HASH_PARTITIONED: 13: ss_list_price
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 06
+
+  5:AGGREGATE (update serialize)
+  |  aggregate: avg[([24: avg, DECIMAL128(38,8), true]); args: DECIMAL64; result: VARBINARY; args nullable: true; result nullable: true], count[([25: count, BIGINT, false]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false], count[([13: ss_list_price, DECIMAL64(7,2), true]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false]
+  |  cardinality: 1
+  |  
+  4:AGGREGATE (merge serialize)
+  |  aggregate: avg[([24: avg, VARBINARY, true]); args: DECIMAL64; result: DECIMAL128(38,8); args nullable: true; result nullable: true], count[([25: count, BIGINT, false]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false]
+  |  group by: [13: ss_list_price, DECIMAL64(7,2), true]
+  |  cardinality: 1040625074
+  |  
+  3:EXCHANGE
+     distribution type: SHUFFLE
+     partition exprs: [13: ss_list_price, DECIMAL64(7,2), true]
+     cardinality: 2081250148
+
+PLAN FRAGMENT 17(F00)
+  Fragment Cost: 4.8534753453045233E11
+
+  Input Partition: RANDOM
+  OutPut Partition: HASH_PARTITIONED: 13: ss_list_price
+  OutPut Exchange Id: 03
+
+  2:AGGREGATE (update serialize)
+  |  STREAMING
+  |  aggregate: avg[([13: ss_list_price, DECIMAL64(7,2), true]); args: DECIMAL64; result: VARBINARY; args nullable: true; result nullable: true], count[([13: ss_list_price, DECIMAL64(7,2), true]); args: DECIMAL64; result: BIGINT; args nullable: true; result nullable: false]
+  |  group by: [13: ss_list_price, DECIMAL64(7,2), true]
+  |  cardinality: 2081250148
+  |  
+  1:Project
+  |  output columns:
+  |  13 <-> [13: ss_list_price, DECIMAL64(7,2), true]
+  |  cardinality: 4162500296
+  |  
+  0:HdfsScanNode
+     TABLE: store_sales
+     NON-PARTITION PREDICATES: 11: ss_quantity >= 0, 11: ss_quantity <= 5, (((13: ss_list_price >= 73) AND (13: ss_list_price <= 83)) OR ((20: ss_coupon_amt >= 7826) AND (20: ss_coupon_amt <= 8826))) OR ((12: ss_wholesale_cost >= 70) AND (12: ss_wholesale_cost <= 90))
+     MIN/MAX PREDICATES: 11: ss_quantity >= 0, 11: ss_quantity <= 5
+     partitions=1/1
+     avgRowSize=4.0
+     cardinality: 4162500296

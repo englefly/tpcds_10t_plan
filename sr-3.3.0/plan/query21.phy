@@ -1,0 +1,174 @@
+Explain String
+RESOURCE GROUP: default_wg
+
+PLAN FRAGMENT 0(F08)
+  Fragment Cost: 19200.0
+  Output Exprs:7: w_warehouse_name | 20: i_item_id | 71: sum | 72: sum
+  Input Partition: UNPARTITIONED
+  RESULT SINK
+
+  18:MERGING-EXCHANGE
+     distribution type: GATHER
+     limit: 100
+     cardinality: 100
+
+PLAN FRAGMENT 1(F07)
+  Fragment Cost: 9.10953436875E9
+
+  Input Partition: HASH_PARTITIONED: 7: w_warehouse_name, 20: i_item_id
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 18
+
+  17:TOP-N
+  |  order by: [7, VARCHAR, true] ASC, [20, VARCHAR, true] ASC
+  |  offset: 0
+  |  limit: 100
+  |  cardinality: 100
+  |  
+  16:AGGREGATE (merge finalize)
+  |  aggregate: sum[([71: sum, BIGINT, true]); args: INT; result: BIGINT; args nullable: true; result nullable: true], sum[([72: sum, BIGINT, true]); args: INT; result: BIGINT; args nullable: true; result nullable: true]
+  |  group by: [7: w_warehouse_name, VARCHAR, true], [20: i_item_id, VARCHAR, true]
+  |  having: if[([71: sum, BIGINT, true] > 0, cast([72: sum, BIGINT, true] as DOUBLE) / cast([71: sum, BIGINT, true] as DOUBLE), NULL); args: BOOLEAN,DOUBLE,DOUBLE; result: DOUBLE; args nullable: true; result nullable: true] >= cast(2.0 / 3.0 as DOUBLE), if[([71: sum, BIGINT, true] > 0, cast([72: sum, BIGINT, true] as DOUBLE) / cast([71: sum, BIGINT, true] as DOUBLE), NULL); args: BOOLEAN,DOUBLE,DOUBLE; result: DOUBLE; args nullable: true; result nullable: true] <= 1.5
+  |  cardinality: 20333761
+  |  
+  15:EXCHANGE
+     distribution type: SHUFFLE
+     partition exprs: [7: w_warehouse_name, VARCHAR, true], [20: i_item_id, VARCHAR, true]
+     cardinality: 154923891
+
+PLAN FRAGMENT 2(F00)
+  Fragment Cost: 1.855622646615E11
+
+  Input Partition: RANDOM
+  OutPut Partition: HASH_PARTITIONED: 7: w_warehouse_name, 20: i_item_id
+  OutPut Exchange Id: 15
+
+  14:AGGREGATE (update serialize)
+  |  STREAMING
+  |  aggregate: sum[([69: case, INT, true]); args: INT; result: BIGINT; args nullable: true; result nullable: true], sum[([70: case, INT, true]); args: INT; result: BIGINT; args nullable: true; result nullable: true]
+  |  group by: [7: w_warehouse_name, VARCHAR, true], [20: i_item_id, VARCHAR, true]
+  |  cardinality: 154923891
+  |  
+  13:Project
+  |  output columns:
+  |  7 <-> [7: w_warehouse_name, VARCHAR, true]
+  |  20 <-> [20: i_item_id, VARCHAR, true]
+  |  69 <-> if[([43: d_date, DATE, true] < '1999-03-20', [4: inv_quantity_on_hand, INT, true], 0); args: BOOLEAN,INT,INT; result: INT; args nullable: true; result nullable: true]
+  |  70 <-> if[([43: d_date, DATE, true] >= '1999-03-20', [4: inv_quantity_on_hand, INT, true], 0); args: BOOLEAN,INT,INT; result: INT; args nullable: true; result nullable: true]
+  |  cardinality: 295093125
+  |  
+  12:HASH JOIN
+  |  join op: INNER JOIN (BROADCAST)
+  |  equal join conjunct: [2: inv_item_sk, BIGINT, true] = [19: i_item_sk, BIGINT, true]
+  |  build runtime filters:
+  |  - filter_id = 2, build_expr = (19: i_item_sk), remote = false
+  |  output columns: 4, 7, 20, 43
+  |  can local shuffle: true
+  |  cardinality: 295093125
+  |  
+  |----11:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 100500
+  |    
+  8:Project
+  |  output columns:
+  |  2 <-> [2: inv_item_sk, BIGINT, true]
+  |  4 <-> [4: inv_quantity_on_hand, INT, true]
+  |  7 <-> [7: w_warehouse_name, VARCHAR, true]
+  |  43 <-> [43: d_date, DATE, true]
+  |  cardinality: 295093125
+  |  
+  7:HASH JOIN
+  |  join op: INNER JOIN (BROADCAST)
+  |  equal join conjunct: [1: inv_date_sk, BIGINT, true] = [41: d_date_sk, BIGINT, true]
+  |  build runtime filters:
+  |  - filter_id = 1, build_expr = (41: d_date_sk), remote = false
+  |  output columns: 2, 4, 7, 43
+  |  can local shuffle: false
+  |  cardinality: 295093125
+  |  
+  |----6:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 18262
+  |    
+  4:Project
+  |  output columns:
+  |  1 <-> [1: inv_date_sk, BIGINT, true]
+  |  2 <-> [2: inv_item_sk, BIGINT, true]
+  |  4 <-> [4: inv_quantity_on_hand, INT, true]
+  |  7 <-> [7: w_warehouse_name, VARCHAR, true]
+  |  cardinality: 295093125
+  |  
+  3:HASH JOIN
+  |  join op: INNER JOIN (BROADCAST)
+  |  equal join conjunct: [3: inv_warehouse_sk, BIGINT, true] = [5: w_warehouse_sk, BIGINT, true]
+  |  build runtime filters:
+  |  - filter_id = 0, build_expr = (5: w_warehouse_sk), remote = false
+  |  output columns: 1, 2, 4, 7
+  |  can local shuffle: false
+  |  cardinality: 295093125
+  |  
+  |----2:EXCHANGE
+  |       distribution type: BROADCAST
+  |       cardinality: 23
+  |    
+  0:HdfsScanNode
+     TABLE: inventory
+     NON-PARTITION PREDICATES: 3: inv_warehouse_sk IS NOT NULL
+     partitions=1/1
+     avgRowSize=4.0
+     cardinality: 1180372500
+     probe runtime filters:
+     - filter_id = 0, probe_expr = (3: inv_warehouse_sk)
+     - filter_id = 1, probe_expr = (1: inv_date_sk)
+     - filter_id = 2, probe_expr = (2: inv_item_sk)
+
+PLAN FRAGMENT 3(F05)
+  Fragment Cost: 1.2864E7
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 11
+
+  10:Project
+  |  output columns:
+  |  19 <-> [19: i_item_sk, BIGINT, true]
+  |  20 <-> [20: i_item_id, VARCHAR, true]
+  |  cardinality: 100500
+  |  
+  9:HdfsScanNode
+     TABLE: item
+     NON-PARTITION PREDICATES: 24: i_current_price >= 0.99, 24: i_current_price <= 1.49
+     MIN/MAX PREDICATES: 24: i_current_price >= 0.99, 24: i_current_price <= 1.49
+     partitions=1/1
+     avgRowSize=3.0
+     cardinality: 100500
+
+PLAN FRAGMENT 4(F03)
+  Fragment Cost: 876588.0
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 06
+
+  5:HdfsScanNode
+     TABLE: date_dim
+     NON-PARTITION PREDICATES: 43: d_date >= '1999-02-18', 43: d_date <= '1999-04-19'
+     MIN/MAX PREDICATES: 43: d_date >= '1999-02-18', 43: d_date <= '1999-04-19'
+     partitions=1/1
+     avgRowSize=2.0
+     cardinality: 18262
+
+PLAN FRAGMENT 5(F01)
+  Fragment Cost: 2160.0
+
+  Input Partition: RANDOM
+  OutPut Partition: UNPARTITIONED
+  OutPut Exchange Id: 02
+
+  1:HdfsScanNode
+     TABLE: warehouse
+     NON-PARTITION PREDICATES: 5: w_warehouse_sk IS NOT NULL
+     partitions=1/1
+     avgRowSize=2.0
+     cardinality: 23

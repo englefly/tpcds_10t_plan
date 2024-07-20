@@ -1,0 +1,85 @@
+Explain String
+- Output => [62:ca_zip, 60:ca_county, 139:sum]
+    - TOP-100(FINAL)[62: ca_zip ASC NULLS FIRST, 60: ca_county ASC NULLS FIRST]
+            Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 1.1298277767657277E13}
+        - TOP-100(PARTIAL)[62: ca_zip ASC NULLS FIRST, 60: ca_county ASC NULLS FIRST]
+                Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 1.1298277748457277E13}
+            - AGGREGATE(GLOBAL) [62:ca_zip, 60:ca_county]
+                    Estimates: {row: 1116275563, cpu: ?, memory: ?, network: ?, cost: 1.1191115284733691E13}
+                    139:sum := sum(139:sum)
+                - EXCHANGE(SHUFFLE) [62, 60]
+                        Estimates: {row: 2126239169, cpu: ?, memory: ?, network: ?, cost: 1.1032923090551256E13}
+                    - AGGREGATE(LOCAL) [62:ca_zip, 60:ca_county]
+                            Estimates: {row: 2126239169, cpu: ?, memory: ?, network: ?, cost: 1.1012511194527717E13}
+                            139:sum := sum(22:ws_sales_price)
+                        - CTEAnchor[1]
+                                Estimates: {row: 4049979369, cpu: ?, memory: ?, network: ?, cost: 1.0974279389277277E13}
+                            - CTEProduce[1]
+                                - HIVE-SCAN [item] => [117:i_item_id]
+                                        Estimates: {row: 201000, cpu: ?, memory: ?, network: ?, cost: 1.9296E7}
+                                        predicate: 116:i_item_sk IN (2, 3, 5, 7, 11, 13, 17, 19, 23, 29)
+                            - NESTLOOP/INNER JOIN [substr(62:ca_zip, 1, 5) IN ('85669', '86197', '88274', '83405', '86475', '85392', '85460', '80348', '81792') OR CASE WHEN 142:countRows IS NULL OR 142:countRows = 0 THEN false WHEN 95:i_item_id IS NULL THEN null WHEN 140:i_item_id IS NOT NULL THEN true WHEN 143:countNotNulls < 142:countRows THEN null ELSE false END] => [22:ws_sales_price, 60:ca_county, 62:ca_zip]
+                                    Estimates: {row: 4049979369, cpu: ?, memory: ?, network: ?, cost: 1.0974244656477277E13}
+                                - HASH/LEFT OUTER JOIN [95:i_item_id = 140:i_item_id]
+                                        Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 3.509322514238877E12}
+                                    - HASH/INNER JOIN [4:ws_item_sk = 94:i_item_sk] => [22:ws_sales_price, 60:ca_county, 62:ca_zip, 95:i_item_id]
+                                            Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 3.094552768776477E12}
+                                        - HASH/INNER JOIN [1:ws_sold_date_sk = 66:d_date_sk] => [4:ws_item_sk, 22:ws_sales_price, 60:ca_county, 62:ca_zip]
+                                                Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 2.6607284152858003E12}
+                                            - HASH/INNER JOIN [39:c_current_addr_sk = 53:ca_address_sk] => [1:ws_sold_date_sk, 4:ws_item_sk, 22:ws_sales_price, 60:ca_county, 62:ca_zip]
+                                                    Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 2.2719203880768003E12}
+                                                - EXCHANGE(SHUFFLE) [39]
+                                                        Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 1.9255777295136E12}
+                                                    - HASH/INNER JOIN [5:ws_bill_customer_sk = 35:c_customer_sk] => [1:ws_sold_date_sk, 4:ws_item_sk, 22:ws_sales_price, 39:c_current_addr_sk]
+                                                            Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 1.5108598420512002E12}
+                                                        - EXCHANGE(SHUFFLE) [5]
+                                                                Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 1.2441536623872002E12}
+                                                            - HIVE-SCAN [web_sales] => [1:ws_sold_date_sk, 4:ws_item_sk, 5:ws_bill_customer_sk, 22:ws_sales_price]
+                                                                    Estimates: {row: 6479966991, cpu: ?, memory: ?, network: ?, cost: 8.294357749248E11}
+                                                                    predicate: 5:ws_bill_customer_sk IS NOT NULL
+                                                        - EXCHANGE(SHUFFLE) [35]
+                                                                Estimates: {row: 58500000, cpu: ?, memory: ?, network: ?, cost: 5.616E9}
+                                                            - HIVE-SCAN [customer] => [35:c_customer_sk, 39:c_current_addr_sk]
+                                                                    Estimates: {row: 58500000, cpu: ?, memory: ?, network: ?, cost: 3.744E9}
+                                                                    predicate: 35:c_customer_sk IS NOT NULL
+                                                - EXCHANGE(SHUFFLE) [53]
+                                                        Estimates: {row: 29250000, cpu: ?, memory: ?, network: ?, cost: 7.02E9}
+                                                    - HIVE-SCAN [customer_address] => [53:ca_address_sk, 60:ca_county, 62:ca_zip]
+                                                            Estimates: {row: 29250000, cpu: ?, memory: ?, network: ?, cost: 4.68E9}
+                                                            predicate: 53:ca_address_sk IS NOT NULL
+                                            - EXCHANGE(BROADCAST)
+                                                    Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 7012704.0}
+                                                - HIVE-SCAN [date_dim] => [66:d_date_sk]
+                                                        Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 1168784.0}
+                                                        predicate: 76:d_qoy = 1 AND 72:d_year = 1998
+                                        - EXCHANGE(BROADCAST)
+                                                Estimates: {row: 361800, cpu: ?, memory: ?, network: ?, cost: 3.820608E8}
+                                            - HIVE-SCAN [item] => [94:i_item_sk, 95:i_item_id]
+                                                    Estimates: {row: 361800, cpu: ?, memory: ?, network: ?, cost: 3.47328E7}
+                                                    predicate: 94:i_item_sk IS NOT NULL
+                                    - EXCHANGE(BROADCAST)
+                                            Estimates: {row: 50250, cpu: ?, memory: ?, network: ?, cost: 3.5376E7}
+                                        - AGGREGATE(GLOBAL) [140:i_item_id]
+                                                Estimates: {row: 50250, cpu: ?, memory: ?, network: ?, cost: 3216000.0}
+                                            - EXCHANGE(SHUFFLE) [140]
+                                                    Estimates: {row: 100500, cpu: ?, memory: ?, network: ?, cost: 804000.0}
+                                                - AGGREGATE(LOCAL) [140:i_item_id]
+                                                        Estimates: {row: 100500, cpu: ?, memory: ?, network: ?, cost: 482400.0}
+                                                    - CTEConsume[1]
+                                                            140:i_item_id := 117:i_item_id
+                                                            Estimates: {row: 201000, cpu: ?, memory: ?, network: ?, cost: 0.0}
+                                - EXCHANGE(BROADCAST)
+                                        Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 161515.2}
+                                    - AGGREGATE(GLOBAL) []
+                                            Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 160875.2}
+                                            142:countRows := count(142:countRows)
+                                            143:countNotNulls := count(143:countNotNulls)
+                                        - EXCHANGE(GATHER)
+                                                Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 160835.2}
+                                            - AGGREGATE(LOCAL) []
+                                                    Estimates: {row: 1, cpu: ?, memory: ?, network: ?, cost: 160803.2}
+                                                    142:countRows := count(1)
+                                                    143:countNotNulls := count(141:i_item_id)
+                                                - CTEConsume[1]
+                                                        141:i_item_id := 117:i_item_id
+                                                        Estimates: {row: 201000, cpu: ?, memory: ?, network: ?, cost: 0.0}

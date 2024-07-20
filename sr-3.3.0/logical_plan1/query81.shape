@@ -1,0 +1,76 @@
+Explain String
+- Output => [153:c_customer_id, 159:c_salutation, 160:c_first_name, 161:c_last_name, 141:ca_street_number, 142:ca_street_name, 143:ca_street_type, 144:ca_suite_number, 145:ca_city, 146:ca_county, 147:ca_state, 148:ca_zip, 149:ca_country, 150:ca_gmt_offset, 151:ca_location_type, 138:sum]
+    - CTEAnchor[1]
+            Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 7.696761837183552E11}
+        - CTEProduce[1]
+            - AGGREGATE(GLOBAL) [8:cr_returning_customer_sk, 64:ca_state]
+                    Estimates: {row: 357218213, cpu: ?, memory: ?, network: ?, cost: 3.8324833849708E11}
+                    69:sum := sum(69:sum)
+                - EXCHANGE(SHUFFLE) [8, 64]
+                        Estimates: {row: 680415645, cpu: ?, memory: ?, network: ?, cost: 3.4106256848104004E11}
+                    - AGGREGATE(LOCAL) [8:cr_returning_customer_sk, 64:ca_state]
+                            Estimates: {row: 680415645, cpu: ?, memory: ?, network: ?, cost: 3.3561924331768005E11}
+                            69:sum := sum(21:cr_return_amt_inc_tax)
+                        - HASH/INNER JOIN [11:cr_returning_addr_sk = 56:ca_address_sk] => [21:cr_return_amt_inc_tax, 8:cr_returning_customer_sk, 64:ca_state]
+                                Estimates: {row: 1296029800, cpu: ?, memory: ?, network: ?, cost: 3.270654466324E11}
+                            - EXCHANGE(SHUFFLE) [11]
+                                    Estimates: {row: 1296029800, cpu: ?, memory: ?, network: ?, cost: 2.747777488036E11}
+                                - HASH/INNER JOIN [1:cr_returned_date_sk = 28:d_date_sk] => [21:cr_return_amt_inc_tax, 8:cr_returning_customer_sk, 11:cr_returning_addr_sk]
+                                        Estimates: {row: 1296029800, cpu: ?, memory: ?, network: ?, cost: 2.125683183652E11}
+                                    - HIVE-SCAN [catalog_returns] => [1:cr_returned_date_sk, 21:cr_return_amt_inc_tax, 8:cr_returning_customer_sk, 11:cr_returning_addr_sk]
+                                            Estimates: {row: 1296029800, cpu: ?, memory: ?, network: ?, cost: 1.658918145024E11}
+                                            predicate: 1:cr_returned_date_sk IS NOT NULL
+                                    - EXCHANGE(BROADCAST)
+                                            Estimates: {row: 36524, cpu: ?, memory: ?, network: ?, cost: 1.3441016E7}
+                                        - HIVE-SCAN [date_dim] => [28:d_date_sk]
+                                                Estimates: {row: 36524, cpu: ?, memory: ?, network: ?, cost: 1753176.0}
+                                                predicate: 34:d_year = 1998
+                            - EXCHANGE(SHUFFLE) [56]
+                                    Estimates: {row: 29250000, cpu: ?, memory: ?, network: ?, cost: 4.212E9}
+                                - HIVE-SCAN [customer_address] => [56:ca_address_sk, 64:ca_state]
+                                        Estimates: {row: 29250000, cpu: ?, memory: ?, network: ?, cost: 2.808E9}
+                                        predicate: 56:ca_address_sk IS NOT NULL
+        - TOP-100(FINAL)[153: c_customer_id ASC NULLS FIRST, 159: c_salutation ASC NULLS FIRST, 160: c_first_name ASC NULLS FIRST, 161: c_last_name ASC NULLS FIRST, 141: ca_street_number ASC NULLS FIRST, 142: ca_street_name ASC NULLS FIRST, 143: ca_street_type ASC NULLS FIRST, 144: ca_suite_number ASC NULLS FIRST, 145: ca_city ASC NULLS FIRST, 146: ca_county ASC NULLS FIRST, 147: ca_state ASC NULLS FIRST, 148: ca_zip ASC NULLS FIRST, 149: ca_country ASC NULLS FIRST, 150: ca_gmt_offset ASC NULLS FIRST, 151: ca_location_type ASC NULLS FIRST, 138: sum ASC NULLS FIRST]
+                Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 3.178419481629392E11}
+            - TOP-100(PARTIAL)[153: c_customer_id ASC NULLS FIRST, 159: c_salutation ASC NULLS FIRST, 160: c_first_name ASC NULLS FIRST, 161: c_last_name ASC NULLS FIRST, 141: ca_street_number ASC NULLS FIRST, 142: ca_street_name ASC NULLS FIRST, 143: ca_street_type ASC NULLS FIRST, 144: ca_suite_number ASC NULLS FIRST, 145: ca_city ASC NULLS FIRST, 146: ca_county ASC NULLS FIRST, 147: ca_state ASC NULLS FIRST, 148: ca_zip ASC NULLS FIRST, 149: ca_country ASC NULLS FIRST, 150: ca_gmt_offset ASC NULLS FIRST, 151: ca_location_type ASC NULLS FIRST, 138: sum ASC NULLS FIRST]
+                    Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 3.178418457629392E11}
+                - HASH/INNER JOIN [156:c_current_addr_sk = 139:ca_address_sk] => [161:c_last_name, 138:sum, 141:ca_street_number, 142:ca_street_name, 143:ca_street_type, 144:ca_suite_number, 145:ca_city, 146:ca_county, 147:ca_state, 148:ca_zip, 149:ca_country, 150:ca_gmt_offset, 151:ca_location_type, 153:c_customer_id, 159:c_salutation, 160:c_first_name]
+                        Estimates: {row: 178609106, cpu: ?, memory: ?, network: ?, cost: 2.2353618450772723E11}
+                    - EXCHANGE(SHUFFLE) [156]
+                            Estimates: {row: 178609106, cpu: ?, memory: ?, network: ?, cost: 1.462218150226566E11}
+                        - HASH/INNER JOIN [77:cr_returning_customer_sk = 152:c_customer_sk] => [161:c_last_name, 153:c_customer_id, 138:sum, 156:c_current_addr_sk, 159:c_salutation, 160:c_first_name]
+                                Estimates: {row: 178609106, cpu: ?, memory: ?, network: ?, cost: 1.147866122042526E11}
+                            - EXCHANGE(SHUFFLE) [77]
+                                    Estimates: {row: 178609106, cpu: ?, memory: ?, network: ?, cost: 6.95718793611966E10}
+                                - HASH/INNER JOIN [133:ca_state = 233:ca_state AND cast(138:sum as double) > cast(239:avg * 1.2 as double)] => [138:sum, 77:cr_returning_customer_sk]
+                                        Estimates: {row: 178609106, cpu: ?, memory: ?, network: ?, cost: 6.099864222890459E10}
+                                    - EXCHANGE(SHUFFLE) [133]
+                                            Estimates: {row: 357218213, cpu: ?, memory: ?, network: ?, cost: 2.857745710764E10}
+                                        - CTEConsume[1]
+                                                133:ca_state := 64:ca_state
+                                                138:sum := 69:sum
+                                                77:cr_returning_customer_sk := 8:cr_returning_customer_sk
+                                                Estimates: {row: 357218213, cpu: ?, memory: ?, network: ?, cost: 0.0}
+                                    - AGGREGATE(GLOBAL) [233:ca_state]
+                                            Estimates: {row: 89304553, cpu: ?, memory: ?, network: ?, cost: 1.15738701285942E10}
+                                            239:avg := avg(239:avg)
+                                        - EXCHANGE(SHUFFLE) [233]
+                                                Estimates: {row: 178609106, cpu: ?, memory: ?, network: ?, cost: 3.0006329963022E9}
+                                            - AGGREGATE(LOCAL) [233:ca_state]
+                                                    Estimates: {row: 178609106, cpu: ?, memory: ?, network: ?, cost: 1.8575347119966E9}
+                                                    239:avg := avg(238:sum)
+                                                - CTEConsume[1]
+                                                        233:ca_state := 64:ca_state
+                                                        238:sum := 69:sum
+                                                        Estimates: {row: 357218213, cpu: ?, memory: ?, network: ?, cost: 0.0}
+                                                        predicate: 233:ca_state IS NOT NULL
+                            - EXCHANGE(SHUFFLE) [152]
+                                    Estimates: {row: 52650000, cpu: ?, memory: ?, network: ?, cost: 2.5272E10}
+                                - HIVE-SCAN [customer] => [161:c_last_name, 152:c_customer_sk, 153:c_customer_id, 156:c_current_addr_sk, 159:c_salutation, 160:c_first_name]
+                                        Estimates: {row: 52650000, cpu: ?, memory: ?, network: ?, cost: 1.6848E10}
+                                        predicate: 156:c_current_addr_sk IS NOT NULL AND 152:c_customer_sk IS NOT NULL
+                    - EXCHANGE(SHUFFLE) [139]
+                            Estimates: {row: 32500000, cpu: ?, memory: ?, network: ?, cost: 3.432E10}
+                        - HIVE-SCAN [customer_address] => [145:ca_city, 146:ca_county, 147:ca_state, 148:ca_zip, 149:ca_country, 150:ca_gmt_offset, 151:ca_location_type, 139:ca_address_sk, 141:ca_street_number, 142:ca_street_name, 143:ca_street_type, 144:ca_suite_number]
+                                Estimates: {row: 32500000, cpu: ?, memory: ?, network: ?, cost: 2.288E10}
+                                predicate: 147:ca_state = 'TX'

@@ -1,0 +1,54 @@
+Explain String
+- Output => [72:w_state, 77:i_item_id, 128:sum, 129:sum]
+    - TOP-100(FINAL)[72: w_state ASC NULLS FIRST, 77: i_item_id ASC NULLS FIRST]
+            Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 4.0325301695217505E12}
+        - TOP-100(PARTIAL)[72: w_state ASC NULLS FIRST, 77: i_item_id ASC NULLS FIRST]
+                Estimates: {row: 100, cpu: ?, memory: ?, network: ?, cost: 4.0325301439217505E12}
+            - AGGREGATE(GLOBAL) [72:w_state, 77:i_item_id]
+                    Estimates: {row: 893022811, cpu: ?, memory: ?, network: ?, cost: 3.9182232112537705E12}
+                    129:sum := sum(129:sum)
+                    128:sum := sum(128:sum)
+                - EXCHANGE(SHUFFLE) [72, 77]
+                        Estimates: {row: 1700995831, cpu: ?, memory: ?, network: ?, cost: 3.74948442478199E12}
+                    - AGGREGATE(LOCAL) [72:w_state, 77:i_item_id]
+                            Estimates: {row: 1700995831, cpu: ?, memory: ?, network: ?, cost: 3.72771167814047E12}
+                            129:sum := sum(127:case)
+                            128:sum := sum(126:case)
+                        - HASH/INNER JOIN [16:cs_item_sk = 76:i_item_sk] => [72:w_state, 77:i_item_id, 126:case, 127:case]
+                                Estimates: {row: 3239992059, cpu: ?, memory: ?, network: ?, cost: 3.692330964848E12}
+                                126:case := if(100:d_date < 2000-03-18, 133:subtract, 0)
+                                127:case := if(100:d_date >= 2000-03-18, 133:subtract, 0)
+                                130:cast := cast(22:cs_sales_price as decimal(8, 2)), 
+                                131:coalesce := coalesce(58:cr_refunded_cash, 0), 
+                                132:cast := cast(131:coalesce as decimal(8, 2)), 
+                                133:subtract := 130:cast - 132:cast, 
+                            - HASH/LEFT OUTER JOIN [18:cs_order_number = 51:cr_order_number AND 16:cs_item_sk = 37:cr_item_sk] => [100:d_date, 22:cs_sales_price, 72:w_state, 58:cr_refunded_cash, 16:cs_item_sk]
+                                    Estimates: {row: 3239992059, cpu: ?, memory: ?, network: ?, cost: 3.484812683024E12}
+                                - EXCHANGE(SHUFFLE) [18, 16]
+                                        Estimates: {row: 3239992059, cpu: ?, memory: ?, network: ?, cost: 2.896567071228E12}
+                                    - HASH/INNER JOIN [1:cs_sold_date_sk = 98:d_date_sk] => [18:cs_order_number, 100:d_date, 22:cs_sales_price, 72:w_state, 16:cs_item_sk]
+                                            Estimates: {row: 3239992059, cpu: ?, memory: ?, network: ?, cost: 2.61144776997E12}
+                                        - HASH/INNER JOIN [15:cs_warehouse_sk = 62:w_warehouse_sk] => [1:cs_sold_date_sk, 18:cs_order_number, 22:cs_sales_price, 72:w_state, 16:cs_item_sk]
+                                                Estimates: {row: 3239992059, cpu: ?, memory: ?, network: ?, cost: 2.436474063762E12}
+                                            - HIVE-SCAN [catalog_sales] => [1:cs_sold_date_sk, 18:cs_order_number, 22:cs_sales_price, 15:cs_warehouse_sk, 16:cs_item_sk]
+                                                    Estimates: {row: 12959968239, cpu: ?, memory: ?, network: ?, cost: 2.07359491824E12}
+                                                    predicate: 15:cs_warehouse_sk IS NOT NULL
+                                            - EXCHANGE(BROADCAST)
+                                                    Estimates: {row: 22, cpu: ?, memory: ?, network: ?, cost: 23760.0}
+                                                - HIVE-SCAN [warehouse] => [72:w_state, 62:w_warehouse_sk]
+                                                        Estimates: {row: 22, cpu: ?, memory: ?, network: ?, cost: 2160.0}
+                                                        predicate: 62:w_warehouse_sk IS NOT NULL
+                                        - EXCHANGE(BROADCAST)
+                                                Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 9642468.0}
+                                            - HIVE-SCAN [date_dim] => [98:d_date_sk, 100:d_date]
+                                                    Estimates: {row: 18262, cpu: ?, memory: ?, network: ?, cost: 876588.0}
+                                                    predicate: 100:d_date >= 2000-02-17 AND 100:d_date <= 2000-04-17
+                                - EXCHANGE(SHUFFLE) [51, 37]
+                                        Estimates: {row: 1440033112, cpu: ?, memory: ?, network: ?, cost: 2.07364768128E11}
+                                    - HIVE-SCAN [catalog_returns] => [51:cr_order_number, 37:cr_item_sk, 58:cr_refunded_cash]
+                                            Estimates: {row: 1440033112, cpu: ?, memory: ?, network: ?, cost: 1.38243178752E11}
+                            - EXCHANGE(BROADCAST)
+                                    Estimates: {row: 100500, cpu: ?, memory: ?, network: ?, cost: 1.09344E8}
+                                - HIVE-SCAN [item] => [76:i_item_sk, 77:i_item_id]
+                                        Estimates: {row: 100500, cpu: ?, memory: ?, network: ?, cost: 1.2864E7}
+                                        predicate: 81:i_current_price >= 0.99 AND 81:i_current_price <= 1.49
